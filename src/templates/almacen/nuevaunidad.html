@@ -1,0 +1,42 @@
+{% extends "base/baseform.html" %}	
+
+
+	{% block tituloform %}
+		Nueva Unidad de Medida
+	{% endblock tituloform %}
+
+	{% block iddanger %}
+	    id="danger"
+	{% endblock iddanger %}
+	
+	{% block formulario %}
+
+		{% csrf_token %}
+		{% comment %}
+		{% for field in form %}
+		    <div class="fieldWrapper">
+		        {{ field.errors }}
+		        {{ field.label_tag }} 
+		        {{ field }}
+		    </div>
+		{% endfor %}
+		{% endcomment %}
+
+		
+
+
+		{% load bootstrap3 %}
+		{% bootstrap_form form %}
+
+		{% buttons %}
+	        <div class="text-center"> 
+	        <button type="submit" class="btn btn-primary btninter">
+	            {% bootstrap_icon "glyphicon glyphicon-ok" %} Guardar
+	        </button>
+	        <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger">{% bootstrap_icon "glyphicon glyphicon-remove" %} Cancelar</a>
+	    </div>	
+	    {% endbuttons %}
+	
+		
+	
+	{% endblock formulario %}

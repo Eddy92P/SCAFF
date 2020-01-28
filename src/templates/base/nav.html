@@ -1,0 +1,272 @@
+<style type="text/css">
+      
+      * {
+        margin:0px;
+        padding:0px;
+      }
+      
+      #header {
+        margin:auto;
+        width:500px;
+        font-family:Arial, Helvetica, sans-serif;
+      }
+      
+      ul, ol {
+        list-style:none;
+      }
+      
+      .nav > li {
+        float:left;
+      }
+      
+      .nav li a {
+        background-color:#1A1919;
+        color:#FFF;
+        text-decoration:none;
+        padding:13px 15px;
+        display:block;
+      }
+      
+      .nav li a:hover {
+        background-color:#FFF;
+        color:#1A1919
+      }
+      
+      .nav li ul {
+        display:none;
+        position:absolute;
+        min-width:140px;
+      }
+      .nav li:hover > ul {
+        display:block;
+      }
+      
+      .nav li ul li {
+        position:relative;
+      }
+      
+      .nav li ul li ul {
+        right:-140px;
+        top:0px;
+      }
+      
+</style>
+
+<nav class="navbar navbar-dark" style="background-color: #1A1919;">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" style="color: white;" href="/">MINDES S.R.L.</a>
+    </div>
+
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+       
+      {% if perms.auth.view_personal %}
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Personal <span class="caret"></span></a>
+          <ul style="background-color: #1A1919;" class="dropdown-menu">
+            {% if perms.usuarios.add_kardex %}
+            <li><a href="{% url 'personal:nuevousuario' %}">Nuevo usuario</a></li>
+            {% endif %}
+            <li><a href="{% url 'personal:listapersonal' %}">Personal</a></li>
+            <li><a href="{% url 'personal:listausuario' %}">Listado de usuarios</a></li>
+          </ul>
+        </li>
+      {% endif %}
+      {% if perms.auth.view_contabilidad %}
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contabilidad <span class="caret"></span></a>
+          <ul style="background-color: #1A1919;" class="dropdown-menu">
+            {% if perms.contabilidad.add_cotizacion %}
+            <li><a href="{% url 'contabilidad:cotizacion_tcupload' %}">Importar Tipo de Cambio/UFVs</a></li>
+            <li><a href="{% url 'contabilidad:listacotizacion_tc' %}">Tipo de Cambio/UFVs</a></li>
+            {% endif %}
+            {% if perms.contabilidad.add_asiento %}
+            <li><a href="{% url 'contabilidad:nuevoasiento' %}">Nuevo Asiento</a></li>
+            <li><a href="{% url 'contabilidad:retencion' %}">Retenciones</a></li>
+            {% endif %}
+            <li>
+              <a href="#">Libros</a>
+              <ul>
+                {% if perms.contabilidad.add_asiento %}
+                  <li><a href="{% url 'contabilidad:listalibromay' %}">Libro Mayor</a></li>
+                {% endif %}
+                {% if perms.contabilidad.add_factura %}
+                  <li><a href="{% url 'contabilidad:listafacturat' %}">Libro de Compras</a></li>
+                  <li><a href="{% url 'contabilidad:listafacturavt' %}">Libro de Ventas</a></li>
+                {% endif %}
+              </ul>
+            </li>
+            <li>
+              {% if perms.contabilidad.add_nivel_uno %}
+              <a href="#">Plan de Cuentas</a>
+              <ul>
+                <li><a href="{% url 'contabilidad:listacuenta1' %}">Grupo</a></li>
+                <li><a href="{% url 'contabilidad:listacuenta2' %}">Rubro</a></li>
+                <li><a href="{% url 'contabilidad:listacuenta3' %}">Título</a></li>
+                <li><a href="{% url 'contabilidad:listacuenta4' %}">Cuenta</a></li>
+                <li><a href="{% url 'contabilidad:listacuenta5' %}">Sub Cuenta</a></li>
+                <li><a href="{% url 'contabilidad:listaplancuenta' %}">General</a></li>
+              </ul>
+              {% endif %}
+            </li> 
+          <li>
+          <a href="#">Listados</a>
+          <ul>
+            {% if perms.contabilidad.add_asiento %}
+            <li><a href="{% url 'contabilidad:listaasiento' %}">Asientos</a></li>
+            <li><a href="{% url 'contabilidad:listabancarizacion' %}">Bancarización</a></li>
+            {% endif %}
+          </ul>
+          </li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Estados Financieros<span class="caret"></span></a>
+          <ul style="background-color: #1A1919;" class="dropdown-menu">
+            {% if perms.contabilidad.add_asiento %}
+            <li><a href="{% url 'contabilidad:cuentas_balance' %}">Balance General</a></li>
+            <li><a href="{% url 'contabilidad:estado_resultados' %}">Estado de Resultados</a></li>
+            <li><a href="{% url 'contabilidad:estado_ev' %}">Estado de Evolución del Patrimonio</a></li>
+            <li><a href="{% url 'contabilidad:costo_servicio' %}">Estado de Costo de Servicio</a></li>
+            {% endif %}
+          </ul>
+        </li>
+      {% endif %}
+
+      {% if perms.auth.view_almacenes %}
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Almacenes<span class="caret"></span></a>
+          <ul style="background-color: #1A1919;" class="dropdown-menu">
+            {% if perms.almacenes.add_ingresoitem %}
+            <li>
+              <a href="#">Proveedores, Clientes</a>
+              <ul>
+                <li><a href="{% url 'almacenes:listaproveedor' %}">Proveedores</a></li>
+                <li><a href="{% url 'almacenes:listacliente' %}">Clientes</a></li>  
+              </ul>
+            </li>
+            <li><a href="{% url 'almacenes:listaunidad' %}">Unidades</a></li>
+            <li>
+              <a href="#">Tipos de Movimiento</a>
+              <ul>
+                <li><a href="{% url 'almacenes:listatipo_entrada' %}">Tipos de Entrada</a></li>
+                <li><a href="{% url 'almacenes:listatipo_salida' %}">Tipos de Salida</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#">Items</a>
+              <ul>
+                <li><a href="{% url 'almacenes:listacategoria' %}">Categorías</a></li>
+                <li><a href="{% url 'almacenes:listasubcategoria' %}">Sub-Categorías</a></li>
+                <li><a href="{% url 'almacenes:listaitem' %}">Items</a></li>
+              </ul>
+            </li>
+            {% endif %}
+            <li>
+              <a href="#">Movimientos</a>
+              <ul>
+                <li><a href="{% url 'almacenes:listaingreso' %}">Ingreso Item</a></li>
+                <li><a href="{% url 'almacenes:listasalida' %}">Salida Item</a></li>
+              </ul>
+            </li>
+            {% if perms.contabilidad.add_asiento %}
+            <li><a href="{% url 'almacenes:act_inventario' %}">Actualización de inventario</a></li>
+            {% endif %}
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Reportes Almacenes<span class="caret"></span></a>
+          <ul style="background-color: #1A1919;" class="dropdown-menu">
+            {% if perms.almacenes.add_ingresoitem %}
+            <li><a href="{% url 'almacenes:rep_kardex_temp' %}">Reporte General</a></li>
+            <li>
+              <a href="#">Reportes Diarios</a>
+              <ul>
+                <li><a href="{% url 'almacenes:rep_diario_e_temp' %}">Entradas</a></li>
+                <li><a href="{% url 'almacenes:rep_diario_s_temp' %}">Salidas</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#">Kardex</a>
+              <ul>
+                <li><a href="{% url 'almacenes:listaitemt' %}">Físico Valorado</a></li>
+                <li><a href="{% url 'almacenes:res_kardex' %}">Resumen</a></li>
+              </ul>
+            </li>
+            <li><a href="{% url 'almacenes:resumen_eys_temp' %}">Reporte Resumen de Entradas y Salidas</a></li>
+            <li>
+              <a href="#">Detalles</a>
+              <ul>
+                <li><a href="{% url 'almacenes:detalle_entradas' %}">Entradas</a></li>
+                <li><a href="{% url 'almacenes:detalle_salidas' %}">Salidas</a></li>
+                <li><a href="{% url 'almacenes:detalle_clientes' %}">Clientes</a></li>
+                <li><a href="{% url 'almacenes:detalle_proveedores' %}">Proveedores</a></li>
+              </ul>
+            </li>
+            {% endif %}
+          </ul>
+        </li>
+      {% endif %}
+      {% if perms.auth.view_activos_f%}
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Activos Fijos<span class="caret"></span></a>
+          <ul style="background-color: #1A1919;" class="dropdown-menu">
+          <li>
+            <a href="#">Registro Activos Fijos</a>
+              <ul>
+                <li><a href="{% url 'activos_f:listaubicacion' %}">Ubicación</a></li>
+                <li><a href="{% url 'almacenes:listaitemact' %}">Asignar Items</a></li>
+                <li><a href="{% url 'activos_f:listarubro' %}">Rubros</a></li>
+                <li><a href="{% url 'activos_f:listatipo_bien' %}">Tipos de Bien</a></li>
+              </ul>
+          </li>
+          <li>
+            <a href="#">Listados</a>
+              <ul>
+              <li><a href="{% url 'almacenes:listasalidaf' %}">Items (A capitalizar)</a></li>
+              <li><a href="{% url 'almacenes:listaitemactivo' %}">Salidas (Alta Activo Fijo)</a></li>
+              <li><a href="{% url 'activos_f:lista_altaactivo' %}">Listado de Altas</a></li>
+              <li><a href="{% url 'activos_f:lista_bajaactivo' %}">Listado de Bajas</a></li>
+              <li><a href="{% url 'activos_f:lista_capitalizacion' %}">Listado de Capitalizaciones</a></li>  
+            </ul>
+          </li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Reportes Activos Fijos<span class="caret"></span></a>
+          <ul style="background-color: #1A1919;" class="dropdown-menu">
+            <li><a href="{% url 'activos_f:temp_espec_bien' %}">Reporte Específico/General de Bienes</a></li>
+            <li><a href="{% url 'activos_f:temp_alta_baja' %}">Reporte Altas/Bajas de Activos</a></li>
+            <li><a href="{% url 'activos_f:temp_inventario' %}">Reporte de Inventario</a></li>
+          </ul>
+        </li>
+      {% endif %}
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+       
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"> 
+            {{ request.user.username }} 
+            <span class="glyphicon glyphicon-cog"></span> 
+            <span class="caret"></span>
+          </a>
+          <ul style="background-color: #1A1919;" class="dropdown-menu" role="menu">
+            <li><a href="{% url 'personal:reset_password' %}">Cambiar Contraseña</a></li>
+            <li><a href="{% url 'personal:updateusuariofronuser' %}">Actualizar información</a></li>
+           
+            <li class="divider"></li>
+            <li><a href="{% url "personal:logout" %}">Salir</a></li>
+          </ul>
+        </li>
+      </ul>
+
+    </div>
+  </div>
+</nav>

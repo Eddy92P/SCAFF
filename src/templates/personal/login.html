@@ -1,0 +1,71 @@
+{% extends "base/baseform.html" %}
+	
+	{% block nav %}
+		
+	{% endblock nav %}
+	
+	{% block legend %}
+		<legend class="text-center">Login</legend>
+	{% endblock legend %}	
+			
+	{% block errores %}
+		{% if form.errors %}
+				<p>Tu nombre de usuario o password no se a encontrado. Intente de nuevo</p>
+		{% endif %}
+
+		{% if next %}
+			{% if user.is_authenticated %}
+			    <p>Tu cuenta no tiene acceso a esta página. Para continuar,
+			    logeese con una cuenta que cuente con los permisos necesarios.</p>
+			{% else %}
+			    <p>Por favor Logeate para ver esta página.</p>
+			{% endif %}
+		{% endif %}	
+	{% endblock errores %}		
+			
+	{% block urlEnvio %}
+		{% url 'personal:login' %}
+	{% endblock urlEnvio %}	    
+			
+	{% block formulario %}
+		<fieldset>
+			{% csrf_token %}
+			<div class="form-group">
+				    <label for="username" class="col-lg-2 control-label">Username</label>
+				    <div class="col-lg-10">
+				      <input type="text" class="form-control" placeholder="Username" name="username">
+				    </div>
+				  </div>
+
+			<div class="form-group">
+				    <label for="password" class="col-lg-2 control-label">Password</label>
+				    <div class="col-lg-10">
+				      <input type="password" class="form-control" placeholder="password" name="password">
+				    </div>
+				  </div>
+
+			<input type="hidden" name="next" value="{{ next }}" />
+					
+				  <div class="col-lg-10 col-lg-offset-2 text-center" >
+				   		<a href="{% url 'personal:reset_password' %}">Perdio su contraseña?</a>
+				      	<button type="reset" class="btn btn-default">Reset</button>
+				      	<button type="submit" value="login" class="btn btn-primary">Login</button>
+				  </div>
+		</fieldset>	
+	{% endblock formulario %}		
+			
+	{% block añadidos %}
+		<div class="row">
+			<div class="col-sm-8">
+				<div class="jumbotron">
+					<div class="container">
+						<h1 style="color: #E4E5D8">Empresa Minera "MINDES S.R.L."</h1>
+						<p style="color: #E4E5D8">Sistemas de Almacenes Contabilidad y Activos Fijos</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-4">
+				
+			</div>
+		</div>
+	{% endblock añadidos %}

@@ -1,0 +1,303 @@
+{% load custom_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title|default:"REPORTE GENERAL" }}</title>
+    <meta charset="utf-8">
+    {% block style_base %}
+        {% comment %}
+            See DEFAULT_CSS in https://github.com/chrisglass/xhtml2pdf/blob/master/xhtml2pdf/default.py
+            for base style.
+        {% endcomment %}
+
+        {% block layout_style %}
+            <style type="text/css">
+                @page {
+                    size: {{ pagesize|default:"Letter" }};
+                    margin-left: 2.2cm;
+                    margin-right: 0.5cm;
+                    margin-top: 1cm;
+                    margin-bottom: 1cm;
+                    @frame header {
+                        -pdf-frame-content: page-header;
+                        margin-top: 3.8cm;
+                        margin-right: 1.5cm;
+                        margin-bottom: 0cm;
+                        margin-left: 2.5cm;
+                    }
+                    @frame footer {
+                        -pdf-frame-content: page-footer;
+                        bottom: 0cm;
+                        margin-left: 1cm;
+                        margin-right: 1cm;
+                        height: 1cm;
+                    }
+                }
+
+                html{
+                    font-size: 8pt;
+                }
+                .tittle_report h1{
+                    text-align: center;
+                    margin: 5px;
+                }
+                .general{
+                    margin: 20px;
+                }
+                .general table, tr, th{
+                    text-align: left;
+                }
+                .lineal table{
+                    padding-top: 3px;
+                    padding-right: 3px;
+                    padding-left: 3px;
+                    border: 1px solid black;
+                }
+                .lineal th{
+                    text-align: center;
+                    font-size: 12px
+                }
+                .firma th{
+                    text-align: center;
+                }
+
+                .division hr{
+                    margin-bottom: 300px;
+                }
+                div#tabla_uno{
+                    width:300px;
+                    position:relative;
+                    float: left;
+                    height: auto;
+                    margin-right: 10px;
+                }
+                #tabla_dos{
+                    width:300px;
+                    padding: 3px;
+                    position:relative;
+                    float: left;
+                    height: auto;
+                }
+                #fuente{
+                    padding-right: 3px;
+                    text-align: right;
+                    font-size: 12px
+                }
+                #fuente2{
+                    font-size: 12px;
+                    padding-left: 3px;
+                    text-align: left;
+                }
+                #fuente3{
+                    border-style: none;
+                    font-size: 12px;
+                    padding-left: 3px;
+                    text-align: left;
+                    font-weight: bold;
+                }
+            </style>
+        {%endblock%}
+        {% block extra_style %}{% endblock %}
+    {% endblock %}
+</head>
+<body>
+
+            <div>
+            {% if res %}
+            <div>
+                <table>
+                    <tr>
+                        
+                        <td colspan="5">EMPRESA MINERA "MINDES S.R.L."</td>
+                        
+                    </tr>
+                    <tr>
+                        <td>POTOSI - BOLIVIA </td>
+                    </tr>
+                    <tr>
+                        <th colspan="5" style="font-size: 6; text-align: center;">REPORTE GENERAL</th>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 4; text-align: center;" colspan="5">
+                            Del {{ fecha1 }} al {{ fecha2 }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 3; text-align: center;" colspan="5">
+                            (Expresado en Bolivianos)
+                        </td>
+                    </tr>
+
+                </table>
+                
+            </div>
+            <div class="lineal">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="background-color: #219FB5;" colspan="3" rowspan="2">Código</th>
+                            <th style="background-color: #219FB5;" colspan="3" rowspan="2">Descripción</th>
+                            <th style="background-color: #219FB5;" colspan="1" rowspan="2">Unid.</th>
+                            <th style="background-color: #219FB5;" colspan="5">Saldo al {{ fecha3 }}</th>
+                            <th style="background-color: #219FB5;" colspan="5">ENTRADAS</th>
+                            <th style="background-color: #219FB5;" colspan="5">SALIDAS</th>
+                            <th style="background-color: #219FB5;" colspan="5">SALDOS</th>  
+                        </tr>
+                        <tr>
+                            <th style="background-color: #219FB5;" colspan="2">Cant</th>
+                            <th style="background-color: #219FB5;" colspan="3">Valor</th>
+                            <th style="background-color: #219FB5;" colspan="2">Cant</th>
+                            <th style="background-color: #219FB5;" colspan="3">Valor</th>
+                            <th style="background-color: #219FB5;" colspan="2">Cant</th>
+                            <th style="background-color: #219FB5;" colspan="3">Valor</th>
+                            <th style="background-color: #219FB5;" colspan="2">Cant</th>
+                            <th style="background-color: #219FB5;" colspan="3">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% regroup res by subcategoria as res_categ %}
+                    {% for res3 in res_categ %}
+                        <tr>
+                            <td id="fuente3" colspan="7"><b>{{ res3.grouper.categoria.nombre|upper }}</b></td>
+                        </tr>
+                        <tr>
+                            <td id="fuente3" colspan="7"><b>{{ res3.grouper.nombre|upper }}</b></td>
+                        </tr>
+                        {% for i in res3.list %}
+                            <tr>
+                                <td colspan="3" id="fuente2">{{ i.codigo }}</td>
+                                <td colspan="3" id="fuente2">{{ i.nombre }}</td>
+                                <td colspan="1" id="fuente2">{{ i.unidad.simbolo }}</td>
+                                {% tot_cant_a i f1 as total_cant_a %}
+                                {% if total_cant_a == 0 %}
+                                    <td colspan="2" id="fuente"> </td>
+                                {% else %} 
+                                    <td colspan="2" id="fuente">{% tot_cant_a i f1 %}</td>
+                                {% endif %}
+                                {% tot_subt_a i f1 as total_subt_a %}
+                                {% if total_subt_a == 0 %}
+                                    <td colspan="3" id="fuente"> </td>
+                                {% else %}
+                                    <td colspan="3" id="fuente">{% tot_subt_a i f1 %}</td>
+                                {% endif %}
+                                {% tot_cant_e i f1 f2 as total_cant_e %}
+                                {% if total_cant_e == 0 %}
+                                    <td colspan="2" id="fuente"> </td>
+                                    <td colspan="3" id="fuente"> </td>
+                                {% else %}
+                                    <td colspan="2" id="fuente">{% tot_cant_e i f1 f2 %}</td>
+                                    <td colspan="3" id="fuente">{% tot_subt_e i f1 f2 %}</td>
+                                {% endif %}
+                                {% tot_cant_s i f1 f2 as total_cant_s %}
+                                {% if total_cant_s == 0 %}
+                                    <td colspan="2" id="fuente"> </td>
+                                    <td colspan="3" id="fuente"> </td>
+                                {% else %}
+                                    <td colspan="2" id="fuente">{% tot_cant_s i f1 f2 %}</td>
+                                    <td colspan="3" id="fuente">{% tot_subt_s i f1 f2 %}</td>
+                                {% endif %}
+                                
+                                {% tot_cant i f1 f2 as total_cant %}
+                                {% if total_cant == 0 %}
+                                    <td colspan="2" id="fuente"> </td>
+                                {% else %}
+                                    <td colspan="2" id="fuente">{% tot_cant i f1 f2 %}</td>
+                                {% endif %}
+                                {% tot_subt i f1 f2 as total_subt %}
+                                {% if total_subt == 0 %}
+                                    <td colspan="3" id="fuente"> </td>
+                                {% else %}
+                                    <td colspan="3" id="fuente">{% tot_subt i f1 f2 %}</td>
+                                {% endif %}
+                            </tr>  
+                        {% endfor %}
+                            {% ifchanged res3.grouper.categoria.nombre %}
+                                <tr>
+                                    <td id="fuente3" colspan="7"><b>TOTAL.- {{ res3.grouper.categoria.nombre|upper }}</b></td>
+                                    {% cat_a_t res3.grouper.categoria f1 as categoria_a_t %}
+                                    {% if categoria_a_t == 0 %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
+                                    {% else %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% cat_a_t res3.grouper.categoria f1 %}</td>
+                                    {% endif %}
+                                    {% tot_categ_e res3.grouper.categoria f1 f2 as total_categ_e %}
+                                    {% if total_categ_e == 0 %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
+                                    {% else %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% tot_categ_e res3.grouper.categoria f1 f2 %}</td>
+                                    {% endif %}
+                                    {% tot_categ_s res3.grouper.categoria f1 f2 as total_categ_s %}
+                                    {% if total_categ_s == 0 %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
+                                    {% else %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% tot_categ_s res3.grouper.categoria f1 f2 %}</td>
+                                    {% endif %}
+                                    {% cat_t res3.grouper.categoria f1 f2 as categoria_t %}
+                                    {% if categoria_t == 0 %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
+                                    {% else %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% cat_t res3.grouper.categoria f1 f2 %}</td>
+                                    {% endif %}
+                                </tr>
+                            {% endifchanged %}
+        
+                            {% ifchanged res3.grouper.nombre %}
+                                <tr>
+                                    <td id="fuente3" colspan="7"><b>TOTAL.- {{ res3.grouper.nombre|upper }}</b></td>
+                                    {% subc_a_t res3.grouper f1 as subcategoria_a_t %}
+                                    {% if subcategoria_a_t == 0 %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
+                                    {% else %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% subc_a_t res3.grouper f1 %}</td>
+                                    {% endif %}
+                                    {% tot_sub_e res3.grouper f1 f2 as total_sub_e %}
+                                    {% if total_sub_e == 0 %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
+                                    {% else %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% tot_sub_e res3.grouper f1 f2 %}</td>
+                                    {% endif %}
+                                    {% tot_sub_s res3.grouper f1 f2 as total_sub_s %}
+                                    {% if total_sub_s == 0 %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
+                                    {% else %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% tot_sub_s res3.grouper f1 f2 %}</td>
+                                    {% endif %}
+                                    {% subc_t res3.grouper f1 f2 as subcategoria_t %}
+                                    {% if subcategoria_t == 0 %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
+                                    {% else %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% subc_t res3.grouper f1 f2 %}</td>
+                                    {% endif %}
+                                </tr>    
+                            {% endifchanged %}
+                            {% if forloop.last %}
+                                {% for i in res|slice:":1" %}
+                                    <tr>
+                                        <th style="text-align: left;" colspan="7">TOTALES</th>
+                                        <td colspan="5" id="fuente">{% subt_t_a i f1 %}</td>
+                                        <td colspan="5" id="fuente">{% ing_t i f1 f2 %}</td>
+                                        <td colspan="5" id="fuente">{% sal_t i f1 f2 %}</td>
+                                        <td colspan="5" id="fuente">{% sald_t i f1 f2 %}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                    {% endfor %}
+                    </tbody>  
+                </table>
+            {% else %}
+            <p>No existe movimiento en las fechas especificadas, verifique los datos</p>
+            {% endif %}
+            </div>  
+        
+            </div>
+
+<div id="page-footer">
+        {%block page_foot%}
+            
+             Página <pdf:pagenumber />
+           
+        {%endblock%}
+</div>
+        
+</body>
+</html>

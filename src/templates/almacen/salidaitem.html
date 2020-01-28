@@ -1,0 +1,281 @@
+{% extends "base/baseform2.html" %}
+
+	{% block tituloform %}
+		Salida Items
+	{% endblock tituloform %}
+	
+	{% block iddanger %}
+	    id="danger"
+	{% endblock iddanger %}
+
+	{% block formulario %}
+    <style type="text/css">
+        .button1 {
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            background-color: white;
+            border: 2px solid #008CBA;
+            border-radius: 4px;
+            padding: 5px 10px;
+            background-color: #008CBA;
+            color: white;
+        }
+
+        .button1:hover {
+            background-color: #008CBA;
+            color: white;
+        }
+
+        .button2 {
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            background-color: white;
+            border: 2px solid #CC1F1F;
+            border-radius: 4px;
+            padding: 5px 10px;
+            background-color: #CC1F1F;
+            color: white;
+        }
+
+        .button2:hover {
+            background-color: #CC1F1F;
+            color: white;
+        }
+        
+    </style>
+        {% csrf_token %}
+        {% comment %}
+        {% for field in form %}
+            <div class="fieldWrapper">
+                {{ field.errors }}
+                {{ field.label_tag }} 
+                {{ field }}
+            </div>
+        {% endfor %}
+        {% endcomment %}
+        {% if error %}
+			<div class="alert alert-danger" role="alert"><strong>Advertencia!!!</strong> {{ error }}</div>
+		{% endif %}                        
+        <div class="panel panel-default">
+                <div class="panel-body">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td class="col-lg-3">
+                                    <label>Nº Comprobante</label>
+                                        {% if form.nro_comp.errors %}
+                                            {% for error in form.nro_comp.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                    <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ form.nro_comp }}
+                                </td>
+                                <td class="col-lg-3">
+                                    <label>Fecha</label>
+                                        {% if form.fecha.errors %}
+                                            {% for error in form.fecha.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                    <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ form.fecha }}
+                                </td>
+                                <td class="col-lg-2">
+                                    <label>Tipo Salida</label>
+                                        {% if form.tipo_salida.errors %}
+                                            {% for error in form.tipo_salida.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                    <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ form.tipo_salida }}
+                                </td>
+                                <td class="col-lg-4">
+                                    <label>Seccion</label>
+                                        {% if form.seccion.errors %}
+                                            {% for error in form.seccion.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                    <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ form.seccion }}
+                                </td>
+                            </tr>
+                            <tr>
+                                
+                                <td class="col-lg-3">
+                                    <label>Destino(Cliente)</label>
+                                        {% if form.cliente.errors %}
+                                            {% for error in form.cliente.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                    <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ form.cliente }}
+                                </td>
+                                <td class="col-lg-3">
+                                    <label>Concepto</label>
+                                        {% if form.concepto.errors %}
+                                            {% for error in form.concepto.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                    <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ form.concepto }}
+                                </td>
+                                {{ crear_personal_form_set.management_form }}
+                                {% for crear_personal_form in crear_personal_form_set %}
+                                    {{ crear_personal_form.id }}
+                                    <td class="col-lg-2">
+                                        {% if forloop.counter == 2 %}
+                                            <label>Autorizado</label>
+                                        {% else %}
+                                            <label>Entregado</label>
+                                        {% endif %}
+                                            {% if crear_personal_form.personal.errors %}
+                                                {% for error in crear_personal_form.personal.errors %}
+                                                <div class="alert alert-danger alert-dismissible" role="alert">
+                                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                        <strong>Error: </strong> {{ error|escape }}
+                                                </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                            {{ crear_personal_form.personal }}
+                                    </td>                                   
+                                {{ crear_personal_form.media }}      
+                                {% endfor %}
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table">
+                    {{ crear_salida_form_set.management_form }}
+                        <tbody>
+                        {% for crear_salida_form in crear_salida_form_set %}
+                            <tr class="formset_row">
+                                {{ crear_salida_form.id }}
+                                <td>
+                                    <label>Item</label>
+                                        {% if crear_salida_form.item.errors %}
+                                            {% for error in crear_salida_form.item.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                    <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ crear_salida_form.item }}
+                                </td>
+                                <td class="col-lg-1">
+                                    <label>Cantidad</label>
+                                        {% if crear_salida_form.cantidad.errors %}
+                                            {% for error in crear_salida_form.cantidad.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                    <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ crear_salida_form.cantidad }}
+                                </td>
+                                <td class="col-lg-1">
+                                    <label>Costo Unit</label>
+                                        {% if crear_salida_form.costo_unit.errors %}
+                                            {% for error in crear_salida_form.costo_unit.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                    <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ crear_salida_form.costo_unit }}
+                                </td>
+                                <td class="col-lg-1">
+                                    <label>Sub-Total</label>
+                                        {% if crear_salida_form.sub_total.errors %}
+                                            {% for error in crear_salida_form.sub_total.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                    <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ crear_salida_form.sub_total }}
+                                </td>
+                                <td class="col-lg-3">
+                                    <label>Observaciones</label>
+                                        {% if crear_salida_form.observaciones.errors %}
+                                            {% for error in crear_salida_form.observaciones.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                    <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ crear_salida_form.observaciones }}
+                                </td>                                   
+                            </tr>
+                            {{ crear_salida_form.media }}      
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                        
+                </div>
+        </div>
+
+
+        <div class="col-lg-12 text-right">
+                <input type="submit" class="btn btn-primary" name="submit" value="Guardar" />
+                <a href="#" class="btn btn-default">Limpiar Formulario</a>   
+        </div>
+        
+<script type="text/javascript">
+
+    $('.formset_row').formset({ 
+    addText: 'añadir fila', 
+    deleteText: 'quitar fila', 
+    prefix: 'salidaitem_set',
+    addCssClass: 'button1',
+    deleteCssClass: 'button2'
+    });
+
+</script>
+
+{% endblock formulario %}
+

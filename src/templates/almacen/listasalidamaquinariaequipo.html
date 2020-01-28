@@ -1,0 +1,135 @@
+{% extends "base/index.html" %}	
+
+	{% block body %}
+		<div class="col-sm-2"></div>
+		<div class="col-sm-8">
+			<div class="well bs-component">
+				
+				<div class="row">
+					<div class="col-lg-12">
+						<h2 style="text-align: center;">
+							Lista de Envio de maquinaria/equipo al Item: {{ item.descripcion }}
+						</h2>
+						<form role="form" class="form-inline" action="" method="get" accept-charset="utf-8">
+								{% load bootstrap3 %}
+				
+								
+								
+								{% bootstrap_form form layout='inline' %}
+
+								{% buttons submit='Buscar' layout='inline' %}{% endbuttons %}
+
+						    	
+						</form>
+						
+					</div>
+				</div>
+				
+				<table class="table table-striped table-hover ">
+				  	<thead>
+				    <tr>
+				      	<th>#id</th>
+				      	<th>Almacén</th>
+				      	<th>Maquinaria/Equipo</th>
+				      	<th>Item</th>
+				      	<th>Devuelto</th>
+				      	<th>Fecha de Salida</th>
+				      	<th>Cantidad</th>
+				    </tr>
+				  	</thead>
+				 	 <tbody>
+				  
+				  	{% if object_list %}
+				  		{% for pet in object_list %}
+
+
+				  			{% if forloop.counter|divisibleby:2 %}
+				  				<tr class="info">
+							      	<td>{{ pet.id }}</td>
+							      	<td>{{ pet.almacen.ciudad }}</td>
+							      	<td>{{ pet.maquinaria_equipo.decripcion }}</td>
+							      	<td>{{ pet.item.descripcion }}</td>
+							      	<td>
+								      	{% if pet.debuelto %}
+								      		Si
+								      	{% else %}
+								      	    No
+								      	{% endif %}
+							      	</td>
+							      	<td>{{ pet.fecha }}</td>
+							      	<td>{{ pet.cantidad }}</td>
+							     
+							{% else %}
+								<tr class="success">
+							      	<td>{{ pet.id }}</td>
+							      	<td>{{ pet.almacen.ciudad }}</td>
+							      	<td>{{ pet.maquinaria_equipo.decripcion }}</td>
+							      	<td>{{ pet.item.descripcion }}</td>
+							      	<td>
+								      	{% if pet.debuelto %}
+								      		Si
+								      	{% else %}
+								      	    No
+								      	{% endif %}
+							      	</td>
+							      	<td>{{ pet.fecha }}</td>
+							      	<td>{{ pet.cantidad }}</td>
+							     
+				  			{% endif %}
+				  					<td>
+				  						<div class="btn-group">
+				  							<div class="btn-group">
+												<!--
+												<a type="button" class="btn btn-primary" href="{% url 'almacenes:updateherramientas' pet.id %}">
+													Editar<span class="glyphicon glyphicon-edit" aria-hidden="true">
+												</a>
+												-->
+											</div>
+											
+										</div>
+				  					</td>
+					  			</tr>
+
+				  		{% endfor %}
+
+					{% endif %}
+
+				  	</tbody>
+				  	
+				</table>
+				<!-- paginador -->
+				<div class="row row-centered">
+				<div class="col-xs-3 col-centered"></div>
+				<div class="col-xs-6 col-centered">
+					{% if is_paginated %}
+						<div class="text-center">
+						<ul class="pagination">
+						{% if page_obj.has_previous %}
+								    <li>
+								        <span><a href="?page={{ page_obj.previous_page_number }}">Anterior</a></span>
+								    </li>
+						{% endif %}
+								    <li class="">
+								        <span>Pagina {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.</span>
+								    </li>
+						{% if page_obj.has_next %}
+								    <li>
+								        <span><a href="?page={{ page_obj.next_page_number }}">Siguiente</a></span>
+								    </li>
+						{% endif %}
+						</ul>
+						</div>
+					{% else %}
+						<!--
+						<h3>Your File Exam</h3>
+						<p>File not yet available</p>
+						-->
+					{% endif %}
+				</div>
+				<div class="col-xs-3 col-centered"></div>
+				</div>
+				<!-- paginador -->
+			</div>
+		</div>
+		<div class="col-sm-2"></div>
+	{% endblock body %}

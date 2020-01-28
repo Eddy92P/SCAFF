@@ -1,0 +1,27 @@
+{% extends "base/baseform_rep.html" %}	
+
+	<h2 style="text-align: center;">
+		{% block tituloform %}
+			Reporte Específico/General de Bienes
+		{% endblock tituloform %}
+	</h2>
+	
+	{% block urlEnviar %}
+	    {% url 'activos_f:reporte_espec_bien' %}
+	{% endblock urlEnviar %}
+
+	{% block formulario %}
+
+	
+		{% load bootstrap3 %}
+		{% bootstrap_form form %}
+
+		{% buttons %}
+	        <button type="submit" class="btn btn-primary center-block">
+	            {% bootstrap_icon "glyphicon glyphicon-ok" %} Generar
+	        </button>
+	    {% endbuttons %}
+
+		
+	
+	{% endblock formulario %}

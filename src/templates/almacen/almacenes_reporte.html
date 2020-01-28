@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title|default:"Reporte" }}</title>
+    <meta charset="utf-8">
+    {% block style_base %}
+        {% comment %}
+            See DEFAULT_CSS in https://github.com/chrisglass/xhtml2pdf/blob/master/xhtml2pdf/default.py
+            for base style.
+        {% endcomment %}
+
+        {% block layout_style %}
+            <style type="text/css">
+                @page {
+                    size: {{ pagesize|default:"A4" }};
+                    margin-left: 2.5cm;
+                    margin-right: 2.5cm;
+                    margin-top: 2.5cm;
+                    margin-bottom: 2cm;
+                    @frame header {
+                        -pdf-frame-content: page-header;
+                        margin-top: 0.7cm;
+                        margin-right: 2mm;
+                        margin-bottom: 0cm;
+                        margin-left: 1.2cm;
+                    }
+                    @frame footer {
+                        -pdf-frame-content: page-footer;
+                        bottom: 0cm;
+                        margin-left: 1cm;
+                        margin-right: 1cm;
+                        height: 1cm;
+                    }
+                }
+
+                html{
+                    font-size: 10pt;
+                }
+                .tittle_report h1{
+                    text-align: center;
+                    margin: 5px;
+                }
+                .general{
+                    margin: 20px;
+                }
+                .general table, tr, th{
+                    text-align: left;
+                }
+                .lineal table{
+                    padding-top: 3px;
+                    padding-right: 3px;
+                    padding-left: 3px;
+                    border: 1px solid black;
+                }
+                .lineal th{
+                    text-align: center;
+                }
+            </style>
+        {%endblock%}
+        {% block extra_style %}{% endblock %}
+    {% endblock %}
+</head>
+<body>
+    
+    <div class="tittle_report">
+        <h1>Reporte de Almacén</h1>
+        <h1>{{ res.ciudad }}.</h1>
+    </div>
+
+    {% block content %}
+        <!-- general -->
+        <h3><b>1. Información General.-</b></h3>
+        <div class="general">
+            <table>
+                <tr>
+                    <th>
+                        Ciudad:
+                    </th>
+                    <td>
+                        {{ res.ciudad }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Dirección:
+                    </th>
+                    <td>
+                        {{ res.direccion }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Teléfono:
+                    </th>
+                    <td>
+                        {{ res.telefono }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Observaciones:
+                    </th>
+                    <td>
+                        {{ res.observaciones }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h3><b>2. Reporte de stock.-</b></h3>
+
+        <!-- mateliales stock -->
+        <h3><b>2.1 Reporte de stock materiales.-</b></h3>
+        {% if res.materialalmacen_set.all %}
+            <div class="lineal">
+                <table border="1">
+                    <tr>
+                        <th>
+                            Material
+                        </th>
+                        <th>
+                            Cantidad en stock disponible
+                        </th>
+                        <th>
+                            Unidad
+                        </th>
+                    </tr>
+                    {% for ma  in res.materialalmacen_set.all %}
+                    <tr>
+                        <td>
+                            {{ ma.material }}
+                        </td>
+                        <td>
+                            {{ ma.cantidad }} 
+                        </td>
+                        <td>
+                            {{ ma.material.unidad }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% else %}
+            <p>No se encuentran materiales en el almacén aún</p>
+        {% endif %}
+        <!-- mateliales stock -->
+
+        <!-- insumos stock -->
+        <h3><b>2.2 Reporte de stock insumos.-</b></h3>
+        {% if res.insumosalmacen_set.all %}
+            <div class="lineal">
+                <table border="1">
+                    <tr>
+                        <th>
+                            Insumo
+                        </th>
+                        <th>
+                            Cantidad en stock disponible
+                        </th>
+                        <th>
+                            Unidad
+                        </th>
+                    </tr>
+                    {% for ia  in res.insumosalmacen_set.all %}
+                    <tr>
+                        <td>
+                            {{ ia.insumos }}
+                        </td>
+                        <td>
+                            {{ ia.cantidad }} 
+                        </td>
+                        <td>
+                            {{ ia.insumos.unidad }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% else %}
+            <p>No se encuentran insumos en el almacén aún</p>
+        {% endif %}
+        <!-- insumos stock -->
+
+        <!-- herramientas stock -->
+        <h3><b>2.3 Reporte de stock herramientas.-</b></h3>
+        {% if res.herramientasalmacen_set.all %}
+            <div class="lineal">
+                <table border="1">
+                    <tr>
+                        <th>
+                            Descripcion
+                        </th>
+                        <th>
+                            Stock
+                        </th>
+                        <th>
+                            Cantidad en stock disponible
+                        </th>
+                        <th>
+                            Tipo
+                        </th>
+                    </tr>
+                    {% for he  in res.herramientasalmacen_set.all %}
+                    <tr>
+                        <td>
+                            {{ he.herramientas }}
+                        </td>
+                        <td>
+                            {{ he.stock }}
+                        </td>
+                        <td>
+                            {{ he.cantidad }} 
+                        </td>
+                        <td>
+                            {{ he.herramientas.tipo }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% else %}
+            <p>No se encuentran herramientas en el almacén aún</p>
+        {% endif %}
+        <!-- herramientas stock -->
+
+        <!-- herramientas stock -->
+        <h3><b>2.4 Reporte de stock maquinaria/equipo.-</b></h3>
+        {% if res.maquinaria_equipoalmacen_set.all %}
+            <div class="lineal">
+                <table border="1">
+                    <tr>
+                        <th>
+                            Descripción
+                        </th>
+                        <th>
+                            Stock
+                        </th>
+                        <th>
+                            Cantidad en stock disponible
+                        </th>
+                        <th>
+                            Tipo
+                        </th>
+                    </tr>
+                    {% for me  in res.maquinaria_equipoalmacen_set.all %}
+                    <tr>
+                        <td>
+                            {{ me.maquinaria_equipo }}
+                        </td>
+                        <td>
+                            {{ me.stock }}
+                        </td>
+                        <td>
+                            {{ me.cantidad }} 
+                        </td>
+                        <td>
+                            {{ me.maquinaria_equipo.tipo }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% else %}
+            <p>No se encuentran maquinaria/equipo en el almacén aún</p>
+        {% endif %}
+        <!-- herramientas stock -->
+
+        <h3><b>3. Ingresos .-</b></h3>
+        <ul>
+            <h3><b><li>Herramientas</li></b></h3>
+        </ul>
+        {% if res.ingresoherramientas_set.all %}
+            <div class="lineal">
+                <table border="1">
+                    <tr>
+                        <th>
+                            Descripción
+                        </th>
+                        <th>
+                            Proveedor
+                        </th>
+                        <th>
+                            N° Factura
+                        </th>
+                        <th>
+                            Cantidad
+                        </th>
+                        <th>
+                            Costo T.
+                        </th>
+                    </tr>
+                    {% for me  in res.ingresoherramientas_set.all %}
+                    <tr>
+                        <td>
+                            {{ me.herramientas }}
+                        </td>
+                        <td>
+                            {{ me.proveedor }}
+                        </td>
+                        <td>
+                            {{ me.no_factura }}
+                        </td>
+                        <td>
+                            {{ me.cantidad }} 
+                        </td>
+                        <td>
+                            {{ me.costo_total }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% else %}
+            <p>No se encuentran ingresos de herramientas aún</p>
+        {% endif %}
+        <ul>
+            <h3><b><li>Maquinaria/equipo</li></b></h3>
+        </ul>
+        {% if res.ingresomaquinaria_equipo_set.all %}
+            <div class="lineal">
+                <table border="1">
+                    <tr>
+                        <th>
+                            Descripción
+                        </th>
+                        <th>
+                            Proveedor
+                        </th>
+                        <th>
+                            Cantidad
+                        </th>
+                        <th>
+                            Costo T.
+                        </th>
+                    </tr>
+                    {% for me  in res.ingresomaquinaria_equipo_set.all %}
+                    <tr>
+                        <td>
+                            {{ me.maquinaria_equipo }}
+                        </td>
+                        <td>
+                            {{ me.proveedor }}
+                        </td>
+                        <td>
+                            {{ me.cantidad }} 
+                        </td>
+                        <td>
+                            {{ me.costo_total }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% else %}
+            <p>No se encuentran ingresos de maquinaria/equipo aún</p>
+        {% endif %}
+
+        <h3><b>4. Información por item .-</b></h3>
+
+        {% if res.items %}
+            {% for it  in res.items %}
+                <h3><b>4.{{ forloop.counter }} Información de item {{ it }} .-</b></h3>
+
+
+                    <!-- item material stock -->
+                    <ul>
+                        <h3><b><li>Ingresos Material</li></b></h3>
+                    </ul>
+                    {% if it.ingresomaterial_set.all %}
+                 
+                    <div class="lineal">
+                        <table border="1">
+                            <tr>
+                                <th>
+                                    Material
+                                </th>
+                                <th>
+                                    Proveedor
+                                </th>
+                                <th>
+                                    No factura
+                                </th>
+                                <th>
+                                    Fecha
+                                </th>
+                                <th>
+                                    Costo total
+                                </th>
+                                <th>
+                                    Cantidad
+                                </th>
+                            </tr>
+                            {% for ing in it.ingresomaterial_set.all %}
+                                <tr>
+                                    <td>
+                                        {{ ing.material }}
+                                    </td>
+                                    <td>
+                                        {{ ing.proveedor }}
+                                    </td>
+                                    <td>
+                                        {{ ing.no_factura }}
+                                    </td>
+                                    <td>
+                                        {{ ing.fecha|date:"Y-m-d" }}
+                                    </td>
+                                    <td>
+                                        {{ ing.costo_total }}
+                                    </td>
+                                    <td>
+                                        {{ ing.cantidad }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    {% else %}
+                        <p>No se encuentran ingresos de material al item aún</p>
+                    {% endif %}
+
+
+                    <ul>
+                        <h3><b><li>Salidas Material</li></b></h3>
+                    </ul>
+                    {% if it.salidamaterial_set.all %}
+                    <div class="lineal">
+                        <table border="1">
+                            <tr>
+                                <th>
+                                    Material
+                                </th>
+                                <th>
+                                    Conf. Recepción
+                                </th>
+                                <th>
+                                    Fecha
+                                </th>
+                                <th>
+                                    Cantidad
+                                </th>
+                            </tr>
+                            {% for sal in it.salidamaterial_set.all %}
+                                <tr>
+                                    <td>
+                                        {{ sal.material }}
+                                    </td>
+                                    <td>
+                                        {% if sal.confirmado %}
+                                            Si
+                                        {% else %}
+                                            No                                  
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ sal.fecha|date:"Y-m-d" }}
+                                    </td>
+                                    <td>
+                                        {{ sal.cantidad }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    {% else %}
+                        <p>No se encuentran ingresos de material al item aún</p>
+                    {% endif %}
+                    <!-- item material stock -->
+
+
+                    <!-- item insumo stock -->
+                    <ul>
+                        <h3><b><li>Ingresos Insumo</li></b></h3>
+                    </ul>
+                    {% if it.ingresoinsumos_set.all %}
+                 
+                    <div class="lineal">
+                        <table border="1">
+                            <tr>
+                                <th>
+                                    Insumo
+                                </th>
+                                <th>
+                                    Proveedor
+                                </th>
+                                <th>
+                                    No factura
+                                </th>
+                                <th>
+                                    Fecha
+                                </th>
+                                <th>
+                                    Costo total
+                                </th>
+                                <th>
+                                    Cantidad
+                                </th>
+                            </tr>
+                            {% for ing in it.ingresoinsumos_set.all %}
+                                <tr>
+                                    <td>
+                                        {{ ing.insumos }}
+                                    </td>
+                                    <td>
+                                        {{ ing.proveedor }}
+                                    </td>
+                                    <td>
+                                        {{ ing.no_factura }}
+                                    </td>
+                                    <td>
+                                        {{ ing.fecha|date:"Y-m-d" }}
+                                    </td>
+                                    <td>
+                                        {{ ing.costo_total }}
+                                    </td>
+                                    <td>
+                                        {{ ing.cantidad }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    {% else %}
+                        <p>No se encuentran ingresos de insumo al item aún</p>
+                    {% endif %}
+
+
+                    <ul>
+                        <h3><b><li>Salidas Insumo</li></b></h3>
+                    </ul>
+                    {% if it.salidainsumos_set.all %}
+                    <div class="lineal">
+                        <table border="1">
+                            <tr>
+                                <th>
+                                    Insumo
+                                </th>
+                                <th>
+                                    Conf. Recepción
+                                </th>
+                                <th>
+                                    Fecha
+                                </th>
+                                <th>
+                                    Cantidad
+                                </th>
+                            </tr>
+                            {% for sal in it.salidainsumos_set.all %}
+                                <tr>
+                                    <td>
+                                        {{ sal.insumos }}
+                                    </td>
+                                    <td>
+                                        {% if sal.confirmado %}
+                                            Si
+                                        {% else %}
+                                            No                                  
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ sal.fecha|date:"Y-m-d" }}
+                                    </td>
+                                    <td>
+                                        {{ sal.cantidad }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    {% else %}
+                        <p>No se encuentran ingresos de insumo al item aún</p>
+                    {% endif %}
+                    <!-- item insumo stock -->
+
+                    <!-- item herramientas stock -->
+                    <ul>
+                        <h3><b><li>Salida/Estado de envio de herramientas </li></b></h3>
+                    </ul>
+                    {% if it.salidaherramientas_set.all %}
+                 
+                    <div class="lineal">
+                        <table border="1">
+                            <tr>
+                                <th>
+                                    Descripción
+                                </th>
+                                <th>
+                                    Fecha
+                                </th>
+                                <th>
+                                    Cantidad
+                                </th>
+                                <th>
+                                    Devuelto
+                                </th>
+                            </tr>
+                            {% for ing in it.salidaherramientas_set.all %}
+                                <tr>
+                                    <td>
+                                        {{ ing.herramientas }}
+                                    </td>
+                                    <td>
+                                        {{ ing.fecha|date:"Y-m-d" }}
+                                    </td>
+                                    <td>
+                                        {{ ing.cantidad }}
+                                    </td>
+                                    <td>
+                                        {% if ing.debuelto %}
+                                            si
+                                        {% else %}
+                                            no
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    {% else %}
+                        <p>No se encuentran ingresos de herramientas al item aún</p>
+                    {% endif %}
+                    <!-- item herramientas stock -->
+
+                    <!-- item maquinaria/equipo stock -->
+                    <ul>
+                        <h3><b><li>Salida/Estado de envio de maquinaria/equipo </li></b></h3>
+                    </ul>
+                    {% if it.salidamaquinaria_equipo_set.all %}
+                 
+                    <div class="lineal">
+                        <table border="1">
+                            <tr>
+                                <th>
+                                    Descripción
+                                </th>
+                                <th>
+                                    Fecha
+                                </th>
+                                <th>
+                                    Cantidad
+                                </th>
+                                <th>
+                                    Devuelto
+                                </th>
+                            </tr>
+                            {% for ing in it.salidamaquinaria_equipo_set.all %}
+                                <tr>
+                                    <td>
+                                        {{ ing.maquinaria_equipo }}
+                                    </td>
+                                    <td>
+                                        {{ ing.fecha|date:"Y-m-d" }}
+                                    </td>
+                                    <td>
+                                        {{ ing.cantidad }}
+                                    </td>
+                                    <td>
+                                        {% if ing.debuelto %}
+                                            si
+                                        {% else %}
+                                            no
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    {% else %}
+                        <p>No se encuentran ingresos de maquinaria/equipo al item aún</p>
+                    {% endif %}
+                    <!-- item maquinaria/equipo stock -->
+
+            {% endfor %}
+        {% else %}
+            <p>No se encuentran items aún</p>
+        {% endif %}
+       
+
+    {% endblock content %}
+
+    <div id="page-footer">
+        {%block page_foot%}
+            
+                <pdf:pagenumber />
+           
+        {%endblock%}
+    </div>
+</body>
+</html>

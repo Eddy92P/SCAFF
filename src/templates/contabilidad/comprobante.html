@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>{{ title|default:"COMPROBANTE" }}</title>
+    <meta charset="utf-8">
+    {% block style_base %}
+        {% comment %}
+            See DEFAULT_CSS in https://github.com/chrisglass/xhtml2pdf/blob/master/xhtml2pdf/default.py
+            for base style.
+        {% endcomment %}
+
+        {% block layout_style %}
+            <style type="text/css">
+                @page {
+                    size: {{ pagesize|default:"A4" }};
+                    margin-left: 2.5cm;
+                    margin-right: 1.5cm;
+                    margin-top: 3.5cm;
+                    margin-bottom: 2cm;
+                    @frame header {
+                        -pdf-frame-content: page-header;
+                        margin-top: 0.7cm;
+                        margin-right: 1.5cm;
+                        margin-bottom: 0cm;
+                        margin-left: 2.5cm;
+                    }
+                    @frame footer {
+                        -pdf-frame-content: page-footer;
+                        bottom: 0cm;
+                        margin-left: 1cm;
+                        margin-right: 1cm;
+                        height: 1cm;
+
+                    }  
+
+                }
+
+                
+                html{
+                    font-size: 9pt;
+                }
+                .textoborde {
+                    font-size:22px; 
+                }
+                .textoborde1 {
+                    font-size:24px; 
+                }
+                .tittle_report h1, h2{
+                    text-align: center;
+                    margin: 5px;
+                }
+                .general{
+                    margin: 20px;
+                }
+                .general table, tr, th{
+                    text-align: left;
+                }
+                .lineal table{
+                    padding-top: 3px;
+                    padding-right: 3px;
+                    padding-left: 3px;
+                    border-right: 1px solid black;
+                    border-left: 1px solid black;
+                }
+                .lineal th{
+                    text-align: center;
+                }
+                div#tabla_dos{
+                    width:300px;
+                    position:relative;
+                    float: left;
+                    height: auto;
+                }
+                .encabezados{
+                    text-align: center; 
+                    border-top: 1px solid black; 
+                    border-bottom: 1px solid black; 
+                    border-right: 1px solid black; 
+                    border-left: 1px solid black;
+                }
+                .firma th{
+                    text-align: center;
+                }
+                .contenido{
+                    text-align: right; 
+                     
+                    border-left: 1px solid black;
+
+                }
+                .contenido2{
+                    text-align: left; 
+                  
+                    border-left: 1px solid black;
+                }
+                .contenido3{
+                    text-align: right;
+                    border-bottom: 1px solid black; 
+                    border-left: 1px solid black; 
+                    border-right: 1px solid black;
+                    border-top: 1px solid black;
+                }
+                .contenido4{
+                    border-left: 1px solid black; 
+                }
+                .contenido5{
+                    border-left: 1px solid black;
+                    border-bottom: 1px solid black; 
+                }
+                .contenido6{
+                    border-left: 1px solid black;
+                    border-right: 1px solid black;
+                    border-top: 1px solid black; 
+                }
+                .contenido7{
+                    border-right: 1px solid black;
+                    border-bottom: 1px solid black; 
+                }
+                .contenido8{
+                    border-right: 1px solid black; 
+                }
+                .contenido9{
+                    border-left: 1px solid black;
+                    border-right: 1px solid black;
+                    border-bottom: 1px solid black; 
+                }
+                .contenido10{
+                    border-bottom: 1px solid black;
+                    border-right: 1px solid black; 
+                }
+                .contenido11{
+                    border-top: 1px solid black;
+                    border-left: 1px solid black; 
+                    border-bottom: 1px solid black; 
+                }
+                .contenido12{
+                    border-left: 1px solid black;
+                    border-top: 1px solid black; 
+                }
+                .tabla1{
+                    padding-top: 3px;
+                    padding-right: 3px;
+                    padding-left: 3px;
+                }
+                .divicion hr{
+                    margin-bottom: 10px;
+                }
+                
+               
+            </style>
+        {%endblock%}
+        {% block extra_style %}{% endblock %}
+    {% endblock %}
+</head>
+<body>
+           {% if comp %}
+            
+            {%block content%}
+                <div id="page-header">
+                    <div class="tabla1">
+                        <table>
+                            <tr>
+                                <td colspan="5">
+                                    EMPRESA MINERA "MINDES S.R.L."
+                                </td>
+                                <th>Fecha</th>
+                                <th>T.C.</th> 
+                            </tr> 
+                            <tr>
+                                <td colspan="2">
+                                    POTOSI-BOLIVIA
+                                </td>
+                                <td colspan="3"></td>
+                                <td colspan="1">
+                                    {{comp.fecha_f}}
+                                </td>
+                                <td colspan="1">
+                                    {{comp.cotizacion}}
+                                </td>
+                            </tr>
+                        </table>
+                        <table>
+                            <tr>
+                                <td colspan="1"></td>
+                                <th class="textoborde" colspan="6">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COMPROBANTE DE {{comp.get_tipo_trans_display}}</th>
+                                <th colspan="2" class="textoborde1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nº {{comp.numero_comp}}</th>
+                            </tr>  
+                           
+                        </table>
+                    </div>
+                    <hr></hr>
+                </div>
+                    <div>
+                        <div>
+                        <table>
+                            <tr style="padding-top: 3px">
+                                <th colspan="2">Lugar y Fecha:</th>
+                                <td colspan="4">
+                                    Potosí, {{comp.fecha}}
+                                </td>
+                                <td colspan="5"></td>
+                            </tr>
+                            <tr>
+                                <th colspan="2">Pagado a:</th>
+                                <td colspan="10">
+                                    {{comp.entregado}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th colspan="2">Concepto:</th>
+                                <td colspan="10">
+                                    {{comp.glosa}}
+                                </td>
+                            </tr>
+                        </table>
+                        </div>
+                        <table class="tabla1">
+                            <tr>
+                                
+                                <th rowspan="2" style="text-align: center;" class="encabezados">CODIGO</th>
+                                <th colspan="3" style="text-align: center;" rowspan="2" class="encabezados">NOMBRE CUENTA</th>
+                                <th rowspan="2" class="encabezados">NUMERO CHEQUE</th>
+                                <th colspan="2" style="text-align: center;" class="encabezados">BOLIVIANOS</th>
+                                <th colspan="2" style="text-align: center;" class="encabezados">DOLARES</th>
+
+                            </tr>
+                            <tr>
+                                
+                                <th style="text-align: center;" class="encabezados">DEBE</th>
+                                <th style="text-align: center;" class="encabezados">HABER</th>
+                                <th style="text-align: center;" class="encabezados">DEBE</th>
+                                <th style="text-align: center;" class="encabezados">HABER</th>
+                            </tr>
+                        </table>
+                        
+
+                        <table class="tabla1">
+
+                            {% for i in comp.asientos.all %}
+                            
+                            <tr>
+                                <td class="contenido2">
+                                    
+                                </td>
+
+
+                                {% ifchanged i.nivel_cinco.nivel_cuatro.descripcion %}
+                                <td colspan="3" class="contenido2">
+                                    <b><u>{{i.nivel_cinco.nivel_cuatro.descripcion}}</u></b>
+                                </td>
+                                <td class="contenido2">
+                                    
+                                </td>
+                                <td class="contenido2">
+                                    
+                                </td>
+                                <td class="contenido2">
+                                    
+                                </td>
+                                <td style="border-right: 1px solid black" class="contenido2">
+                                    
+                                </td>
+                                <td style="border-right: 1px solid black">
+                                    
+                                </td>
+                                {% else %}
+                                <td colspan="3" class="contenido2">
+                                    
+                                </td>
+                                <td class="contenido2">
+                                    
+                                </td>
+                                <td class="contenido2">
+                                    
+                                </td>
+                                <td class="contenido2">
+                                    
+                                </td>
+                                <td style="border-right: 1px solid black" class="contenido2">
+                                    
+                                </td>
+                                <td style="border-right: 1px solid black">
+                                    
+                                </td>
+                                {% endifchanged %}
+                            </tr>
+                            <tr>
+                                <td style="border-left: 1px solid black; text-align: center;">
+                                    {{i.nivel_cinco.codigo}}   
+                                </td>
+                                <td colspan="3" class="contenido2">
+                                    {{i.nivel_cinco.descripcion}}
+                                </td>
+                                <td class="contenido2">
+                                    {{i.numero_cheque}}
+                                </td>
+                                {% if i.debe_b == 0 or i.debe_b == None %}
+                                <td class="contenido">
+                                    
+                                </td>
+                                {% else %}
+                                <td class="contenido">
+                                    {{i.debe_b}}
+                                </td>
+                                {% endif %}
+                                {% if i.haber_b == 0 or i.haber_b == None %}
+                                <td class="contenido">
+                                    
+                                </td>
+                                {% else %}
+                                <td class="contenido">
+                                    {{i.haber_b}}
+                                </td>
+                                {% endif %}
+                                {% if i.debe_d == 0 or i.debe_d == None %}
+                                <td class="contenido">
+                                    
+                                </td>
+                                {% else %}
+                                <td class="contenido">
+                                    {{i.debe_d}}
+                                </td>
+                                {% endif %}
+                                {% if i.haber_d == 0 or i.haber_d == None %}
+                                <td style="border-right: 1px solid black" class="contenido">
+                                    
+                                </td>
+                                {% else %}
+                                <td style="border-right: 1px solid black" class="contenido">
+                                    {{i.haber_d}}
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% if forloop.last %}
+                            <tr>
+                                <td class="contenido3" colspan="5"><b>TOTALES</b></td>
+                                <td class="contenido3">
+                                    {{comp.debe_bs}}
+                                </td>
+                                <td class="contenido3">
+                                    {{comp.haber_bs}}
+                                </td>
+                                <td class="contenido3">
+                                    {{comp.debe_dls}}
+                                </td>
+                                <td class="contenido3">
+                                    {{comp.haber_dls}}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </table>
+                    </div>
+                    <div>
+                        <table class="tabla1">
+                            <tbody>
+                                <tr>
+                                    <td class="contenido6" colspan="9">
+                                        
+                                    </td>
+                                </tr>
+                            <tr>
+                                <th class="contenido4">SON: </th>
+                                <td class="contenido8" colspan="8">
+                                    {{comp.letras}} Bolivianos
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="contenido5">SON: </th>
+                                <td class="contenido7" colspan="8">
+                                    {{comp.letras2}} Dólares Americanos
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+              
+                    {% endblock content %}
+                    
+            {% else %}
+            <p>No contiene incluido el detalle de insumos aún</p>
+            {% endif %}
+
+            </div>
+            
+
+<table>
+<tr>
+    <td style="border-left: 1px solid black; border-right: 1px solid black">
+        
+    </td>
+    <td style="border-right: 1px solid black">
+        
+    </td>
+    <td style="border-right: 1px solid black">
+        
+    </td>
+    <td style="border-right: 1px solid black">
+        &nbsp;
+    </td>
+    
+</tr>
+<tr>
+    <td style="border-left: 1px solid black; border-right: 1px solid black">
+        
+    </td>
+    <td style="border-right: 1px solid black">
+        
+    </td>
+    <td style="border-right: 1px solid black">
+        
+    </td>
+    <td style="border-right: 1px solid black">
+        &nbsp;
+    </td>
+    
+    
+</tr>
+<tr>
+    <td style="border-left: 1px solid black; border-right: 1px solid black">
+        
+    </td>
+    <td style="border-right: 1px solid black">
+        
+    </td>
+    <td style="border-right: 1px solid black">
+        
+    </td>
+    <td style="border-right: 1px solid black">
+        &nbsp;
+    </td>
+   
+
+</tr>
+<tr>
+    <td style="border-left: 1px solid black; border-right: 1px solid black">
+        
+    </td>
+    <td style="border-right: 1px solid black">
+        
+    </td>
+    <td style="border-right: 1px solid black">
+        
+    </td>
+    <td style="border-right: 1px solid black">
+        &nbsp;
+    </td>
+    
+</tr>
+<tr>
+    <td style="border-left: 1px solid black; border-right: 1px solid black">
+        
+    </td>
+    <td style="border-right: 1px solid black">
+        
+    </td>
+    <td style="border-right: 1px solid black">
+        
+    </td>
+    <td style="border-right: 1px solid black">
+        &nbsp;
+    </td>
+    
+</tr>
+</table>
+
+
+<table class="firma">   
+<tr>
+            <th class="contenido9">
+                <hr></hr>
+                PREPARADO POR:
+            </th>
+
+            <th class="contenido10">
+                <hr></hr>
+                REVISADO POR:
+            </th>
+            <th class="contenido10">
+                <hr></hr>
+                AUTORIZADO POR:
+            </th>
+            <th class="contenido7">
+                <hr></hr>
+                {{comp.entregado|upper}}:
+            </th>
+        </tr>
+        
+
+    </table>
+    <table>
+        <tr>
+            
+        </tr>
+    <tr>
+        <td>
+            Registrado por: {{user.first_name}} {{user.last_name}}
+        </td>
+    </tr>
+    </table>
+    
+    <div id="page-footer">
+        {%block page_foot%}
+            
+             Página <pdf:pagenumber />
+           
+        {%endblock%}
+    </div>
+    
+    
+</body>
+</html>

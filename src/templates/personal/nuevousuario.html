@@ -1,0 +1,41 @@
+{% extends "base/baseform.html" %}	
+
+
+	{% block tituloform %}
+		Nuevo Usuario
+	{% endblock tituloform %}
+
+	{% block iddanger %}
+	    id="danger"
+	{% endblock iddanger %}
+	
+	{% block formulario %}
+
+	
+		{% csrf_token %}
+		{% comment %}
+		{% for field in form %}
+		    <div class="fieldWrapper">
+		        {{ field.errors }}
+		        {{ field.label_tag }} 
+		        {{ field }}
+		    </div>
+		{% endfor %}
+		{% endcomment %}
+
+		
+
+
+		{% load bootstrap3 %}
+		{% bootstrap_form form %}
+		{% bootstrap_form form2 %}
+
+		{% buttons %}
+	        <button type="submit" class="btn btn-primary center-block">
+	            {% bootstrap_icon "glyphicon glyphicon-ok" %} Enviar
+	        </button>
+	    {% endbuttons %}
+	
+		
+	
+	{% endblock formulario %}

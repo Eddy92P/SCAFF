@@ -1,0 +1,480 @@
+{% extends "base/baseform2.html" %}
+
+	{% block tituloform %}
+		Ingreso Items
+	{% endblock tituloform %}
+	
+	{% block iddanger %}
+	    id="danger"
+	{% endblock iddanger %}
+
+	{% block formulario %}
+    <style type="text/css">
+        .button1 {
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            background-color: white;
+            border: 2px solid #008CBA;
+            border-radius: 4px;
+            padding: 5px 10px;
+            background-color: #008CBA;
+            color: white;
+        }
+
+        .button1:hover {
+            background-color: #008CBA;
+            color: white;
+        }
+
+        .button2 {
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            background-color: white;
+            border: 2px solid #CC1F1F;
+            border-radius: 4px;
+            padding: 5px 10px;
+            background-color: #CC1F1F;
+            color: white;
+        }
+
+        .button2:hover {
+            background-color: #CC1F1F;
+            color: white;
+        }
+        
+    </style>
+    <script>
+        $(document).ready(function(){
+            $(document).on('keyup', function(){
+                $(".table tbody tr").each(function(index){
+                    var p = $(this).find('input');
+                    var precio_unit = 0;
+                    var costo_unit = 0;
+                    var sub_total = 0;
+                    var cant = p.eq(1).val();
+                    var costo_t = p.eq(2).val();
+                    precio_unit = costo_t/cant;
+                    var p_unit = p.eq(3).val(precio_unit.toFixed(2));
+                    var c_unit = p.eq(4).val(precio_unit.toFixed(2));
+                    var s_total = p.eq(5).val(costo_t);
+                    $("#id_iva").on('change', function(){
+                        if($(this).is(':checked'))
+                        {
+                            var debe = $("#id_total");
+                            var iva = precio_unit-(precio_unit*0.13);
+                            var iva2 = costo_t-(costo_t*0.13);
+                            c_unit = p.eq(4).val(iva.toFixed(2));
+                            s_total = p.eq(5).val(iva2.toFixed(2));
+                            var aux = 0;
+                            var aux1 = 0;
+                            var dif = 0;
+                            var aux2 = $("#id_total");
+                            var aux3 = $("#id_total_iva");
+                            $(".table tbody tr").each(function(){
+                                var p = $(this).find('input');
+                                var aux4 = p.eq(2).val();
+                                var aux5 = p.eq(5).val();
+                                aux += parseFloat(aux4) || 0;
+                                aux1 += parseFloat(aux5) || 0;
+                                aux2.val(aux.toFixed(2));
+                                aux3.val(aux1.toFixed(2));
+                                x = $("#id_total").val()
+                                y = $("#id_total_iva").val()
+                                dif = parseFloat(x) - parseFloat(y);
+                                $("#id_importe_iva").val(parseFloat(dif));
+                            });
+                            $(document).unbind("keyup");
+                        }
+                        else
+                        {
+                            $(document).bind('keyup', function(){
+                                var dif = 0;
+                                var aux = 0;
+                                var aux1 = 0;
+                                var aux2 = $("#id_total");
+                                var aux3 = $("#id_total_iva");
+                                $(".table tbody tr").each(function(index){
+                                    var p = $(this).find('input');
+                                    var precio_unit = 0;
+                                    var costo_unit = 0;
+                                    var sub_total = 0;
+                                    var cant = p.eq(1).val();
+                                    var costo_t = p.eq(2).val();
+                                    precio_unit = costo_t/cant;
+                                    var p_unit = p.eq(3).val(precio_unit.toFixed(2));
+                                    var c_unit = p.eq(4).val(precio_unit.toFixed(2));
+                                    var s_total = p.eq(5).val(costo_t);
+                                    var aux4 = p.eq(2).val();
+                                    var aux5 = p.eq(5).val();
+                                    aux += parseFloat(aux4) || 0;
+                                    aux1 += parseFloat(aux5) || 0;
+                                    aux2.val(aux.toFixed(2));
+                                    aux3.val(aux1.toFixed(2));
+                                    x = $("#id_total").val()
+                                    y = $("#id_total_iva").val()
+                                    dif = parseFloat(x) - parseFloat(y);
+                                    $("#id_importe_iva").val(parseFloat(dif));
+                                });
+                            });
+                        }
+                    });
+                });
+            });
+            
+        });
+        $(document).ready(function(){
+            $(document).on("keyup", function(){
+                var dif = 0;
+                var aux = 0;
+                var aux1 = 0;
+                var aux2 = $("#id_total");
+                var aux3 = $("#id_total_iva");
+                $(".table tbody tr").each(function(){
+                    var p = $(this).find('input');
+                    var aux4 = p.eq(2).val();
+                    var aux5 = p.eq(5).val();
+                    aux += parseFloat(aux4) || 0;
+                    aux1 += parseFloat(aux5) || 0;
+                    aux2.val(aux.toFixed(2))
+                    aux3.val(aux1.toFixed(2))
+                    x = $("#id_total").val()
+                    y = $("#id_total_iva").val()
+                    dif = parseFloat(x) - parseFloat(y);
+                    $("#id_importe_iva").val(parseFloat(dif));
+                });
+            });
+        });
+    </script>
+        {% csrf_token %}
+        {% comment %}
+        {% for field in form %}
+            <div class="fieldWrapper">
+                {{ field.errors }}
+                {{ field.label_tag }} 
+                {{ field }}
+            </div>
+        {% endfor %}
+        {% endcomment %}
+        {% if error %}
+            <div class="alert alert-danger" role="alert"><strong>Advertencia!!!</strong> {{ error }}</div>
+        {% endif %}
+        <div class="panel panel-default">
+                <div class="panel-body">
+                    <table class="table2">
+                        {% load bootstrap3 %}
+                        <tbody>
+                            <tr>
+                                <td class="col-lg-1">
+                                    <label>Tipo Entrada</label>
+                                        {% if form.tipo_entrada.errors %}
+                                            {% for error in form.tipo_entrada.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ form.tipo_entrada }}
+                
+                                </td>
+                                <td class="col-lg-2">
+                                    <label>Proveedor</label>
+                                        {% if form.proveedor.errors %}
+                                            {% for error in form.proveedor.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ form.proveedor }}
+                
+                                </td>
+                                <td class="col-lg-1">
+                                    <label>Nº Factura</label>
+                                        {% if form.factura.errors %}
+                                            {% for error in form.factura.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ form.factura }}
+                
+                                </td>
+                                <td class="col-lg-1">
+                                    <label>Fecha</label>
+                                        {% if form.fecha.errors %}
+                                            {% for error in form.fecha.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ form.fecha }}
+                
+                                </td>
+                                <td style="padding-top: 15px" class="col-lg-1">
+                                    <label>C/IVA</label>
+                                        {% if form.iva.errors %}
+                                            {% for error in form.iva.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ form.iva }}
+                
+                                </td>
+                                <tr>
+                                <td style="padding-top: 15px" class="col-lg-2">
+                                    <label>Concepto</label>
+                                        {% if form.concepto.errors %}
+                                            {% for error in form.concepto.errors %}
+                                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                <strong>Error: </strong> {{ error|escape }}
+                                            </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {{ form.concepto }}
+                
+                                </td>
+                                
+                                {{ crear_personal_form_set.management_form }}
+                                {% for crear_personal_form in crear_personal_form_set %}
+                                    {{ crear_personal_form.id }}
+                                    <td class="col-lg-2">
+                                        {% if forloop.counter == 2 %}
+                                            <label>Autorizado</label>
+                                        {% else %}
+                                            <label>Entregado</label>
+                                        {% endif %}
+                                            {% if crear_personal_form.personal.errors %}
+                                                {% for error in crear_personal_form.personal.errors %}
+                                                <div class="alert alert-danger alert-dismissible" role="alert">
+                                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                        <strong>Error: </strong> {{ error|escape }}
+                                                </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                            {{ crear_personal_form.personal }}
+                                    </td>                                   
+                                {{ crear_personal_form.media }}      
+                                {% endfor %}
+                                </tr>
+                                
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        <div class="panel panel-default">
+                <div class="panel-body">
+
+                        <table class="table">
+ 
+                        {{ crear_ingreso_form_set.management_form }}
+                        <tbody>
+                        {% for crear_ingreso_form in crear_ingreso_form_set %}
+                                <tr class="formset_row">
+                                     {{ crear_ingreso_form.id }}
+                                     <td class="col-lg-3">
+                                            <label>Item</label>
+                                                {% if crear_ingreso_form.item.errors %}
+                                                        {% for error in crear_ingreso_form.item.errors %}
+                                                        <div class="alert alert-danger alert-dismissible" role="alert">
+                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                                <strong>Error: </strong> {{ error|escape }}
+                                                        </div>
+                                                        {% endfor %}
+                                                {% endif %}
+                                                {{ crear_ingreso_form.item }}
+                                        </td>
+                                          <td class="col-lg-1">
+                                            <label>Cantidad</label>
+                                                {% if crear_ingreso_form.cantidad.errors %}
+                                                        {% for error in crear_ingreso_form.cantidad.errors %}
+                                                        <div class="alert alert-danger alert-dismissible" role="alert">
+                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                                <strong>Error: </strong> {{ error|escape }}
+                                                        </div>
+                                                        {% endfor %}
+                                                {% endif %}
+                                                {{ crear_ingreso_form.cantidad }}
+                                        </td>
+                                        <td class="col-lg-2">
+                                            <label>Costo Total</label>
+                                                {% if crear_ingreso_form.costo_total.errors %}
+                                                        {% for error in crear_ingreso_form.costo_total.errors %}
+                                                        <div class="alert alert-danger alert-dismissible" role="alert">
+                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                                <strong>Error: </strong> {{ error|escape }}
+                                                        </div>
+                                                        {% endfor %}
+                                                {% endif %}
+                                                {{ crear_ingreso_form.costo_total }}
+                                        </td>
+                                        <td class="col-lg-2">
+                                            <label>Precio Unit.</label>
+                                                {% if crear_ingreso_form.precio_unit.errors %}
+                                                        {% for error in crear_ingreso_form.precio_unit.errors %}
+                                                        <div class="alert alert-danger alert-dismissible" role="alert">
+                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                                <strong>Error: </strong> {{ error|escape }}
+                                                        </div>
+                                                        {% endfor %}
+                                                {% endif %}
+                                                {{ crear_ingreso_form.precio_unit }}
+                                        </td>
+                                        <td class="col-lg-2">
+                                            <label>Costo Unit.</label>
+                                                {% if crear_ingreso_form.costo_unit.errors %}
+                                                        {% for error in crear_ingreso_form.costo_unit.errors %}
+                                                        <div class="alert alert-danger alert-dismissible" role="alert">
+                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                                <strong>Error: </strong> {{ error|escape }}
+                                                        </div>
+                                                        {% endfor %}
+                                                {% endif %}
+                                                {{ crear_ingreso_form.costo_unit }}
+                                        </td>
+                                        <td class="col-lg-2">
+                                            <label>Sub Total</label>
+                                                {% if crear_ingreso_form.sub_total.errors %}
+                                                        {% for error in crear_ingreso_form.sub_total.errors %}
+                                                        <div class="alert alert-danger alert-dismissible" role="alert">
+                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                                <strong>Error: </strong> {{ error|escape }}
+                                                        </div>
+                                                        {% endfor %}
+                                                {% endif %}
+                                                {{ crear_ingreso_form.sub_total }}
+                                        </td>
+                                        {{ crear_ingreso_form.costo_unit_actualizado.as_hidden }}
+
+
+                                        {{ crear_ingreso_form.sub_total_actualizado.as_hidden }}
+                                                                             
+                                </tr>
+                                {{ crear_ingreso_form.media }}
+                                
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                        
+                </div>
+        </div>
+        <div class="panel panel-default">
+        <div class="panel-body">
+
+            <table class="table1">
+            <tbody>
+            <tr>
+                <th colspan="10" style="text-align: center; padding-bottom: 10px">TOTALES</th>
+            </tr>
+            <tr>
+                <td class="col-lg-2">
+                    <label>Importe IVA</label>
+                        {% if form.importe_iva.errors %}
+                            {% for error in form.importe_iva.errors %}
+                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                </button>
+                                <strong>Error: </strong> {{ error|escape }}
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                        {{ form.importe_iva }}
+
+                </td>
+                <td class="col-lg-2">
+                    <label>S/Factura</label>
+                        {% if form.total.errors %}
+                            {% for error in form.total.errors %}
+                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                </button>
+                                <strong>Error: </strong> {{ error|escape }}
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                        {{ form.total }}
+
+                </td>
+                <td class="col-lg-2">
+                    <label>C/Factura</label>
+                        {% if form.total_iva.errors %}
+                            {% for error in form.total_iva.errors %}
+                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                </button>
+                                <strong>Error: </strong> {{ error|escape }}
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                        {{ form.total_iva }}
+
+                </td>
+            </tr>
+        </tbody>
+        </table>
+
+        </div>
+        </div>
+
+
+        <div class="col-lg-12 text-right">
+                <input type="submit" class="btn btn-primary" name="submit" value="Guardar" />
+                <a href="#" class="btn btn-default">Limpiar Formulario</a>   
+        </div>
+        
+<script type="text/javascript">
+
+    $('.formset_row').formset({ 
+    addText: 'añadir fila', 
+    deleteText: 'quitar fila', 
+    prefix: 'ingresoitem_set',
+    addCssClass: 'button1',
+    deleteCssClass: 'button2'
+    });
+
+</script>
+
+{% endblock formulario %}
+

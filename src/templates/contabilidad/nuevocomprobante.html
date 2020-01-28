@@ -1,0 +1,130 @@
+{% extends "base/baseform.html" %}	
+
+	{% block tituloform %}
+		Nuevo Comprobante
+	{% endblock tituloform %}
+	
+	{% block iddanger %}
+	    id="danger"
+	{% endblock iddanger %}
+
+	{% block formulario %}
+
+        {% csrf_token %}                         
+        <div class="panel panel-default">
+                <div class="panel-body">
+                        {{ form.as_p }}
+                        
+
+                        {{ crear_comprobante_form_set.management_form }}
+                        {% for crear_comprobante_form in crear_comprobante_form_set %}
+
+                                <div class="row">
+                                        <div class="col-lg-2">
+                                                <label>Nombre Cuenta</label>
+                                                {% if crear_comprobante_form.comprobante.errors %}
+                                                        {% for error in crear_comprobante_form.contabilidad.errors %}
+                                                        <div class="alert alert-danger alert-dismissible" role="alert">
+                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                                <strong>Error: </strong> {{ error|escape }}
+                                                        </div>
+                                                        {% endfor %}
+                                                {% endif %}
+                                                {{ crear_comprobante_form.nombre_cu }}
+                                        </div>
+                                          <div class="col-lg-2">
+                                                <label>Descripcion</label>
+                                                {% if crear_comprobante_form.comprobante.errors %}
+                                                        {% for error in crear_comprobante_form.contabilidad.errors %}
+                                                        <div class="alert alert-danger alert-dismissible" role="alert">
+                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                                <strong>Error: </strong> {{ error|escape }}
+                                                        </div>
+                                                        {% endfor %}
+                                                {% endif %}
+                                                {{ crear_comprobante_form.descripcion }}
+                                        </div>
+                                          <div class="col-lg-2">
+                                                <label>Glosa Individual</label>
+                                                {% if crear_comprobante_form.comprobante.errors %}
+                                                        {% for error in crear_comprobante_form.contabilidad.errors %}
+                                                        <div class="alert alert-danger alert-dismissible" role="alert">
+                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                                <strong>Error: </strong> {{ error|escape }}
+                                                        </div>
+                                                        {% endfor %}
+                                                {% endif %}
+                                                {{ crear_comprobante_form.glosa_indiv }}
+                                        </div>
+                                          <div class="col-lg-2">
+                                                <label>Debe Bs</label>
+                                                {% if crear_comprobante_form.comprobante.errors %}
+                                                        {% for error in crear_comprobante_form.contabilidad.errors %}
+                                                        <div class="alert alert-danger alert-dismissible" role="alert">
+                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                                <strong>Error: </strong> {{ error|escape }}
+                                                        </div>
+                                                        {% endfor %}
+                                                {% endif %}
+                                                {{ crear_comprobante_form.debe_b }}
+                                        </div>
+                                          <div class="col-lg-2">
+                                                <label>Haber Bs</label>
+                                                {% if crear_comprobante_form.comprobante.errors %}
+                                                        {% for error in crear_comprobante_form.contabilidad.errors %}
+                                                        <div class="alert alert-danger alert-dismissible" role="alert">
+                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                                <strong>Error: </strong> {{ error|escape }}
+                                                        </div>
+                                                        {% endfor %}
+                                                {% endif %}
+                                                {{ crear_comprobante_form.haber_b }}
+                                        </div>
+                                          <div class="col-lg-1">
+                                                <label>Presup</label>
+                                                {% if crear_comprobante_form.comprobante.errors %}
+                                                        {% for error in crear_comprobante_form.contabilidad.errors %}
+                                                        <div class="alert alert-danger alert-dismissible" role="alert">
+                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                                <strong>Error: </strong> {{ error|escape }}
+                                                        </div>
+                                                        {% endfor %}
+                                                {% endif %}
+                                                {{ crear_comprobante_form.presup }}
+                                        </div>
+                                          <div class="col-lg-1">
+                                                <label>Nro cheque</label>
+                                                {% if crear_comprobante_form.comprobante.errors %}
+                                                        {% for error in crear_comprobante_form.contabilidad.errors %}
+                                                        <div class="alert alert-danger alert-dismissible" role="alert">
+                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                                <strong>Error: </strong> {{ error|escape }}
+                                                        </div>
+                                                        {% endfor %}
+                                                {% endif %}
+                                                {{ crear_comprobante_form.numero_cheque }}
+                                        </div>                                        
+                                </div>
+                        {% endfor %}
+                </div>
+        </div>
+        <div class="col-lg-12 text-right">
+                <input type="submit" class="btn btn-primary" name="submit" value="Guardar">
+
+        </div>
+
+    {% endblock formulario %}

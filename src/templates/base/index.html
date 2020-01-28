@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es-la">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>{% block blockname %}MINDES S.R.L.{% endblock blockname %} </title>
+	<!-- css bosstrap -->
+	<link href="{% static 'css/bootstrap.min.css'%} " rel="stylesheet">
+	<link href="{% static 'css/cssconf.css' %} " rel="stylesheet"> 
+
+	<link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
+
+
+	<link href="{% static 'css/ie10-viewport-bug-workaround.css' %}" rel="stylesheet">
+
+	<script src="{% static 'js/ie-emulation-modes-warning.js' %}"></script>
+	<script src="{% static 'js/jquery.min.js' %}"></script>
+
+    <script src="{% static 'js/html5shiv.min.js' %}"></script>
+    <script src="{% static 'js/respond.min.js' %}"></script>
+    
+
+	<script type="text/javascript" src="/static/autocomplete_light/jquery.init.js"></script>
+	<script type="text/javascript" src="/static/autocomplete_light/select2.full.js"></script>
+	<script type="text/javascript" src="/static/autocomplete_light/select2.js"></script>
+	<script src = "{% static 'formset/jquery.formset.js'%} "> </script>
+	<script type="text/javascript" src="/static/autocomplete_light/autocomplete.init.js"></script>
+	<script src="{% static 'js/jquery.auto-complete.js' %}"></script>
+	<script type="text/javascript" src="/static/autocomplete_light/autocomplete.js"></script>
+	
+	<script type="text/javascript" src="/static/autocomplete_light/forward.js"></script>
+	
+	
+
+	<script src="{% static 'js/es.js' %}"></script>
+	<link href="/static/autocomplete_light/select2.css" type="text/css" media="all" rel="stylesheet" />
+
+	 <link href="{% static 'css/select2.min.css' %}" rel="stylesheet"></link>
+  
+  <script src="{% static 'js/select2.min.js' %}"></script>
+
+  <link href="{% static 'css/datatables.min.css' %}" rel="stylesheet">
+
+
+
+     
+
+
+</head>
+<body>
+	{% block nav %}
+		{% include "base/nav.html" %}
+	{% endblock nav %}	
+	{% block foto %}
+		<div id="cn-overlay" class="cn-overlay"></div>
+	{% endblock foto %}
+	{% block body %}
+		<script>
+			$(document).ready(function(){
+				//console.log("hola");
+				$('#danger').submit(function(){
+					currentForm = this;
+					console.log("holas");
+					$('#dialog-confirm').dialog({
+						position: { my: "center", at: "center", of: window },
+						resizable: false,
+						//height:200,
+						modal: true,
+						draggable: false,
+						buttons: {
+							'Enviar': function() 
+							{
+								currentForm.submit();
+							},
+							Cancelar: function() {
+								$(this).dialog('close');
+							}
+						},
+					});
+					return false;
+				});
+			});	
+		</script>
+        <div id="dialog-confirm" title="Cuidado!!!" style="display: none;">
+        	<div class="alert alert-danger" role="alert">
+        		 <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
+        		El siguiente formulario contiene información sencible por favor verifique los datos antes de ingresarlos
+        	</div>
+		</div>
+	{% endblock body %}
+    <!--<script src="{% static 'js/jquery-3.1.0.min.js' %}"></script>-->
+
+ 	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+    <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+   
+    <script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
+
+    <script src="{% static 'js/datatables.min.js' %}"></script>
+
+
+    
+    <script>window.jQuery || document.write('<script src="{% static 'js/jquery.min.js' %}"><\/script>')</script>
+</body>
+</html>

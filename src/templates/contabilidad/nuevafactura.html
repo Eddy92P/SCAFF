@@ -1,0 +1,155 @@
+{% extends "base/baseform.html" %}	
+
+
+	{% block tituloform %}
+		Nueva Factura
+	{% endblock tituloform %}
+
+	{% block iddanger %}
+	    id="danger"
+	{% endblock iddanger %}
+	
+	{% block formulario %}
+	<script>
+		$(document).ready(function(){
+			$(document).on("submit", function(){
+				$("#id_estado").val(true);
+			});
+		});
+
+		$(document).ready(function(){
+			$(document).on("keyup", function(){
+				total = 0
+				total1 = 0
+				porcent = 0
+				var importe = $("#id_importe_fac").val();
+				var importe_cred = $("#id_importe_credit").val();
+				total = parseFloat(importe) - parseFloat(importe_cred)
+				$("#id_subtot").val(total.toFixed(2))
+				var subtotal = $("#id_subtot").val();
+				var desc = $("#id_descuento").val();
+				total1 = parseFloat(subtotal) - parseFloat(desc)
+				$("#id_base_credito").val(total1)
+				var base = $("#id_base_credito").val();
+				porcent = parseFloat(base) * 0.13
+				$("#id_credit_fisc").val(porcent.toFixed(2))
+			});
+			$("#id_nro_dui").prop('readonly', true)
+			$("#id_sucursal").prop('readonly', true)
+			$("#id_retencion_0").on('change', function(){
+				var total = 0
+				$("#id_importe_credit").val(0);
+				$("#id_subtot").val(0);
+				$("#id_descuento").val(0);
+				$("#id_base_credito").val(0);
+				$("#id_credit_fisc").val(0);
+				var compra = $("#id_importe_fac").val();
+				var no_cred = $("#id_importe_credit");
+				var subt = $("#id_subtot");
+				if($(this).is(':checked'))
+				{
+					no_cred.val(parseFloat(compra).toFixed(2));
+					no_cred = $("#id_importe_credit").val();
+					total = parseFloat(compra) - parseFloat(no_cred);
+					subt.val(parseFloat(total).toFixed(2));
+					$("#id_subtot").prop('readonly', true);
+					$("#id_descuento").prop('readonly', true);
+					$("#id_base_credito").prop('readonly', true);
+					$("#id_credit_fisc").prop('readonly', true);
+				}
+			});
+			$("#id_retencion_1").on('change', function(){
+				var total = 0
+				var porcent = 0
+				var fiscal = 0
+				$("#id_importe_credit").val(0);
+				$("#id_subtot").val(0);
+				$("#id_descuento").val(0);
+				$("#id_base_credito").val(0);
+				$("#id_credit_fisc").val(0);
+				var compra = $("#id_importe_fac").val();
+				var no_cred = $("#id_importe_credit");
+				var subt = $("#id_subtot");
+				var base = $("#id_base_credito")
+				if($(this).is(':checked'))
+				{
+					porcent = parseFloat(compra) * 0.3
+					no_cred.val(parseFloat(porcent).toFixed(2));
+					no_cred = $("#id_importe_credit").val();
+					total = parseFloat(compra) - parseFloat(no_cred);
+					subt.val(parseFloat(total).toFixed(2));
+					$("#id_subtot").prop('readonly', true);
+					$("#id_descuento").prop('readonly', true);
+					$("#id_base_credito").prop('readonly', true);
+					$("#id_credit_fisc").prop('readonly', true);
+					subt = $("#id_subtot").val();
+					base.val(parseFloat(subt).toFixed(2));
+					base = $("#id_base_credito").val();
+					fiscal = parseFloat(base) * 0.13
+					$("#id_credit_fisc").val(fiscal.toFixed(2))
+				}
+			});
+			/*$("#id_retencion_0").on('change', function(){
+				if($(this).is(':checked'))
+				{
+					$("#id_importe_credit").val(0);
+					$("#id_subtot").val(0);
+					$("#id_descuento").val(0);
+					$("#id_base_credito").val(0);
+					$("#id_credit_fisc").val(0);
+					$("#id_subtot").prop('readonly', false);
+					$("#id_descuento").prop('readonly', false);
+					$("#id_base_credito").prop('readonly', false);
+					$("#id_credit_fisc").prop('readonly', false);
+					$(document).on("keyup", function(){
+						total = 0
+						total1 = 0
+						porcent = 0
+						var importe = $("#id_importe_fac").val();
+						var importe_cred = $("#id_importe_credit").val();
+						total = parseFloat(importe) - parseFloat(importe_cred)
+						$("#id_subtot").val(total)
+						var subtotal = $("#id_subtot").val();
+						var desc = $("#id_descuento").val();
+						total1 = parseFloat(subtotal) - parseFloat(desc)
+						$("#id_base_credito").val(total1)
+						var base = $("#id_base_credito").val();
+						porcent = parseFloat(base) * 0.13
+						$("#id_credit_fisc").val(porcent.toFixed(2))
+					});
+					
+				}
+			});*/
+		});
+	</script>
+
+		{% csrf_token %}
+		{% comment %}
+		{% for field in form %}
+		    <div class="fieldWrapper">
+		        {{ field.errors }}
+		        {{ field.label_tag }} 
+		        {{ field }}
+		    </div>
+		{% endfor %}
+		{% endcomment %}
+
+		
+
+
+		{% load bootstrap3 %}
+		{% bootstrap_form form %}
+
+		{% buttons %}
+	        <div class="text-center"> 
+	        <button type="submit" class="btn btn-primary btninter">
+	            {% bootstrap_icon "glyphicon glyphicon-ok" %} Guardar
+	        </button>
+	        <a href="#" class="btn btn-default">Limpiar Formulario</a>
+	        <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger">Salir</a>
+	    </div>	
+	    {% endbuttons %}
+	
+		
+	
+	{% endblock formulario %}

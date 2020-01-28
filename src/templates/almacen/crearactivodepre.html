@@ -1,0 +1,38 @@
+{% extends "base/baseform.html" %}	
+
+
+	<h2 style="text-align: center;">
+		{% block tituloform %}
+			Depreciación
+		{% endblock tituloform %}
+	</h2>
+	{% block formulario %}
+
+	
+		{% csrf_token %}
+		{% comment %}
+		{% for field in form %}
+		    <div class="fieldWrapper">
+		        {{ field.errors }}
+		        {{ field.label_tag }} 
+		        {{ field }}
+		    </div>
+		{% endfor %}
+		{% endcomment %}
+		{% if res %}
+			<div class="alert alert-danger" role="alert"><strong>Su depreciación es de: </strong> {{ res }}</div>
+		{% endif %}
+
+		<!--
+		<div class="row">
+			<div class="col-lg-6">	
+				<button type="reset" class="btn btn-default center-block">Reset</button>
+			</div>
+			<div class="col-lg-6">
+				<button type="submit" value="login" class="btn btn-primary center-block">Submit</button>
+			</div>
+		</div>
+		-->
+		
+	
+	{% endblock formulario %}

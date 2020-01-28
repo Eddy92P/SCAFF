@@ -1,0 +1,38 @@
+{% extends "base/index.html" %}
+
+{% block body %}
+
+	
+	<div class="col-sm-4"></div>
+	<div class="col-sm-4 well">
+		<div class="margen">
+			{% block legend %}
+				
+			{% endblock legend %}
+			{% block errores %}
+				
+			{% endblock errores %}
+
+			
+			<h2 style="text-align: center;">
+				{% block tituloform %}
+
+				{% endblock tituloform %}
+			</h2>
+			<form {% block iddanger %} {% endblock iddanger %} action="{% block urlEnvio %} {% endblock urlEnvio %}" method="post" enctype="multipart/form-data" class="form">
+				{% block formulario %}
+					
+				{% endblock formulario %}
+				
+			</form>
+		</div>
+
+	</div>
+
+	<div class="col-sm-4"></div>
+
+	{% block añadidos %}
+		
+	{% endblock añadidos %}
+
+{% endblock body %}

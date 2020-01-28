@@ -1,0 +1,123 @@
+{% extends "base/index.html" %}	
+
+	{% block body %}
+	<script>
+    $(document).ready(function(){
+        $('#listado').dataTable();
+    });
+    </script>
+		<div class="col-sm-1"></div>
+		<div class="col-sm-12">
+			<div class="well bs-component">
+				
+				<div class="row">
+					<div class="col-lg-12">
+						
+						<h2 style="text-align: center;">
+							Listado de Altas
+						</h2>
+						<form role="form" class="form-inline" action="" method="get" accept-charset="utf-8">
+								{% load bootstrap3 %}
+
+								{% if perms.activos_f.add_alta_baja_activo %}
+								<a class="btn btn-primary" type="submit"  href="{% url 'activos_f:nueva_altaactivo' %}">Registrar Alta</a>
+						    	{% endif %}
+						</form>
+						
+					</div>
+				</div>
+				
+				<form action="{% url 'contabilidad:nuevoasiento_act' %}" method="get">
+
+				<label> Fecha Actualización/Depreciación:
+				<input class="form-control" type="date" name="campo"></label>
+
+				<table id="listado" class="table table-striped table-hover ">
+				  	<thead style="background-color: #000000">
+				    <tr>
+				      	<th style="color: #FFFFFF"><i>ID</i></th>
+				      	<th style="color: #FFFFFF"><i>Tipo Bien</i></th>
+				      	<th style="color: #FFFFFF"><i>Ubicación</i></th>
+				      	<th style="color: #FFFFFF"><i>Fecha alta</i></th>
+				      	<th style="color: #FFFFFF"><i>Valor inicial</i></th>
+				      	<th style="color: #FFFFFF"><i>Vida util</i></th>
+				      	<th style="color: #FFFFFF"><i>Vida util restante</i></th>
+				      	<th style="color: #FFFFFF"><i>Imagen activo</i></th>
+						{% if perms.contabilidad.add_asiento %}
+				      		<th style="color: #FFFFFF"><i>Mandar</i></th>
+				      	{% endif %}
+				      	<th style="color: #FFFFFF"><i>Opciones</i></th>
+				    </tr>
+				  	</thead>
+				 	 <tbody>
+				 	 	
+				  
+				  	{% if object_list %}
+				  		{% for obj in object_list %}
+
+
+				  			{% if forloop.counter|divisibleby:2 %}
+				  				<tr style="background-color: #FFFFFF;">
+							      	<td>{{ obj.id }}</td>
+							      	<td>{{ obj.tipo_bien }}</td>
+							      	<td>{{ obj.ubicacion }}</td>
+							      	<td>{{ obj.fecha_alt }}</td>
+							      	<td>{{ obj.valor_inic }}</td>
+							      	<td>{{ obj.vida_util }}</td>
+							      	<td>{{ obj.vida_util_rest }}</td>
+							      	{% if obj.img_activo %}
+							      	<td><img src="{{ obj.img_activo.url }}" style="width: 90px"></td>
+							      	{% else %}
+							      	<td>Sin imagen</td>
+							      	{% endif %}
+							      	{% if perms.contabilidad.add_asiento %}
+							      		<td><input type="checkbox" name="envia" value="{{ obj.id }}"></td>
+							      	{% endif %}
+							    
+							     
+							{% else %}
+								<tr style="background-color: #E3E3E3;">
+							      	<td>{{ obj.id }}</td>
+							      	<td>{{ obj.tipo_bien }}</td>
+							      	<td>{{ obj.ubicacion }}</td>
+							      	<td>{{ obj.fecha_alt }}</td>
+							      	<td>{{ obj.valor_inic }}</td>
+							      	<td>{{ obj.vida_util }}</td>
+							      	<td>{{ obj.vida_util_rest }}</td>
+							      	{% if obj.img_activo %}
+							      	<td><img src="{{ obj.img_activo.url }}" style="width: 90px"></td>
+							      	{% else %}
+							      	<td>Sin imagen</td>
+							      	{% endif %}
+							      	{% if perms.contabilidad.add_asiento %}
+							      		<td><input type="checkbox" name="envia" value="{{ obj.id }}"></td>
+							      	{% endif %}
+							     
+				  			{% endif %}
+				  					<td>
+				  						<div class="btn-group">
+				  							{% if perms.activos_f.change_alta_baja_activo %}
+                                        		<a href="{% url 'activos_f:update_altaactivo' obj.id %}" type="button" class="btn btn-primary" title="editar">
+                                            	<span class="glyphicon glyphicon-edit" aria-hidden="true">
+                                        		</a>
+                                        	{% endif %}
+                                        	{% if perms.contabilidad.add_asiento %}
+                                        			<button type="submit" class="btn btn-info btninter" title="Mandar a Contabilidad"><span class="glyphicon glyphicon-send" aria-hidden="true">
+	        										</button>
+                                        	{% endif %}
+										</div>
+				  					</td>
+					  			</tr>
+
+				  		{% endfor %}
+
+					{% endif %}
+
+				  	</tbody>
+				  	
+				</table>
+			</form>
+			</div>
+		</div>
+		<div class="col-sm-2"></div>
+	{% endblock body %}

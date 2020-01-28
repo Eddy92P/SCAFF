@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title|default:"Reporte" }}</title>
+    <meta charset="utf-8">
+    {% block style_base %}
+        {% comment %}
+            See DEFAULT_CSS in https://github.com/chrisglass/xhtml2pdf/blob/master/xhtml2pdf/default.py
+            for base style.
+        {% endcomment %}
+
+        {% block layout_style %}
+            <style type="text/css">
+                @page {
+                    size: {{ pagesize|default:"A4" }};
+                    margin-left: 1.5cm;
+                    margin-right: 1.5cm;
+                    margin-top: 2.5cm;
+                    margin-bottom: 2cm;
+                    @frame header {
+                        -pdf-frame-content: page-header;
+                        margin-top: 0.7cm;
+                        margin-right: 2mm;
+                        margin-bottom: 0cm;
+                        margin-left: 1.2cm;
+                    }
+                    @frame footer {
+                        -pdf-frame-content: page-footer;
+                        bottom: 0cm;
+                        margin-left: 1cm;
+                        margin-right: 1cm;
+                        height: 1cm;
+                    }
+                }
+
+                html{
+                    font-size: 10pt;
+                }
+                .tittle_report h1{
+                    text-align: center;
+                    margin: 5px;
+                    margin-bottom: 200px;
+                }
+                .general{
+                    margin: 20px;
+                }
+                .general table, tr, th{
+                    text-align: left;
+                }
+                .lineal table{
+                    padding-top: 3px;
+                    padding-right: 3px;
+                    padding-left: 3px;
+                    border: 1px solid black;
+                }
+                .lineal th{
+                    text-align: center;
+                }
+
+                .firma th{
+                    text-align: center;
+                }
+
+                .divicion hr{
+                    margin-bottom: 300px;
+                }
+            </style>
+        {%endblock%}
+        {% block extra_style %}{% endblock %}
+    {% endblock %}
+</head>
+<body>
+
+    <div class="tittle_report">
+        <h1>Boleta de envio de insumos</h1>
+    </div>
+
+    <h4><b>EMPRESA CONSTRUCTORA VIDAURRE J.C.</b></h4>
+    <h4><b>Unidad Administrativa y Financiera Área de Almacén</b></h4>
+    <p>“Nota: Al firmar esta boleta, El encargado de envió garantiza que las cantidad que se indica es enviada,
+    por otra parte el recepcionista debe verificar todo lo enviado antes firmar”</p>
+    <table>
+        <tr>
+            <th>
+                Del almacén:
+            </th>
+            <td>
+                {{ res.almacen }}
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Del proyecto:
+            </th>
+            <td>
+                {{ res.item.proyecto }}
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Del item:
+            </th>
+            <td>
+                {{ res.item.descripcion }}
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Descripción del envio:
+            </th>
+            <td>
+                {{ res.insumos }}
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Cantidad del envio:
+            </th>
+            <td>
+                {{ res.cantidad }} {{ res.insumos.unidad }}
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Fecha de Salida:
+            </th>
+            <td>
+                {{ res.fecha }}
+            </td>
+        </tr>
+    </table>
+
+    <div class="divicion">
+        <hr>
+    </div>
+    
+
+    <table class="firma">
+        <tr>
+            <th>
+                Firma del encargado de envio:<br> {{ usuario.first_name }} {{ usuario.last_name }}
+            </th>
+            <th>
+                Firma del recepcionista
+            </th>
+        </tr>
+    </table>
+</body>
+</html>

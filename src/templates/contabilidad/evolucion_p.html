@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title|default:"ESTADO DE EVOLUCION DEL PATRIMONIO" }}</title>
+    <meta charset="utf-8">
+    {% block style_base %}
+        {% comment %}
+            See DEFAULT_CSS in https://github.com/chrisglass/xhtml2pdf/blob/master/xhtml2pdf/default.py
+            for base style.
+        {% endcomment %}
+
+        {% block layout_style %}
+            <style type="text/css">
+                @page {
+                    size: {{ pagesize|default:"landscape" }};
+                    margin-left: 2.2cm;
+                    margin-right: 1cm;
+                    margin-top: 1cm;
+                    margin-bottom: 1cm;
+                    @frame header {
+                        -pdf-frame-content: page-header;
+                        margin-top: 3.8cm;
+                        margin-right: 1.5cm;
+                        margin-bottom: 0cm;
+                        margin-left: 2.5cm;
+                    }
+                    @frame footer {
+                        -pdf-frame-content: page-footer;
+                        bottom: 0cm;
+                        margin-left: 1cm;
+                        margin-right: 1cm;
+                        height: 1cm;
+                    }
+                }
+
+                html{
+                    font-size: 8pt;
+                }
+                .tittle_report h1{
+                    text-align: center;
+                    margin: 5px;
+                }
+                .general{
+                    margin: 20px;
+                }
+                .general table, tr, th{
+                    text-align: left;
+                }
+                .lineal table{
+                    padding-top: 3px;
+                    padding-right: 3px;
+                    padding-left: 3px;
+                    border: 1px solid black;
+                }
+                .lineal th{
+                    text-align: center;
+                    font-size: 12px
+                }
+                .firma th{
+                    text-align: center;
+                }
+
+                .division hr{
+                    margin-bottom: 300px;
+                }
+                div#tabla_uno{
+                    width:300px;
+                    position:relative;
+                    float: left;
+                    height: auto;
+                    margin-right: 10px;
+                }
+                #tabla_dos{
+                    width:300px;
+                    padding: 3px;
+                    position:relative;
+                    float: left;
+                    height: auto;
+                }
+                #fuente{
+                    padding-right: 3px;
+                    text-align: right;
+                    font-size: 12px
+                }
+                #fuente2{
+                    font-size: 12px;
+                    padding-left: 3px;
+                    text-align: left;
+                }
+            </style>
+        {%endblock%}
+        {% block extra_style %}{% endblock %}
+    {% endblock %}
+</head>
+<body>
+            <div>
+            {% if asi %}
+            <div>
+                <table>
+                    <tr>
+                        <td colspan="2">EMPRESA MINERA "MINDES S.R.L."</td>
+                    </tr>
+                    <tr>
+                        <td>POTOSI - BOLIVIA </td>
+                    </tr>
+                    <tr>
+                     
+                        <th colspan="5" style="font-size: 6; text-align: center;">ESTADO DE EVOLUCION DEL PATRIMONIO</th>
+                        
+                    </tr>
+                    <tr>
+                        <td colspan="5" style="font-size: 4; text-align: center;">
+                            Periodo al {{campo}}
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="5" style="font-size: 4; text-align: center;">
+                            (Expresado en Bolivianos)
+                        </td>
+                    </tr>
+                </table>
+                
+            </div>
+            <div class="lineal">
+                <table>
+                    <thead>
+                    <tr>
+                        <th style="background-color: #219FB5;" colspan="4">DENOMINACION</th>
+                        <th style="background-color: #219FB5;" colspan="2">CAPITAL SOCIAL</th>
+                        <th style="background-color: #219FB5;" colspan="2">AJUSTE DE CAPITAL</th>
+                        <th style="background-color: #219FB5;" colspan="2">RESERVA LEGAL</th>
+                        <th style="background-color: #219FB5;" colspan="2">AJUSTE DE RESERVAS PATRIMONIALES</th>
+                        <th style="background-color: #219FB5;" colspan="2">RESULTADOS ACUMULADOS</th>
+                        <th style="background-color: #219FB5;" colspan="2">PATRIMONIO NETO</th>
+                    </tr>
+                    <tr>
+                        <td colspan="4" id="fuente2">Saldos al inicio de la Gestión</td>
+                        <td colspan="2" id="fuente">{{ cap_soc_a }}</td>
+                        <td colspan="2" id="fuente">{{ ajuste_cap_a }}</td>
+                        <td colspan="2" id="fuente">{{ res_leg_a }}</td>
+                        <td colspan="2" id="fuente">{{ ajust_res_a }}</td>
+                        <td colspan="2" id="fuente">{{ res_acum_a }}</td>
+                        <td colspan="2" id="fuente">{{ patri_n }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" id="fuente2">Incremento de Capital</td>
+                        <td colspan="2" id="fuente">{{ cap_soc }}</td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente">({{ cap_soc }})</td>
+                        <td colspan="2" id="fuente"> </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" id="fuente2">Apropiación Fondo de Reserva Legal</td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente">{{ res_leg }}</td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente">({{ res_leg }})</td>
+                        <td colspan="2" id="fuente"> </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" id="fuente2">Ajuste de Capital</td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente">{{ ajuste_cap }}</td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente">{{ ajuste_cap }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" id="fuente2">Ajuste de Reservas Patrimoniales</td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente">{{ ajust_res }}</td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente">{{ ajust_res }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" id="fuente2">Actualización Resultado Acumulado</td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente">{{ res_acum }}</td>
+                        <td colspan="2" id="fuente">{{ res_acum }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" id="fuente2">Resultado del Ejercicio</td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente"> </td>
+                        <td colspan="2" id="fuente">{{ resultados_ejer }}</td>
+                        <td colspan="2" id="fuente">{{ resultados_ejer }}</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #219FB5;" colspan="4" id="fuente2"><b>Saldos Finales</b></td>
+                        <td style="background-color: #219FB5;" colspan="2" id="fuente"><b>{{ cap_soc_t }}</b></td>
+                        <td style="background-color: #219FB5;" colspan="2" id="fuente"><b>{{ ajuste_cap_t }}</b></td>
+                        <td style="background-color: #219FB5;" colspan="2" id="fuente"><b>{{ res_leg_t }}</b></td>
+                        <td style="background-color: #219FB5;" colspan="2" id="fuente"><b>{{ ajust_res_t }}</b></td>
+                        <td style="background-color: #219FB5;" colspan="2" id="fuente"><b>{{ res_acum_t }}</b></td>
+                        <td style="background-color: #219FB5;" colspan="2" id="fuente"><b>{{ patri_t }}</b></td>
+                    </tr>
+                    </thead>
+                </table>
+            </div>  
+            {% else %}
+            <p>No existen movimientos a la fecha</p>
+            {% endif %}
+            </div>
+        <div id="page-footer">
+        {%block page_foot%}
+            
+             Página <pdf:pagenumber />
+           
+        {%endblock%}
+        </div>
+</body>
+</html>

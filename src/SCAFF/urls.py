@@ -1,0 +1,37 @@
+"""SCAFF URL Configuration
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/1.10/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.conf.urls import url, include
+    2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
+"""
+from django.conf.urls import url, include
+from django.contrib import admin
+
+from django.views.generic import RedirectView
+from django.core.urlresolvers import reverse_lazy
+from django.contrib.auth.decorators import login_required
+
+
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^admin/', admin.site.urls),
+    url(r'^personal/', include('usuarios.urls', namespace='personal')),
+    url(r'^contabilidad/', include('contabilidad.urls', namespace='contabilidad')),
+    url(r'^almacenes/', include('almacenes.urls', namespace='almacenes')),
+    url(r'^activos_f/', include('activos_f.urls', namespace='activos_f')),
+    #url(r'^chaining/', include('smart_selects.urls')),
+    #url(r'^proyectos/', include('Proyectos.urls', namespace='proyectos')),
+    url(r'^$', RedirectView.as_view(url=reverse_lazy('personal:main')), name='home'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

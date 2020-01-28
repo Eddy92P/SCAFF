@@ -1,0 +1,27 @@
+{% extends "base/baseform_rep.html" %}	
+
+	<h2 style="text-align: center;">
+		{% block tituloform %}
+			Estado de Costo de Servicio
+		{% endblock tituloform %}
+	</h2>
+	
+	{% block urlEnviar %}
+	    {% url 'contabilidad:rep_costo_servicio' %}
+	{% endblock urlEnviar %}
+
+	{% block formulario %}
+
+	
+		{% load bootstrap3 %}
+		{% bootstrap_form form %}
+
+		{% buttons %}
+	        <button type="submit" class="btn btn-primary center-block">
+	            {% bootstrap_icon "glyphicon glyphicon-ok" %} Generar
+	        </button>
+	    {% endbuttons %}
+
+		
+	
+	{% endblock formulario %}

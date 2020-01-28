@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title|default:"REPORTE DIARIO DE ENTRADAS" }}</title>
+    <meta charset="utf-8">
+    {% block style_base %}
+        {% comment %}
+            See DEFAULT_CSS in https://github.com/chrisglass/xhtml2pdf/blob/master/xhtml2pdf/default.py
+            for base style.
+        {% endcomment %}
+
+        {% block layout_style %}
+            <style type="text/css">
+                @page {
+                    size: {{ pagesize|default:"Letter" }};
+                    margin-left: 2.2cm;
+                    margin-right: 1cm;
+                    margin-top: 1cm;
+                    margin-bottom: 1cm;
+                    @frame header {
+                        -pdf-frame-content: page-header;
+                        margin-top: 3.8cm;
+                        margin-right: 1.5cm;
+                        margin-bottom: 0cm;
+                        margin-left: 2.5cm;
+                    }
+                    @frame footer {
+                        -pdf-frame-content: page-footer;
+                        bottom: 0cm;
+                        margin-left: 1cm;
+                        margin-right: 1cm;
+                        height: 1cm;
+                    }
+                }
+
+                html{
+                    font-size: 8pt;
+                }
+                .tittle_report h1{
+                    text-align: center;
+                    margin: 5px;
+                }
+                .general{
+                    margin: 20px;
+                }
+                .general table, tr, th{
+                    text-align: left;
+                }
+                .lineal table{
+                    padding-top: 3px;
+                    padding-right: 3px;
+                    padding-left: 3px;
+                    border: 1px solid black;
+                }
+                .lineal th{
+                    text-align: center;
+                    font-size: 12px
+                }
+                .firma th{
+                    text-align: center;
+                }
+
+                .division hr{
+                    margin-bottom: 300px;
+                }
+                div#tabla_uno{
+                    width:300px;
+                    position:relative;
+                    float: left;
+                    height: auto;
+                    margin-right: 10px;
+                }
+                #tabla_dos{
+                    width:300px;
+                    padding: 3px;
+                    position:relative;
+                    float: left;
+                    height: auto;
+                }
+                #fuente{
+                    padding-right: 3px;
+                    text-align: right;
+                    font-size: 12px
+                }
+                #fuente2{
+                    font-size: 12px;
+                    padding-left: 3px;
+                    text-align: left;
+                }
+                #fuente3{
+                    border-style: none;
+                    font-size: 12px;
+                    padding-left: 3px;
+                    text-align: left;
+                    font-weight: bold;
+                }
+            </style>
+        {%endblock%}
+        {% block extra_style %}{% endblock %}
+    {% endblock %}
+</head>
+<body>
+
+            <div>
+                {% if res %}
+            <div>
+                <table>
+                    <tr>
+                        
+                        <td colspan="5">EMPRESA MINERA "MINDES S.R.L."</td>
+                        
+                    </tr>
+                    <tr>
+                        <td>POTOSI - BOLIVIA </td>
+                    </tr>
+                    <tr>
+                        <th colspan="5" style="font-size: 6; text-align: center;">REPORTE DIARIO DE INGRESOS</th>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 4; text-align: center;" colspan="5">
+                            Del {{ fecha1 }} al {{ fecha2 }}
+                        </td>
+                    </tr>
+                </table>
+                
+            </div>
+            <div class="lineal">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="background-color: #219FB5;" colspan="2">Fecha</th>
+                            <th style="background-color: #219FB5;" colspan="4">Proveedor</th>
+                            <th style="background-color: #219FB5;" colspan="3">Responsable</th>
+                            <th style="background-color: #219FB5;" colspan="3">Código</th>
+                            <th style="background-color: #219FB5;" colspan="4">Descripción</th>
+                            <th style="background-color: #219FB5;" colspan="2">Cant</th>
+                            <th style="background-color: #219FB5;" colspan="1">Unid</th>
+                            <th style="background-color: #219FB5;" colspan="2">Costo U (Bs.)</th>
+                            <th style="background-color: #219FB5;" colspan="3">Importe (Bs.)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% regroup res by encingresoitem.fecha as res_fecha %}
+                    {% for res1 in res_fecha %}
+                        {% regroup res1.list by item.subcategoria as res_categ %}
+                            {% for res3 in res_categ %}
+                                {% for i in res3.list %}
+                                <tr>
+                                    <td colspan="2" id="fuente2">{{ i.encingresoitem.fecha_f }}</td>
+                                    <td colspan="4" id="fuente2">{{ i.encingresoitem.proveedor.nombre }}</td>
+                                {% for j in i.encingresoitem.personal.all %}
+                                    {% if forloop.first %}
+                                        <td colspan="3" id="fuente2">{{ j.nombre }} {{ j.ap_paterno }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                                    <td colspan="3" id="fuente2">{{ i.item.codigo }}</td>
+                                    <td colspan="4" id="fuente2">{{ i.item.nombre }}</td>
+                                    <td colspan="2" id="fuente">{{ i.cantidad }}</td>
+                                    <td colspan="1" id="fuente2">{{ i.item.unidad.simbolo }}</td>
+                                    <td colspan="2" id="fuente">{{ i.costo_unit }}</td>
+                                    <td colspan="3" id="fuente">{{ i.sub_total }}</td>
+                                </tr>
+                                {% endfor %}
+                                {% for m in res1.list %}
+                                    {% ifchanged res3.grouper %}
+                                        <tr>
+                                            <td colspan="21" id="fuente2"><b>TOTAL.- {{ res3.grouper|upper }}</b></td>
+                                            <td colspan="3" id="fuente">{{ m.total }}</td>
+                                        </tr>
+                                    {% endifchanged %}
+                                    {% ifchanged res3.grouper.categoria %}
+                                        <tr>
+                                            <td colspan="21" id="fuente2"><b>TOTAL.- {{ res3.grouper.categoria|upper }}</b></td>
+                                            <td colspan="3" id="fuente">{{ m.total1 }}</td>
+                                        </tr>
+                                    {% endifchanged %}
+                                {% endfor %}
+                            {% endfor %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>  
+            {% else %}
+            <p>No existen movimientos a la fecha</p>
+            {% endif %}
+            </div>
+        
+</body>
+</html>

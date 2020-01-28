@@ -1,0 +1,182 @@
+{% load custom_tags_cont %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title|default:"ESTADO DE COSTO DE SERVICIO" }}</title>
+    <meta charset="utf-8">
+    {% block style_base %}
+        {% comment %}
+            See DEFAULT_CSS in https://github.com/chrisglass/xhtml2pdf/blob/master/xhtml2pdf/default.py
+            for base style.
+        {% endcomment %}
+
+        {% block layout_style %}
+            <style type="text/css">
+                @page {
+                    size: {{ pagesize|default:"Letter" }};
+                    margin-left: 2.2cm;
+                    margin-right: 1cm;
+                    margin-top: 1cm;
+                    margin-bottom: 1cm;
+                    @frame header {
+                        -pdf-frame-content: page-header;
+                        margin-top: 3.8cm;
+                        margin-right: 1.5cm;
+                        margin-bottom: 0cm;
+                        margin-left: 2.5cm;
+                    }
+                    @frame footer {
+                        -pdf-frame-content: page-footer;
+                        bottom: 0cm;
+                        margin-left: 1cm;
+                        margin-right: 1cm;
+                        height: 1cm;
+                    }
+                }
+
+                html{
+                    font-size: 8pt;
+                }
+                .tittle_report h1{
+                    text-align: center;
+                    margin: 5px;
+                }
+                .general{
+                    margin: 20px;
+                }
+                .general table, tr, th{
+                    text-align: left;
+                }
+                .lineal table{
+                    padding-top: 3px;
+                    padding-right: 3px;
+                    padding-left: 3px;
+                    border: 1px solid black;
+                }
+                .lineal th{
+                    text-align: center;
+                    font-size: 12px
+                }
+                .firma th{
+                    text-align: center;
+                }
+
+                .division hr{
+                    margin-bottom: 300px;
+                }
+                div#tabla_uno{
+                    width:300px;
+                    position:relative;
+                    float: left;
+                    height: auto;
+                    margin-right: 10px;
+                }
+                #tabla_dos{
+                    width:300px;
+                    padding: 3px;
+                    position:relative;
+                    float: left;
+                    height: auto;
+                }
+                #fuente{
+                    padding-right: 3px;
+                    text-align: right;
+                    font-size: 12px
+                }
+                #fuente2{
+                    font-size: 12px;
+                    padding-left: 3px;
+                    text-align: left;
+                }
+                #fuente3{
+                    border-style: none;
+                    font-size: 12px;
+                    padding-left: 3px;
+                    text-align: left;
+                    font-weight: bold;
+                }
+            </style>
+        {%endblock%}
+        {% block extra_style %}{% endblock %}
+    {% endblock %}
+</head>
+<body>
+
+            <div>
+                {% if res %}
+            <div>
+                <table>
+                    <tr>
+                        
+                        <td colspan="5">EMPRESA MINERA "MINDES S.R.L."</td>
+                        
+                    </tr>
+                    <tr>
+                        <td>POTOSI - BOLIVIA </td>
+                    </tr>
+                    <tr>
+                        <th colspan="5" style="font-size: 6; text-align: center;">ESTADO DE COSTO DE SERVICIO</th>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 4; text-align: center;" colspan="5">
+                            Desde el {{ fecha1 }} al {{ fecha1 }}
+                        </td>
+                    </tr>
+                </table>
+                
+            </div>
+            <div class="lineal">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="background-color: #219FB5;" colspan="6">Cuenta</th>
+                            <th style="background-color: #219FB5;" colspan="2">Monto Bs.</th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% regroup res by nivel_cuatro as niv_cuatro %}
+                        {% for res1 in niv_cuatro %}
+                        <tr>
+                            <td id="fuente3" colspan="6"><b>{{ res1.grouper.descripcion }}</b></td>
+                        </tr>
+                            {% for i in res1.list %}
+                                {% for j in i.asiento_set.all|slice:":1" %}
+                                <tr>
+                                    <td colspan="6" id="fuente2">{{ i.descripcion }}</td>
+                                    <td colspan="2" id="fuente">{% debe_b_a j f1 f2 %}</td>
+                                </tr>
+                                {% endfor %}
+                            {% endfor %}
+                            {% ifchanged res1.grouper.descripcion %}
+                            {% for i in res1.list|slice:":1" %}
+                                <tr>
+                                    <td id="fuente3" colspan="6"><b>TOTAL.- {{ res1.grouper.descripcion|upper }}</b></td>
+                                    <td colspan="2" id="fuente">{% debe_b_ci i f1 f2 %}</td>
+                                </tr>
+                            {% endfor %}
+                            {% endifchanged %}
+                            {% if forloop.last %}
+                                    <tr>
+                                        <th style="text-align: left;" colspan="6">COSTOS POR SERVICIOS DE TOLL</th>
+                                        <td colspan="2" id="fuente">{{ total }}</td>
+                                    </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                   
+                </table>
+            </div>  
+            {% else %}
+            <p>No existen movimientos a la fecha</p>
+            {% endif %}
+            </div>
+<div id="page-footer">
+    {%block page_foot%}
+            
+        Página <pdf:pagenumber />
+           
+    {%endblock%}
+</div>
+        
+</body>
+</html>

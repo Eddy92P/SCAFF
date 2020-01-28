@@ -1,0 +1,45 @@
+{% extends "base/index.html" %}
+
+{% block body %}
+<style> 
+	#contenedor { 
+        width: 105%;
+    }
+</style>
+
+	<div class="col-lg-40"></div>
+	<div class="col-lg-40 well" id="contenedor">
+			
+
+			{% block legend %}
+				
+			{% endblock legend %}
+			{% block errores %}
+				
+			{% endblock errores %}
+
+			
+			<h2 style="text-align: center;">
+				{% block tituloform %}
+
+				{% endblock tituloform %}
+			</h2>
+    		
+			<form {% block iddanger %} {% endblock iddanger %} action="{% block urlEnvio %} {% endblock urlEnvio %}" method="post" enctype="multipart/form-data" class="form-vertical" id="formulario">
+				{% block formulario %}
+				
+					
+				{% endblock formulario %}
+				
+			</form>
+			
+
+	</div>
+
+	<div class="col-sm-40"></div>
+
+	{% block añadidos %}
+		
+	{% endblock añadidos %}
+
+{% endblock body %}

@@ -1,0 +1,27 @@
+{% extends "base/baseform_rep.html" %}	
+
+	<h2 style="text-align: center;">
+		{% block tituloform %}
+			Reporte de Altas/Bajas
+		{% endblock tituloform %}
+	</h2>
+	
+	{% block urlEnviar %}
+	    {% url 'activos_f:reporte_alta_baja' %}
+	{% endblock urlEnviar %}
+
+	{% block formulario %}
+
+	
+		{% load bootstrap3 %}
+		{% bootstrap_form form %}
+
+		{% buttons %}
+	        <button type="submit" class="btn btn-primary center-block">
+	            {% bootstrap_icon "glyphicon glyphicon-ok" %} Generar
+	        </button>
+	    {% endbuttons %}
+
+		
+	
+	{% endblock formulario %}

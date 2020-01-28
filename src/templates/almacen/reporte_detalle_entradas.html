@@ -1,0 +1,266 @@
+{% load custom_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+    {% if tipo_mov == 'T' %}
+        <title>{{ title|default:"DETALLE DE ENTRADAS AL ALMACEN (POR TIPO DE ENTRADA)" }}</title>
+    {% else %}
+        <title>{{ title|default:"DETALLE DE ENTRADAS AL ALMACEN (POR CATEGORIA Y SUBCATEGORIA)" }}</title>
+    {% endif %}
+    <meta charset="utf-8">
+    {% block style_base %}
+        {% comment %}
+            See DEFAULT_CSS in https://github.com/chrisglass/xhtml2pdf/blob/master/xhtml2pdf/default.py
+            for base style.
+        {% endcomment %}
+
+        {% block layout_style %}
+            <style type="text/css">
+                @page {
+                    size: {{ pagesize|default:"Letter" }};
+                    margin-left: 2.2cm;
+                    margin-right: 1cm;
+                    margin-top: 1cm;
+                    margin-bottom: 1cm;
+                    @frame header {
+                        -pdf-frame-content: page-header;
+                        margin-top: 3.8cm;
+                        margin-right: 1.5cm;
+                        margin-bottom: 0cm;
+                        margin-left: 2.5cm;
+                    }
+                    @frame footer {
+                        -pdf-frame-content: page-footer;
+                        bottom: 0cm;
+                        margin-left: 1cm;
+                        margin-right: 1cm;
+                        height: 1cm;
+                    }
+                }
+
+                html{
+                    font-size: 8pt;
+                }
+                .tittle_report h1{
+                    text-align: center;
+                    margin: 5px;
+                }
+                .general{
+                    margin: 20px;
+                }
+                .general table, tr, th{
+                    text-align: left;
+                }
+                .lineal table{
+                    padding-top: 3px;
+                    padding-right: 3px;
+                    padding-left: 3px;
+                    border: 1px solid black;
+                }
+                .lineal th{
+                    text-align: center;
+                    font-size: 12px
+                }
+                .firma th{
+                    text-align: center;
+                }
+
+                .division hr{
+                    margin-bottom: 300px;
+                }
+                div#tabla_uno{
+                    width:300px;
+                    position:relative;
+                    float: left;
+                    height: auto;
+                    margin-right: 10px;
+                }
+                #tabla_dos{
+                    width:300px;
+                    padding: 3px;
+                    position:relative;
+                    float: left;
+                    height: auto;
+                }
+                #fuente{
+                    padding-right: 3px;
+                    text-align: right;
+                    font-size: 12px
+                }
+                #fuente2{
+                    font-size: 12px;
+                    padding-left: 3px;
+                    text-align: left;
+                }
+                #fuente3{
+                    border-style: none;
+                    font-size: 12px;
+                    padding-left: 3px;
+                    text-align: left;
+                    font-weight: bold;
+                }
+                #fuente4{
+                    text-align: center;
+                    font-size: 12px
+                }
+            </style>
+        {%endblock%}
+        {% block extra_style %}{% endblock %}
+    {% endblock %}
+</head>
+<body>
+
+        <div>
+            {% if res %}
+            <div>
+                <table>
+                    <tr>
+                        
+                        <td colspan="5">EMPRESA MINERA "MINDES S.R.L."</td>
+                        
+                    </tr>
+                    <tr>
+                        <td>POTOSI - BOLIVIA</td>
+                    </tr>
+                    {% if tipo_mov == 'T' %}
+                        <tr>
+                            <th colspan="5" style="font-size: 6; text-align: center;">DETALLE DE ENTRADAS AL ALMACEN (POR TIPO DE ENTRADA)</th>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <th colspan="5" style="font-size: 6; text-align: center;">DETALLE DE ENTRADAS AL ALMACEN (POR CATEGORIA Y SUB CATEGORIA)</th>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <td style="font-size: 4; text-align: center;" colspan="5">
+                            Del {{ fecha1 }} al {{ fecha2 }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 3; text-align: center;" colspan="5">
+                            (Expresado en Bolivianos)
+                        </td>
+                    </tr>
+                </table>
+                
+            </div>
+            {% if tipo_mov == 'T' %}
+            <div class="lineal">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="background-color: #219FB5;" colspan="1">Nº</th>
+                            <th style="background-color: #219FB5;" colspan="2">Fecha</th>
+                            <th style="background-color: #219FB5;" colspan="2">Factura o Recibo</th>
+                            <th style="background-color: #219FB5;" colspan="4">Proveedor</th>
+                            <th style="background-color: #219FB5;" colspan="3">Importe</th>
+                            <th style="background-color: #219FB5;" colspan="3">I.V.A.</th>
+                            <th style="background-color: #219FB5;" colspan="3">Costo</th>
+                        </tr>
+                    </thead>
+                        <tbody>
+                        {% regroup res by encingresoitem.tipo_entrada as entradas %}
+                        {% for res1 in entradas %}
+                            <td id="fuente3" colspan="9"><b>{{ res1.grouper.nombre|upper }}</b></td>
+                            {% for i in res1.list %}     
+                                <tr>
+                                    <td colspan="1" id="fuente2">{{ i.encingresoitem.id }}</td>
+                                    <td colspan="2" id="fuente4">{{ i.encingresoitem.fecha_f }}</td>
+                                    <td colspan="2" id="fuente">{{ i.encingresoitem.factura }}</td>
+                                    <td colspan="4" id="fuente2">{{ i.encingresoitem.proveedor }}</td>
+                                    <td colspan="3" id="fuente">{{ i.costo_total }}</td>
+                                    <td colspan="3" id="fuente">{{ i.iva }}</td>
+                                    <td colspan="3" id="fuente">{{ i.sub_total }}</td>
+                                </tr>
+                            {% endfor %}
+                                {% for j in res1.grouper.encingresoitem_set.all|slice:":1" %}
+                                    {% for k in j.ingresoitem_set.all|slice:":1" %}
+                                    <tr>
+                                        <td id="fuente3" colspan="9"><b>TOTAL.- {{ k.encingresoitem.tipo_entrada.nombre|upper }}</b></td>
+                                        <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% imp k f1 f2 %}</td>
+                                        <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% import_iva k f1 f2 %}</td>
+                                        <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% costo_t k f1 f2 %}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% if forloop.last %}
+                                <tr>
+                                    <th style="text-align: left;" colspan="9">TOTALES</th>
+                                    <td colspan="3" id="fuente">{{ total }}</td>
+                                    <td colspan="3" id="fuente">{{ total_imp_i }}</td>
+                                    <td colspan="3" id="fuente">{{ total_i }}</td>
+                                </tr>
+                            {% endif %} 
+                        {% endfor %}
+                        </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="lineal">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="background-color: #219FB5;" colspan="2">Código</th>
+                            <th style="background-color: #219FB5;" colspan="5">Descripción</th>
+                            <th style="background-color: #219FB5;" colspan="1">Unid</th>
+                            <th style="background-color: #219FB5;" colspan="3">Cantidad</th>
+                            <th style="background-color: #219FB5;" colspan="3">Importe</th>
+                            <th style="background-color: #219FB5;" colspan="3">I.V.A.</th>
+                            <th style="background-color: #219FB5;" colspan="3">Costo</th>
+                        </tr>
+                    </thead>
+                        <tbody>
+                        {% regroup res by subcategoria as items %}
+                        {% for res1 in items %}
+                            <tr>
+                                <td id="fuente3" colspan="9"><b>{{ res1.grouper.categoria.nombre|upper }}</b></td>
+                            </tr>
+                            <tr>
+                                <td id="fuente3" colspan="9"><b>{{ res1.grouper.nombre|upper }}</b></td>
+                            </tr>
+                            {% for i in res1.list %}     
+                                <tr>
+                                    <td colspan="2" id="fuente2">{{ i.codigo }}</td>
+                                    <td colspan="5" id="fuente2">{{ i.nombre }}</td>
+                                    <td colspan="1" id="fuente4">{{ i.unidad.simbolo }}</td>
+                                    <td colspan="3" id="fuente">{% tot_cant_e i f1 f2 %}</td>
+                                    <td colspan="3" id="fuente">{% imp_t_e i f1 f2 %}</td>
+                                    <td colspan="3" id="fuente">{% imp_iva i f1 f2 %}</td>
+                                    <td colspan="3" id="fuente">{% imp_t_iva i f1 f2 %}</td>
+                                </tr>
+                            {% endfor %}
+                                <tr>
+                                    <td id="fuente3" colspan="8"><b>TOTAL.- {{ res1.grouper.nombre|upper }}</b></td>
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% tot_cant_e res1.grouper f1 f2 %}</td>
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% imp_t res1.grouper f1 f2 %}</td>
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% imp_iva res1.grouper f1 f2 %}</td>
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% imp_t_iva res1.grouper f1 f2 %}</td>
+                                </tr>
+                                <tr>
+                                    <td id="fuente3" colspan="8"><b>TOTAL.- {{ res1.grouper.categoria.nombre|upper }}</b></td>
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% tot_cant_e res1.grouper f1 f2 %}</td>
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% imp_t res1.grouper.categoria f1 f2 %}</td>
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% imp_iva res1.grouper.categoria f1 f2 %}</td>
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% imp_t_iva res1.grouper.categoria f1 f2 %}</td>
+                                </tr>
+                            {% if forloop.last %}
+                                <tr>
+                                    <th style="text-align: left;" colspan="8">TOTALES</th>
+                                    <td colspan="3" id="fuente">{{ total_cant }}</td>
+                                    <td colspan="3" id="fuente">{{ total }}</td>
+                                    <td colspan="3" id="fuente">{{ total_imp_i }}</td>
+                                    <td colspan="3" id="fuente">{{ total_i }}</td>
+                                </tr>
+                            {% endif %} 
+                        {% endfor %}
+                        </tbody>
+                </table>
+            </div>
+            {% endif %}  
+            {% else %}
+            <p>No existen movimientos a la fecha</p>
+            {% endif %}
+            </div>
+        
+</body>
+</html>
