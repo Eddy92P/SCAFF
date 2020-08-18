@@ -101,6 +101,11 @@
                                             	<span class="glyphicon glyphicon-edit" aria-hidden="true">
                                         		</a>
                                         	{% endif %}
+                                        	{% if perms.activos_f.add_alta_baja_activo %}
+                                        		<a href="{% url 'activos_f:update_bajaactivo' obj.id %}" type="button" class="btn btn-danger" title="Dar de Baja Activo">
+                                            	<span class="glyphicon glyphicon-ban-circle" aria-hidden="true">
+                                        		</a>
+                                        	{% endif %}
                                         	{% if perms.contabilidad.add_asiento %}
                                         			<button type="submit" class="btn btn-info btninter" title="Mandar a Contabilidad"><span class="glyphicon glyphicon-send" aria-hidden="true">
 	        										</button>

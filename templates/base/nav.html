@@ -69,7 +69,7 @@
        
       {% if perms.auth.view_personal %}
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Personal <span class="caret"></span></a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Personal<span class="caret"></span></a>
           <ul style="background-color: #1A1919;" class="dropdown-menu">
             {% if perms.usuarios.add_kardex %}
             <li><a href="{% url 'personal:nuevousuario' %}">Nuevo usuario</a></li>
@@ -148,8 +148,7 @@
             <li>
               <a href="#">Proveedores, Clientes</a>
               <ul>
-                <li><a href="{% url 'almacenes:listaproveedor' %}">Proveedores</a></li>
-                <li><a href="{% url 'almacenes:listacliente' %}">Clientes</a></li>  
+                <li><a href="{% url 'almacenes:listaproveedor' %}">Proveedores</a></li>  
               </ul>
             </li>
             <li><a href="{% url 'almacenes:listaunidad' %}">Unidades</a></li>
@@ -176,7 +175,7 @@
                 <li><a href="{% url 'almacenes:listasalida' %}">Salida Item</a></li>
               </ul>
             </li>
-            {% if perms.contabilidad.add_asiento %}
+            {% if perms.contabilidad.change_ingresoitem %}
             <li><a href="{% url 'almacenes:act_inventario' %}">Actualización de inventario</a></li>
             {% endif %}
           </ul>
@@ -222,19 +221,21 @@
             <a href="#">Registro Activos Fijos</a>
               <ul>
                 <li><a href="{% url 'activos_f:listaubicacion' %}">Ubicación</a></li>
-                <li><a href="{% url 'almacenes:listaitemact' %}">Asignar Items</a></li>
+		<li><a href="{% url 'almacenes:listacliente' %}">Clientes</a></li>
                 <li><a href="{% url 'activos_f:listarubro' %}">Rubros</a></li>
                 <li><a href="{% url 'activos_f:listatipo_bien' %}">Tipos de Bien</a></li>
+                <li><a href="{% url 'almacenes:listaitemact' %}">Asignar Items</a></li>
+                <li><a href="{% url 'activos_f:lista_altaactivo' %}">Dar de Alta</a></li>
+                <li><a href="{% url 'activos_f:lista_capitalizacion' %}">Capitalizaciones</a></li>
               </ul>
           </li>
           <li>
             <a href="#">Listados</a>
               <ul>
+              <li><a href="{% url 'activos_f:lista_bajaactivo' %}">Listado de Bajas</a></li>
               <li><a href="{% url 'almacenes:listasalidaf' %}">Items (A capitalizar)</a></li>
               <li><a href="{% url 'almacenes:listaitemactivo' %}">Salidas (Alta Activo Fijo)</a></li>
-              <li><a href="{% url 'activos_f:lista_altaactivo' %}">Listado de Altas</a></li>
-              <li><a href="{% url 'activos_f:lista_bajaactivo' %}">Listado de Bajas</a></li>
-              <li><a href="{% url 'activos_f:lista_capitalizacion' %}">Listado de Capitalizaciones</a></li>  
+                
             </ul>
           </li>
           </ul>

@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '*d$6whs27v%bwuj^x^^4b88epjbw11+3txc0aw89#rs#seu*v0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1','192.168.1.240']
+ALLOWED_HOSTS = ['*']
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 7000
 
@@ -88,8 +88,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
          'NAME': 'scaff',
-         'USER': 'root',
-         'PASSWORD': 'Vetealaversh2468',
+	 'HOST': '192.168.1.14',
+         'USER': 'rafa',
+	 'PORT': '3306',
+         'PASSWORD': 'cas',
          'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
     }
@@ -138,11 +140,11 @@ MEDIA_URL = '/media/'
 
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static_pro", "static")
+    os.path.join(BASE_DIR, "static")
 ]
 
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_env", "static_root")
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_env", "media_root")
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static")
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "media")
 
 LOGIN_REDIRECT_URL = reverse_lazy('personal:main')
 LOGIN_URL = reverse_lazy('personal:login')

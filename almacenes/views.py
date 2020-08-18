@@ -297,7 +297,7 @@ class ubicacionAutocomplete(autocomplete.Select2QuerySetView):
 			return Ubicacion_gen.objects.none()
 		qs = Ubicacion_gen.objects.all().order_by('id')
 		if self.q:
-			qs = qs.filter(ubicacion__istartswith=self.q)
+			qs = qs.filter(ubicacion_g__istartswith=self.q)
 		return qs
 
 """class crearAlmacen(CreateView):

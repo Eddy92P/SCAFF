@@ -38,7 +38,8 @@ class crearTipo_bienForm(forms.ModelForm):
 		model = Tipo_bien
 		exclude = ['']
 		labels = {
-			'tipo':'Descripción'
+			'tipo':'Descripción',
+			'caracter':'Características'
 		}
 		widgets = {
 			'rubro':autocomplete.ModelSelect2(url='activos_f:rubro_autocomplete'),

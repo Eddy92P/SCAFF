@@ -394,4 +394,29 @@ urlpatterns = [
         permission_required('auth.view_contabilidad')(login_required(RepPlanCuentas.as_view())), 
         name='rep_plan_cuenta'
     ),
+    url(r'^nivel_unoupload/$',
+        #aqui el decorador de permisos
+        permission_required('auth.view_contabilidad')(login_required(uploadNiveluno.as_view())), 
+        name='nivel_unoupload'
+    ),
+    url(r'^nivel_dosupload/$',
+        #aqui el decorador de permisos
+        permission_required('auth.view_contabilidad')(login_required(uploadNiveldos.as_view())), 
+        name='nivel_dosupload'
+    ),
+    url(r'^nivel_tresupload/$',
+        #aqui el decorador de permisos
+        permission_required('auth.view_contabilidad')(login_required(uploadNiveltres.as_view())), 
+        name='nivel_tresupload'
+    ),
+    url(r'^nivel_cuatroupload/$',
+        #aqui el decorador de permisos
+        permission_required('auth.view_contabilidad')(login_required(uploadNivelcuatro.as_view())), 
+        name='nivel_cuatroupload'
+    ),
+    url(r'^nivel_cincoupload/$',
+        #aqui el decorador de permisos
+        permission_required('auth.view_contabilidad')(login_required(uploadNivelcinco.as_view())), 
+        name='nivel_cincoupload'
+    ),
 ]

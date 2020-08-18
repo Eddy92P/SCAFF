@@ -53,7 +53,7 @@
 				  			{% if forloop.counter|divisibleby:2 %}
 				  				<tr style="background-color: #FFFFFF;">
 							      	<td>{{ obj.id }}</td>
-							      	<td>{{ obj.tipo_bien.nombre }}</td>
+							      	<td>{{ obj.alta_activo.tipo_bien.tipo }}</td>
 							      	<td>{{ obj.fecha_f }}</td>
 							      	<td>{{ obj.valor_inic }}</td>
 							      	{% if perms.contabilidad.add_asiento %}
@@ -63,7 +63,7 @@
 							{% else %}
 								<tr style="background-color: #E3E3E3;">
 							      	<td>{{ obj.id }}</td>
-							      	<td>{{ obj.tipo_bien.nombre  }}</td>
+							      	<td>{{ obj.alta_activo.tipo_bien.tipo }}</td>
 							      	<td>{{ obj.fecha_f }}</td>
 							      	<td>{{ obj.valor_inic }}</td>
 							      	{% if perms.contabilidad.add_asiento %}

@@ -19,7 +19,7 @@
 						<form role="form" class="form-inline" action="" method="get" accept-charset="utf-8">
 								{% load bootstrap3 %}
 
-								{% if perms.almacenes.add_ubicacion_gen %}
+								{% if perms.activos_f.add_ubicacion_gen %}
 								<a class="btn btn-primary" type="submit"  href="{% url 'activos_f:nuevaubicacion' %}">Registrar Ubicación</a>
 								{% endif %}
 						    	
@@ -55,7 +55,7 @@
 				  			{% endif %}
 				  					<td>
 				  						<div class="btn-group">
-				  							{% if perms.almacenes.change_ubicacion_gen %}
+				  							{% if perms.activos_f.change_ubicacion_gen %}
                                         		<a href="{% url 'activos_f:updateubicacion' obj.id %}" type="button" class="btn btn-primary" title="editar">
                                             	<span class="glyphicon glyphicon-edit" aria-hidden="true">
                                         		</a>

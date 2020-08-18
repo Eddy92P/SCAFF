@@ -133,8 +133,8 @@ class crearAsiento1(crearAsiento):
 				aux1.append(i.encsalidaitem.cliente.num_cuenta)
 				aux1.append(i.item.categoria.num_cuenta)
 				aux2.append(0)
-				aux2.append(i.sub_total_actualizado)
-				aux4.append(i.sub_total_actualizado)
+				aux2.append(i.sub_total)
+				aux4.append(i.sub_total)
 				aux4.append(0)
 			aux3 = zip(aux1, aux2, aux4)
 			crear_asiento_form_set = crearAsientoFormSet(initial=[{'nivel_cinco': i, 'debe_b': k, 'haber_b': j} for i, j, k in aux3])
@@ -1803,7 +1803,6 @@ class uploadCotizacionTC(FormView):
 				aux.append(f2)
 			t_c = sheet.col_values(1, 0)
 			u = sheet.col_values(2, 0)
-			print(t_c)
 			for fecha, tipo_c, ufv in zip(aux, t_c, u):
 				cotizacion, created = Cotizacion.objects.get_or_create(fecha=fecha, tipo_c=tipo_c, ufv=ufv)
 				cotizacion.save()
@@ -1837,6 +1836,177 @@ class uploadCotizacionUFV(FormView):
 			for fecha, tipo_c in zip(aux, t_c):
 				cotizacion, created = Cotizacion_ufv.objects.get_or_create(fecha=fecha, ufv=tipo_c)
 				cotizacion.save()
+			return HttpResponseRedirect(self.success_url)
+		else:
+			return render(request, {'form':form})
+
+class uploadNiveluno(FormView):
+	form_class = XlsInputForm
+	success_url = reverse_lazy('contabilidad:listacuenta1')
+	template_name = 'contabilidad/nivel_unoupload.html'
+
+	def get(self, request, *args, **kwargs):
+		form = self.form_class()
+		return self.render_to_response({'form':form})
+
+	def post(self, request, *args, **kwargs):
+		form = self.form_class(request.POST, request.FILES)
+		if form.is_valid():
+			input_excel = request.FILES['input_excel']
+			book = xlrd.open_workbook(file_contents=input_excel.read())
+			sheet = book.sheets()[0]
+			descr = sheet.col_values(0, 0)
+			for descripcion in descr:
+				cuenta, created = nivel_uno.objects.get_or_create(descripcion=descripcion)
+				cuenta.save()
+			return HttpResponseRedirect(self.success_url)
+		else:
+			return render(request, {'form':form})
+
+class uploadNiveldos(FormView):
+	form_class = XlsInputForm
+	success_url = reverse_lazy('contabilidad:listacuenta2')
+	template_name = 'contabilidad/nivel_dosupload.html'
+
+	def get(self, request, *args, **kwargs):
+		form = self.form_class()
+		return self.render_to_response({'form':form})
+
+	def post(self, request, *args, **kwargs):
+		form = self.form_class(request.POST, request.FILES)
+		if form.is_valid():
+			input_excel = request.FILES['input_excel']
+			book = xlrd.open_workbook(file_contents=input_excel.read())
+			sheet = book.sheets()[0]
+			aux = []
+			aux1 = []
+			uno = sheet.col_values(0, 0)
+			for i in uno:
+				aux.append(int(i))
+			cod = sheet.col_values(1, 0)
+			for j in cod:
+				aux1.append(int(j))
+			descr = sheet.col_values(2, 0)
+			for nivel_uno, codigo, descripcion in zip(aux, aux1, descr):
+				cuenta, created = nivel_dos.objects.get_or_create(nivel_uno_id=nivel_uno, codigo=codigo, descripcion=descripcion)
+				cuenta.save()
+			return HttpResponseRedirect(self.success_url)
+		else:
+			return render(request, {'form':form})
+
+class uploadNiveltres(FormView):
+	form_class = XlsInputForm
+	success_url = reverse_lazy('contabilidad:listacuenta3')
+	template_name = 'contabilidad/nivel_tresupload.html'
+
+	def get(self, request, *args, **kwargs):
+		form = self.form_class()
+		return self.render_to_response({'form':form})
+
+	def post(self, request, *args, **kwargs):
+		form = self.form_class(request.POST, request.FILES)
+		if form.is_valid():
+			input_excel = request.FILES['input_excel']
+			book = xlrd.open_workbook(file_contents=input_excel.read())
+			sheet = book.sheets()[0]
+			aux = []
+			aux1 = []
+			aux2 = []
+			uno = sheet.col_values(0, 0)
+			dos = sheet.col_values(1, 0)
+			for i in uno:
+				aux.append(int(i))
+			for j in dos:
+				aux1.append(int(j))
+			cod = sheet.col_values(2, 0)
+			for k in cod:
+				aux2.append(int(k))
+			descr = sheet.col_values(3, 0)
+			for nivel_uno, nivel_dos, codigo, descripcion in zip(aux, aux1, aux2, descr):
+				cuenta, created = nivel_tres.objects.get_or_create(nivel_uno_id=nivel_uno, nivel_dos_id=nivel_dos, codigo=codigo, descripcion=descripcion)
+				cuenta.save()
+			return HttpResponseRedirect(self.success_url)
+		else:
+			return render(request, {'form':form})
+
+class uploadNivelcuatro(FormView):
+	form_class = XlsInputForm
+	success_url = reverse_lazy('contabilidad:listacuenta4')
+	template_name = 'contabilidad/nivel_cuatroupload.html'
+
+	def get(self, request, *args, **kwargs):
+		form = self.form_class()
+		return self.render_to_response({'form':form})
+
+	def post(self, request, *args, **kwargs):
+		form = self.form_class(request.POST, request.FILES)
+		if form.is_valid():
+			input_excel = request.FILES['input_excel']
+			book = xlrd.open_workbook(file_contents=input_excel.read())
+			sheet = book.sheets()[0]
+			aux = []
+			aux1 = []
+			aux2 = []
+			aux3 = []
+			uno = sheet.col_values(0, 0)
+			dos = sheet.col_values(1, 0)
+			tres = sheet.col_values(2, 0)
+			for i in uno:
+				aux.append(int(i))
+			for j in dos:
+				aux1.append(int(j))
+			for k in dos:
+				aux2.append(int(k))
+			cod = sheet.col_values(3, 0)
+			for l in cod:
+				aux3.append(int(l))
+			descr = sheet.col_values(4, 0)
+			for nivel_uno, nivel_dos, nivel_tres, codigo, descripcion in zip(aux, aux1, aux2, aux3, descr):
+				cuenta, created = nivel_cuatro.objects.get_or_create(nivel_uno_id=nivel_uno, nivel_dos_id=nivel_dos, nivel_tres_id=nivel_tres, codigo=codigo, descripcion=descripcion)
+				cuenta.save()
+			return HttpResponseRedirect(self.success_url)
+		else:
+			return render(request, {'form':form})
+
+class uploadNivelcinco(FormView):
+	form_class = XlsInputForm
+	success_url = reverse_lazy('contabilidad:listacuenta5')
+	template_name = 'contabilidad/nivel_cincoupload.html'
+
+	def get(self, request, *args, **kwargs):
+		form = self.form_class()
+		return self.render_to_response({'form':form})
+
+	def post(self, request, *args, **kwargs):
+		form = self.form_class(request.POST, request.FILES)
+		if form.is_valid():
+			input_excel = request.FILES['input_excel']
+			book = xlrd.open_workbook(file_contents=input_excel.read())
+			sheet = book.sheets()[0]
+			aux = []
+			aux1 = []
+			aux2 = []
+			aux3 = []
+			aux4 = []
+			uno = sheet.col_values(0, 0)
+			dos = sheet.col_values(1, 0)
+			tres = sheet.col_values(2, 0)
+			cuatro = sheet.col_values(3, 0)
+			for i in uno:
+				aux.append(int(i))
+			for j in dos:
+				aux1.append(int(j))
+			for k in dos:
+				aux2.append(int(k))
+			for l in dos:
+				aux3.append(int(l))
+			cod = sheet.col_values(4, 0)
+			for m in cod:
+				aux4.append(int(m))
+			descr = sheet.col_values(5, 0)
+			for nivel_uno, nivel_dos, nivel_tres, nivel_cuatro, codigo, descripcion in zip(aux, aux1, aux2, aux3, aux4, descr):
+				cuenta, created = nivel_cinco.objects.get_or_create(nivel_uno_id=nivel_uno, nivel_dos_id=nivel_dos, nivel_tres_id=nivel_tres, nivel_cuatro_id=nivel_cuatro, codigo=codigo, descripcion=descripcion)
+				cuenta.save()
 			return HttpResponseRedirect(self.success_url)
 		else:
 			return render(request, {'form':form})

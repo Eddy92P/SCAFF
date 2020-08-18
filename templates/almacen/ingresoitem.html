@@ -368,6 +368,8 @@
                                                 {% endif %}
                                                 {{ crear_ingreso_form.costo_unit }}
                                         </td>
+                                        {{ crear_ingreso_form.costo_unit_actualizado.as_hidden }}
+                                        {{ crear_ingreso_form.sub_total_actualizado.as_hidden }}
                                         <td class="col-lg-2">
                                             <label>Sub Total</label>
                                                 {% if crear_ingreso_form.sub_total.errors %}
@@ -381,12 +383,7 @@
                                                         {% endfor %}
                                                 {% endif %}
                                                 {{ crear_ingreso_form.sub_total }}
-                                        </td>
-                                        {{ crear_ingreso_form.costo_unit_actualizado.as_hidden }}
-
-
-                                        {{ crear_ingreso_form.sub_total_actualizado.as_hidden }}
-                                                                             
+                                        </td>                                        
                                 </tr>
                                 {{ crear_ingreso_form.media }}
                                 

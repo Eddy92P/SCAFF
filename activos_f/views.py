@@ -45,7 +45,7 @@ class tipo_bienAutocomplete(autocomplete.Select2QuerySetView):
 		if rubro:
 			qs = qs.filter(rubro=rubro)
 		if self.q:
-			qs = qs.filter(nombre__istartswith=self.q)
+			qs = qs.filter(tipo__istartswith=self.q)
 		return qs
 
 class crearRubro(CreateView):
