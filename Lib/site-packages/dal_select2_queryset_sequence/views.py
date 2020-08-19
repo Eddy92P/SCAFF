@@ -8,9 +8,10 @@ from dal_select2.views import Select2ViewMixin
 
 from django.db.models import Q
 from django.template.defaultfilters import capfirst
-from django.utils import six
 
 from queryset_sequence import QuerySetSequence
+
+import six
 
 
 class Select2QuerySetSequenceView(BaseQuerySetSequenceView, Select2ViewMixin):

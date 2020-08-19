@@ -16,7 +16,7 @@ from django.db.models import Q
 
 class nivel_uno(models.Model):
 	descripcion = models.CharField(
-		max_length=50,
+		max_length=100,
 		null=False,
 		blank=False,
 		validators=[
@@ -159,7 +159,7 @@ class nivel_dos(models.Model):
 			]
 		)
 	descripcion = models.CharField(
-		max_length=50,
+		max_length=100,
 		null=False,
 		blank=False,
 		validators=[
@@ -234,7 +234,7 @@ class nivel_tres(models.Model):
 			]
 		)
 	descripcion = models.CharField(
-		max_length=50,
+		max_length=100,
 		null=False,
 		blank=False,
 		validators=[
@@ -310,7 +310,7 @@ class nivel_cuatro(models.Model):
 			]
 		)
 	descripcion = models.CharField(
-		max_length=50,
+		max_length=100,
 		null=False,
 		blank=False,
 		validators=[
@@ -386,7 +386,7 @@ class nivel_cinco(models.Model):
 			]
 		)
 	descripcion = models.CharField(
-		max_length=50,
+		max_length=100,
 		null=False,
 		blank=False,
 		validators=[
@@ -671,7 +671,7 @@ class asiento(models.Model):
 class Factura(models.Model):
 	asiento = models.OneToOneField(asiento)
 	sucursal = models.CharField(
-		max_length=60,
+		max_length=100,
 		null=False,
 		blank=False,
 		default="Oficina Central(Potosí)"
@@ -693,7 +693,7 @@ class Factura(models.Model):
 			]
 		)
 	nomb_razon = models.CharField(
-		max_length=80,
+		max_length=100,
 		null=False,
 		blank=False,
 		validators=[
@@ -814,7 +814,7 @@ class Factura(models.Model):
 class Factura_V(models.Model):
 	asiento = models.OneToOneField(asiento)
 	sucursal = models.CharField(
-		max_length=60,
+		max_length=100,
 		null=False,
 		blank=False,
 		default="Oficina Central(Potosí)"
@@ -865,7 +865,7 @@ class Factura_V(models.Model):
 			]
 		)
 	nomb_razon = models.CharField(
-		max_length=80,
+		max_length=100,
 		null=False,
 		blank=False,
 		validators=[
@@ -987,7 +987,7 @@ class Proyecto(models.Model):
 			]
 		)
 	nombre = models.CharField(
-		max_length=50,
+		max_length=100,
 		null=False,
 		blank=False,
 		validators=[

@@ -99,7 +99,7 @@ class Tipo_bien(models.Model):
 			]
 		)
 	tipo = models.CharField(
-		max_length=60,
+		max_length=100,
 		null=False,
 		blank=False,
 		validators=[
@@ -111,7 +111,7 @@ class Tipo_bien(models.Model):
 			]
 		)
 	marca = models.CharField(
-		max_length=60,
+		max_length=100,
 		blank=True,
 		validators=[
 			RegexValidator(
@@ -122,7 +122,7 @@ class Tipo_bien(models.Model):
 			]
 		)
 	modelo = models.CharField(
-		max_length=60,
+		max_length=100,
 		blank=True,
 		validators=[
 			RegexValidator(
@@ -133,7 +133,7 @@ class Tipo_bien(models.Model):
 			]
 		)
 	caracter = models.CharField(
-		max_length=100,
+		max_length=500,
 		blank=True,
 		validators=[
 			RegexValidator(
@@ -155,7 +155,7 @@ class Tipo_bien(models.Model):
 			]
 		)
 	serie = models.CharField(
-		max_length=80,
+		max_length=300,
 		blank=True,
 		validators=[
 			RegexValidator(
@@ -175,7 +175,7 @@ class personal_aut_act(models.Model):
 
 class Ubicacion_gen(models.Model):
 	ubicacion_g = models.CharField(
-		max_length=80,
+		max_length=100,
 		blank=False,
 		null=False,
 		validators=[

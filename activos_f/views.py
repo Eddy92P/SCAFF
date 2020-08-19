@@ -138,7 +138,7 @@ class crearAltaActivo(CreateView):
 		self.object = None	
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
-		crear_personal_form_set = crearPersonalFormSet(request.POST)
+		crear_personal_form_set = crearPersonalFormSet(request.POST, request.FILES)
 		if form.is_valid() and crear_personal_form_set.is_valid():
 			form1 = form.save(commit=False) 
 			r = Rubro.objects.get(id=form1.tipo_bien.rubro.id)
@@ -183,7 +183,7 @@ class updateAltaActivo(UpdateView):
 	def post(self, request, *args, **kwargs):
 		self.object = self.get_object
 		pk1=self.kwargs['pk']	
-		form = self.form_class(request.POST, instance=self.model.objects.get(id=pk1))
+		form = self.form_class(request.POST, request.FILES, instance=self.model.objects.get(id=pk1))
 		crear_personal_form_set = updatePersonalFormSet(request.POST, instance=self.model.objects.get(id=pk1))
 		if form.is_valid() and crear_personal_form_set.is_valid():
 			form1 = form.save(commit=False) 

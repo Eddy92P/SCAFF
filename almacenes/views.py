@@ -553,7 +553,6 @@ class ingresoItem(CreateView):
 		form = self.get_form(form_class)
 		crear_ingreso_form_set = crearIngresoItemFormSet(request.POST)
 		crear_personal_form_set = crearPersonalFormSet(request.POST)
-
 		if form.is_valid() and crear_ingreso_form_set.is_valid() and crear_personal_form_set.is_valid():
 			form1 = form.save(commit=False) 
 			crear_personal_form_set.instance = form1
@@ -564,7 +563,6 @@ class ingresoItem(CreateView):
 				formset.costo_unit_actualizado = formset.costo_unit
 				formset.sub_total_actualizado = formset.sub_total
 				a=itemalmacen.objects.get_or_create(item = formset.item)
-				aux = ingresoitem.objects.filter(item = formset.item).aggregate(total=Avg('costo_unit'))
 				if a[0].cantidad >= formset.item.maximo:
 					return self.render_to_response(self.get_context_data(form = form, crear_ingreso_form_set = crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error='El almacen se encuentra lleno, realice salidas del item ' + a[0].item.nombre))
 				elif formset.cantidad >= formset.item.maximo:
@@ -574,7 +572,7 @@ class ingresoItem(CreateView):
 					if a[0].cantidad >= formset.item.maximo:
 						return self.render_to_response(self.get_context_data(form = form, crear_ingreso_form_set = crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad excede el maximo permitido de '+ str(formset.item.maximo) + ' del item ' + a[0].item.nombre + ', por favor verifique los datos'))
 					else:
-						a[0].precio = aux['total']
+						a[0].precio = 0
 						a[0].save()
 					form1.save()
 					crear_personal_form_set.save()
@@ -1498,7 +1496,6 @@ class actualizarInventario(FormView):
 				aux1 = i.costo_unit * Decimal(ufv)
 				aux2 = i.sub_total * Decimal(ufv)
 				res = round(aux1, 2)
-				print(res)
 				res1 = round(aux2, 2)
 				ingresoitem.objects.filter(encingresoitem__fecha__lte=f1, id=i.id).update(costo_unit_actualizado=res, sub_total_actualizado=res1)
 			return HttpResponseRedirect(self.success_url)

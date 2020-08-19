@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '*d$6whs27v%bwuj^x^^4b88epjbw11+3txc0aw89#rs#seu*v0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -84,19 +84,30 @@ WSGI_APPLICATION = 'SCAFF.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-         'NAME': 'scaff',
-	 'HOST': '192.168.1.14',
-         'USER': 'rafa',
-	 'PORT': '3306',
-         'PASSWORD': 'cas',
-         'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-    }
-}
-}
+if DEBUG:
+   DATABASES = {
+         'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'scaff',
+            'HOST': 'localhost',
+            'USER': 'root',
+            'PASSWORD': '',
+         }
+      }
+else:
+   DATABASES = {
+         'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'scaff',
+            'HOST': '192.168.1.14',
+            'USER': 'rafa',
+            'PORT': '3306',
+            'PASSWORD': 'cas',
+            'OPTIONS': {
+               'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            }
+         }
+      }
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators

@@ -7,8 +7,9 @@ from django import http
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseBadRequest, HttpResponseNotAllowed
-from django.utils import six
 from django.views.generic.list import BaseListView
+
+import six
 
 
 class ViewMixin(object):

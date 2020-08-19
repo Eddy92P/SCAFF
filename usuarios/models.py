@@ -51,7 +51,7 @@ class kardex(models.Model):
 			]
 		)
 	direccion = models.CharField(
-		max_length=30,
+		max_length=50,
 		null=False,
 		blank=False
 		)
@@ -73,7 +73,7 @@ class kardex(models.Model):
 			#return (self.ci)
 class cargo(models.Model):
 	nombre_cargo = models.CharField(
-		max_length=60,
+		max_length=100,
 		null=False,
 		blank=False,
 		validators=[
@@ -91,7 +91,7 @@ class cargo(models.Model):
 
 class personal(models.Model):
 	nombre = models.CharField(
-		max_length=50,
+		max_length=60,
 		null=False,
 		blank=False,
 		validators=[
@@ -103,7 +103,7 @@ class personal(models.Model):
 			]
 		)
 	ap_paterno = models.CharField(
-		max_length=50,
+		max_length=60,
 		null=False,
 		blank=False,
 		validators=[
@@ -115,7 +115,7 @@ class personal(models.Model):
 			]
 		)
 	ap_materno = models.CharField(
-		max_length=50,
+		max_length=60,
 		null=False,
 		blank=False,
 		validators=[

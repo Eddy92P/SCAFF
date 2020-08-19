@@ -16,7 +16,7 @@ import re
 # Create your models here.
 class proveedor(models.Model):
 	nombre = models.CharField(
-		max_length=50,
+		max_length=100,
 		blank=False,
 		null=False,
 		validators=[
@@ -97,7 +97,7 @@ class cliente(models.Model):
 		]
 	)
 	referencia = models.CharField(
-		max_length=150,
+		max_length=500,
 		blank=False,
 		null=False,
 		validators=[
@@ -164,7 +164,7 @@ class unidad(models.Model):
 			]
 		)
 	descripcion = models.CharField(
-		max_length=30,
+		max_length=50,
 		null=False,
 		blank=False,
 		validators=[
@@ -282,7 +282,7 @@ class unidad(models.Model):
 class categoria(models.Model):
 	num_cuenta = models.OneToOneField('contabilidad.nivel_cinco')
 	nombre = models.CharField(
-		max_length=50,
+		max_length=100,
 		null=False,
 		blank=False,
 		validators=[
@@ -376,7 +376,7 @@ class categoria(models.Model):
 class subcategoria(models.Model):
 	categoria = models.ForeignKey(categoria)
 	nombre = models.CharField(
-		max_length=50,
+		max_length=100,
 		null=False,
 		blank=False,
 		validators=[

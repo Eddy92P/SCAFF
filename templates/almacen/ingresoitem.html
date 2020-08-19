@@ -51,12 +51,14 @@
                     var precio_unit = 0;
                     var costo_unit = 0;
                     var sub_total = 0;
+                    p.eq(5).val(0);
+                    p.eq(6).val(0);
                     var cant = p.eq(1).val();
                     var costo_t = p.eq(2).val();
                     precio_unit = costo_t/cant;
                     var p_unit = p.eq(3).val(precio_unit.toFixed(2));
                     var c_unit = p.eq(4).val(precio_unit.toFixed(2));
-                    var s_total = p.eq(5).val(costo_t);
+                    var s_total = p.eq(7).val(costo_t);
                     $("#id_iva").on('change', function(){
                         if($(this).is(':checked'))
                         {
@@ -81,7 +83,7 @@
                                 x = $("#id_total").val()
                                 y = $("#id_total_iva").val()
                                 dif = parseFloat(x) - parseFloat(y);
-                                $("#id_importe_iva").val(parseFloat(dif));
+                                $("#id_importe_iva").val(parseFloat(dif).toFixed(2));
                             });
                             $(document).unbind("keyup");
                         }
@@ -109,11 +111,8 @@
                                     aux += parseFloat(aux4) || 0;
                                     aux1 += parseFloat(aux5) || 0;
                                     aux2.val(aux.toFixed(2));
-                                    aux3.val(aux1.toFixed(2));
-                                    x = $("#id_total").val()
-                                    y = $("#id_total_iva").val()
-                                    dif = parseFloat(x) - parseFloat(y);
-                                    $("#id_importe_iva").val(parseFloat(dif));
+                                    aux3.val(0);
+                                    $("#id_importe_iva").val(0);
                                 });
                             });
                         }
@@ -137,10 +136,6 @@
                     aux1 += parseFloat(aux5) || 0;
                     aux2.val(aux.toFixed(2))
                     aux3.val(aux1.toFixed(2))
-                    x = $("#id_total").val()
-                    y = $("#id_total_iva").val()
-                    dif = parseFloat(x) - parseFloat(y);
-                    $("#id_importe_iva").val(parseFloat(dif));
                 });
             });
         });
