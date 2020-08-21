@@ -171,11 +171,10 @@
   <table class="firma">
         <tr style="padding-top: 10px">
             <th>
-                <b>Entregado por:<b>
-            </th>
-
-            <th>
                 <b>Solicitado por:<b>
+            </th>
+            <th>
+                <b>Entregado por:<b>
             </th>
             <th>
                 <b>Autorizado por:<b>
@@ -187,13 +186,13 @@
                 <b>{{ user }}</b> 
             </td>
             {% for i in res.personal_aut_set.all %}
-                    {% if forloop.counter == 2 %}
+                    {% if forloop.counter == 1 %}
                         <td style="text-align: center"><b>{{ i.personal.nombre }} {{ i.personal.ap_paterno }} {{ i.personal.ap_materno }}</b></td>
                     {% endif %}
             {% endfor %}
 
             {% for i in res.personal_aut_set.all %}
-                    {% if forloop.counter == 1 %}
+                    {% if forloop.counter == 2 %}
                         <td style="text-align: center"><b>{{ i.personal.nombre }} {{ i.personal.ap_paterno }} {{ i.personal.ap_materno }}</b></td>
                     {% endif %}
             {% endfor %}
