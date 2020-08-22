@@ -56,6 +56,9 @@
 		<div id="cn-overlay" class="cn-overlay"></div>
 	{% endblock foto %}
 	{% block body %}
+		
+	{% endblock body %}
+	{% block advertencia %}
 		<script>
 			$(document).ready(function(){
 				//console.log("hola");
@@ -83,12 +86,13 @@
 			});	
 		</script>
         <div id="dialog-confirm" title="Cuidado!!!" style="display: none;">
-        	<div class="alert alert-danger" role="alert">
+        	<div class="alert alert-info" role="alert">
         		 <span class="glyphicon glyphicon-alert" aria-hidden="true"></span>
-        		El siguiente formulario contiene información sencible por favor verifique los datos antes de ingresarlos
+        		Está a punto de guardar la información, desea continuar?
         	</div>
 		</div>
-	{% endblock body %}
+
+	{% endblock advertencia %}
     <!--<script src="{% static 'js/jquery-3.1.0.min.js' %}"></script>-->
 
  	<script src="{% static 'js/bootstrap.min.js' %}"></script>
