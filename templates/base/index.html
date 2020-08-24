@@ -59,20 +59,18 @@
 		
 	{% endblock body %}
 	{% block advertencia %}
-		<script>
+    	<script>
 			$(document).ready(function(){
-				//console.log("hola");
-				$('#danger').submit(function(){
+				$('#danger').on('submit', function(){
+					console.log('hola')
 					currentForm = this;
-					console.log("holas");
 					$('#dialog-confirm').dialog({
 						position: { my: "center", at: "center", of: window },
 						resizable: false,
-						//height:200,
 						modal: true,
 						draggable: false,
 						buttons: {
-							'Enviar': function() 
+							Guardar: function() 
 							{
 								currentForm.submit();
 							},
@@ -92,19 +90,19 @@
         	</div>
 		</div>
 
-	{% endblock advertencia %}
+    {% endblock advertencia %}
     <!--<script src="{% static 'js/jquery-3.1.0.min.js' %}"></script>-->
 
- 	<script src="{% static 'js/bootstrap.min.js' %}"></script>
-
     <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+
+ 	<script src="{% static 'js/bootstrap.min.js' %}"></script>
    
     <script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
 
     <script src="{% static 'js/datatables.min.js' %}"></script>
 
-
     
-    <script>window.jQuery || document.write('<script src="{% static 'js/jquery.min.js' %}"><\/script>')</script>
+    <script>window.jQuery || document.write('<script src="{% static 'js/jquery.min.js' %}"><\/script>')
+	</script>
 </body>
 </html>
