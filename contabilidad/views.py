@@ -25,6 +25,7 @@ from django.core.urlresolvers import reverse_lazy
 
 from easy_pdf.views import PDFTemplateView
 from openpyxl import Workbook
+from openpyxl.writer.excel import save_virtual_workbook
 
 class crearAsiento(CreateView):
 	model_pk = nivel_cinco
@@ -2574,7 +2575,7 @@ class FacturasExcel(TemplateView):
 		response = HttpResponse(content_type = "application/ms-excel")
 		content = "attachment; filename = {0}".format(nombre_archivo)
 		response['Content-Disposition'] = content
-		wb.save(response)
+		response.content = save_virtual_workbook(wb)
 		return response
 
 class FacturasVExcel(TemplateView):
@@ -2631,7 +2632,7 @@ class FacturasVExcel(TemplateView):
 		response = HttpResponse(content_type = "application/ms-excel")
 		content = "attachment; filename = {0}".format(nombre_archivo)
 		response['Content-Disposition'] = content
-		wb.save(response)
+		response.content = save_virtual_workbook(wb)
 		return response
 
 class RetencionExcel(TemplateView):
@@ -2692,7 +2693,7 @@ class RetencionExcel(TemplateView):
 		response = HttpResponse(content_type = "application/ms-excel")
 		content = "attachment; filename = {0}".format(nombre_archivo)
 		response['Content-Disposition'] = content
-		wb.save(response)
+		response.content = save_virtual_workbook(wb)
 		return response
 
 class estadoEvolucionP(PDFTemplateView):
