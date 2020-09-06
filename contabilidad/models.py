@@ -30,42 +30,42 @@ class nivel_uno(models.Model):
 
 	#Totales para balance general
 	def debe_b_t(self, f1, f2):
-		res = nivel_uno.objects.filter(codigo__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b'))
+		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b'))
 		if res['total'] == None:
 			return 0.0
 		else:
 			return res['total']
 
 	def haber_b_t(self, f1, f2):
-		res = nivel_uno.objects.filter(codigo__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b'))
+		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b'))
 		if res['total'] == None:
 			return 0.0
 		else:
 			return res['total']
 
 	def debe_d_t(self, f1, f2):
-		res = nivel_uno.objects.filter(codigo__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d'))
+		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d'))
 		if res['total'] == None:
 			return 0.0
 		else:
 			return res['total']
 
 	def haber_d_t(self, f1, f2):
-		res = nivel_uno.objects.filter(codigo__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d'))
+		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d'))
 		if res['total'] == None:
 			return 0.0
 		else:
 			return res['total']
 
 	def saldo_b_t(self, f1, f2):
-		res = nivel_uno.objects.filter(codigo__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
+		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
 		if res['total'] == None:
 			return 0.0
 		else:
 			return res['total']
 
 	def saldo_d_t(self, f1, f2):
-		res = nivel_uno.objects.filter(codigo__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
+		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
 		if res['total'] == None:
 			return 0.0
 		else:
@@ -74,42 +74,42 @@ class nivel_uno(models.Model):
 
 	#Totales para estado de resultados
 	def debe_b_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(codigo__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b'))
+		res = nivel_uno.objects.filter(id__lte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b'))
 		if res['total'] == None:
 			return 0.0
 		else:
 			return res['total']
 
 	def haber_b_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(codigo__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b'))
+		res = nivel_uno.objects.filter(id__lte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b'))
 		if res['total'] == None:
 			return 0.0
 		else:
 			return res['total']
 
 	def debe_d_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(codigo__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d'))
+		res = nivel_uno.objects.filter(id__lte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d'))
 		if res['total'] == None:
 			return 0.0
 		else:
 			return res['total']
 
 	def haber_d_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(codigo__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d'))
+		res = nivel_uno.objects.filter(id__lte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d'))
 		if res['total'] == None:
 			return 0.0
 		else:
 			return res['total']
 
 	def saldo_b_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(codigo__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
+		res = nivel_uno.objects.filter(id__lte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
 		if res['total'] == None:
 			return 0.0
 		else:
 			return res['total']
 
 	def saldo_d_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(codigo__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
+		res = nivel_uno.objects.filter(id__lte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
 		if res['total'] == None:
 			return 0.0
 		else:

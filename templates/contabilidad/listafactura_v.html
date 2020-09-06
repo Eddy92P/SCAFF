@@ -19,8 +19,8 @@
                         <form role="form" class="form-inline" action="" method="get" accept-charset="utf-8">
                                 {% load bootstrap3 %}
 
-                            {% if perms.contabilidad.add_Factura_V %}
-                            <a class="btn btn-warning" type="submit"  href="{% url 'contabilidad:nuevafactura_v' pk1 %}">Crear Factura </a>
+                            {% if perms.contabilidad.add_factura_v %}
+                            <a class="btn btn-warning" type="submit"  href="{% url 'contabilidad:nuevafactura_v' pk1 %}">Crear Factura</a>
                             {% endif %}
                                 
                         </form>

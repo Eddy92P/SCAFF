@@ -549,7 +549,7 @@ class nivel_cuatroAutocomplete(autocomplete.Select2QuerySetView):
 		return qs
 
 def cuenta(request):
-	data = serializers.serialize("json", nivel_cinco.objects.filter(Q(codigo='1102200001') | Q(codigo='2101250005') | Q(codigo='2101250006') | Q(codigo='2101250003') | Q(codigo='2101250004') | Q(codigo='2101250002') | Q(codigo='4101010001') | Q(codigo='5102020002') | Q(codigo='2101250001') | Q(codigo='2101200001')).order_by('codigo'))
+	data = serializers.serialize("json", nivel_cinco.objects.filter(Q(codigo='1102080001') | Q(codigo='5201300001') | Q(codigo='4101010001') | Q(codigo='2101200001') | Q(codigo='2101210001')).order_by('codigo'))
 	return HttpResponse(data, content_type="application/json")
 
 
@@ -2416,7 +2416,7 @@ class balanceGen(PDFTemplateView):
 		context.update({'campo': fecha1})
 		context.update({'campo2': fecha2})
 		context.update({'campo3': campo3})
-		res = nivel_uno.objects.filter(Q(codigo__lte=3) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)))).distinct()
+		res = nivel_uno.objects.filter(Q(id__lte=3) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)))).distinct()
 		context['niv'] = res
 		context['f1'] = f1
 		context['f2'] = f2
@@ -2441,9 +2441,9 @@ class estadoResultado(PDFTemplateView):
 		context.update({'campo': fecha1})
 		context.update({'campo2': fecha2})
 		context.update({'campo3': campo3})
-		res = nivel_uno.objects.filter(Q(codigo__gte=4) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)))).distinct()
+		res = nivel_uno.objects.filter(Q(id__gte=4) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)))).distinct()
 		context['niv'] = res
-		for i in nivel_uno.objects.filter(Q(codigo__gte=4) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)))).distinct():
+		for i in nivel_uno.objects.filter(Q(id__gte=4) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)))).distinct():
 			for j in i.nivel_dos_set.all():
 				for k in j.nivel_tres_set.all():
 					for l in k.nivel_cuatro_set.all():

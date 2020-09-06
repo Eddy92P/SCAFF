@@ -1158,7 +1158,8 @@
                                 type: 'GET',
                                 url: '{% url 'contabilidad:cuenta' %}',
                             }).then(function (data) {
-                                var option = new Option(data[9].fields.codigo+" "+data[9].fields.descripcion, data[9].pk, true, true);
+                                console.log(data)
+                                var option = new Option(data[4].fields.codigo+" "+data[4].fields.descripcion, data[4].pk, true, true);
                                 cuentaSelect.append(option).trigger('change');
                                 cuentaSelect.trigger({
                                     type: 'select2:select',
@@ -1179,7 +1180,7 @@
                                 type: 'GET',
                                 url: '{% url 'contabilidad:cuenta' %}',
                             }).then(function (data) {
-                                var option = new Option(data[8].fields.codigo+" "+data[8].fields.descripcion, data[8].pk, true, true);
+                                var option = new Option(data[3].fields.codigo+" "+data[3].fields.descripcion, data[3].pk, true, true);
                                 cuentaSelect1.append(option).trigger('change');
                                 cuentaSelect1.trigger({
                                     type: 'select2:select',
