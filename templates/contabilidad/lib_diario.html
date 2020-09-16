@@ -88,7 +88,7 @@
                     text-align: left
                 }
             </style>
-        {%endblock%}
+        {% endblock %}
         {% block extra_style %}{% endblock %}
     {% endblock %}
 </head>
@@ -125,35 +125,36 @@
                 <table>
                     <thead>
                     <tr>
-                        <th style="background-color: #219FB5;" colspan="2">Nº DE COMP</th>
-                        <th style="background-color: #219FB5;" colspan="4">ENTREGADO A</th>
+                        <th style="background-color: #219FB5;">Nº DE COMP</th>
+                        <th style="background-color: #219FB5;" colspan="2">TIPO</th>
                         <th style="background-color: #219FB5;" colspan="2">FECHA</th>
-                        <th style="background-color: #219FB5;" colspan="2">TIPO TRANSACCION</th>
-                        <th style="background-color: #219FB5;" colspan="2">MONEDA</th>
-                        <th style="background-color: #219FB5;" colspan="1">T/C</th>
+                        <th style="background-color: #219FB5;" colspan="2">COD. CUENTA</th>
+                        <th style="background-color: #219FB5;" colspan="4">NOMBRE CUENTA</th>
                         <th style="background-color: #219FB5;" colspan="2">DEBE Bs.</th>
                         <th style="background-color: #219FB5;" colspan="2">HABER Bs.</th>
                         <th style="background-color: #219FB5;" colspan="2">DEBE $us.</th>
                         <th style="background-color: #219FB5;" colspan="2">HABER $us.</th>
+                        <th style="background-color: #219FB5;">T/C</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% regroup lib by fecha as res_fecha %}
-                    {% for res in res_fecha %}
+                    {% regroup lib by encabezadoas as libs %}
+                    {% for res in libs %}
                         {% for i in res.list %}
                         <tr>
-                            <td colspan="2" id="fuente2">{{ i.numero_comp }}</td>
-                            <td colspan="4" id="fuente2">{{ i.entregado|upper }}</td>
-                            <td colspan="2" id="fuente2">{{ i.fecha_f }}</td>
-                            <td colspan="2" id="fuente2">{{ i.get_tipo_trans_display }}</td>
-                            <td colspan="2" id="fuente2">{{ i.get_moneda_display }}</td>
-                            <td colspan="1" id="fuente">{{ i.cotizacion }}</td>
-                            <td colspan="2" id="fuente">{{ i.debe_bs }}</td>
-                            <td colspan="2" id="fuente">{{ i.haber_bs }}</td>
-                            <td colspan="2" id="fuente">{{ i.debe_dls }}</td>
-                            <td colspan="2" id="fuente">{{ i.haber_dls }}</td>
+                            <td id="fuente2">{{ i.encabezadoas.numero_comp }}</td>
+                            <td colspan="2" id="fuente2" style="text-align: center;">{{ i.encabezadoas.get_tipo_trans_display }}</td>
+                            <td colspan="2" id="fuente2" style="text-align: center;">{{ i.encabezadoas.fecha_f }}</td>
+                            <td colspan="2" id="fuente2" style="text-align: center;">{{ i.nivel_cinco.codigo }}</td>
+                            <td colspan="4" id="fuente2">{{ i.nivel_cinco.descripcion }}</td>
+                            <td colspan="2" id="fuente">{{ i.debe_b }}</td>
+                            <td colspan="2" id="fuente">{{ i.haber_b }}</td>
+                            <td colspan="2" id="fuente">{{ i.debe_d }}</td>
+                            <td colspan="2" id="fuente">{{ i.haber_d }}</td>
+                            <td id="fuente">{{ i.encabezadoas.cotizacion }}</td>
                         </tr>
                         {% endfor %}
+                        <td id="fuente2" colspan="20"><b>GLOSA: </b>{{ res.grouper.glosa }}</td>
                     {% endfor %}
                     </tbody>
                 </table>

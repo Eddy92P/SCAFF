@@ -2304,7 +2304,7 @@ class libroMayorP(PDFTemplateView):
 		saldo = []
 		saldo_aux = []
 		b = 0
-		if ini == '2':
+		if (ini == '2') | (ini == '4'):
 			if campo4 == 'Bs':
 				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(nivel_cinco__codigo=campo3)).order_by('encabezadoas__fecha'):
 					aux = 0
@@ -2794,7 +2794,7 @@ class libroDiario(PDFTemplateView):
 		f2 = datetime.datetime.strptime(campo1, "%Y-%m-%d")
 		fecha1 = f1.strftime("%d/%m/%Y")
 		fecha2 = f2.strftime("%d/%m/%Y")
-		res = encabezadoas.objects.filter(fecha__range=(f1, f2)).order_by('fecha')
+		res = asiento.objects.filter(encabezadoas__fecha__range=(f1, f2)).order_by('encabezadoas__numero_comp')
 		context['lib'] = res
 		context['fecha1'] = fecha1
 		context['fecha2'] = fecha2

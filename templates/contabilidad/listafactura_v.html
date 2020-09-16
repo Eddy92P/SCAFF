@@ -32,9 +32,9 @@
                     <tr>
                         <th style="color: #FFFFFF"><i>Número de Comprobante</i></th>
                         <th style="color: #FFFFFF"><i>Número de Factura</i></th>
-                        <th style="color: #FFFFFF"><i>Tipo de Factura</i></th>
-                        <th style="color: #FFFFFF"><i>Número DUI</i></th>
+                        <th style="color: #FFFFFF"><i>Número de Autorización</i></th>
                         <th style="color: #FFFFFF"><i>Fecha Factura</i></th>
+                        <th style="color: #FFFFFF"><i>Estado Factura</i></th>
                         <th style="color: #FFFFFF"><i>Importe Factura</i></th>
                         <th style="color: #FFFFFF"><i>NIT del Proveedor</i></th>
                         <th style="color: #FFFFFF"><i>Código de Control</i></th>
@@ -49,23 +49,23 @@
                             {% if forloop.counter|divisibleby:2 %}
                                 <tr style="background-color: #FFFFFF;">
                                     <td>{{ factura.asiento.encabezadoas.numero_comp }}</td>
-                                    <td>{{ factura.fecha_fac }}</td>
                                     <td>{{ factura.nro_fact }}</td>
                                     <td>{{ factura.nro_aut }}</td>
+                                    <td>{{ factura.fecha_fac }}</td>
                                     <td>{{ factura.estado_p }}</td>
-                                    <td>{{ factura.nit_cliente }}</td>
                                     <td>{{ factura.importe_fac }}</td>
+                                    <td>{{ factura.nit_cliente }}</td>
                                     <td>{{ factura.codigo }}</td>
                                 
                             {% else %}
                                 <tr style="background-color: #E3E3E3;">
                                     <td>{{ factura.asiento.encabezadoas.numero_comp }}</td>
-                                    <td>{{ factura.fecha_fac }}</td>
                                     <td>{{ factura.nro_fact }}</td>
                                     <td>{{ factura.nro_aut }}</td>
+                                    <td>{{ factura.fecha_fac }}</td>
                                     <td>{{ factura.estado_p }}</td>
-                                    <td>{{ factura.nit_cliente }}</td>
                                     <td>{{ factura.importe_fac }}</td>
+                                    <td>{{ factura.nit_cliente }}</td>
                                     <td>{{ factura.codigo }}</td>
                                     
                             {% endif %}
