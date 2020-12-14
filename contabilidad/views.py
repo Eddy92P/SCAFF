@@ -94,6 +94,18 @@ class crearAsiento(CreateView):
 				form.numero_comp = t + 1
 			form.save()
 			crear_asiento_form_set.instance = form
+			formset = crear_asiento_form_set.save(commit=False)
+			for f in formset:
+				if f.debe_b != None:
+					f.haber_b = 0.00
+					f.haber_d = 0.00
+					f.auxiliar = 1
+
+				elif f.haber_b != None:
+					f.debe_b = 0.00
+					f.debe_d = 0.00
+					f.auxiliar = 2
+
 			crear_asiento_form_set.save()
 			try:
 				for i in selec:
@@ -104,7 +116,7 @@ class crearAsiento(CreateView):
 				pass
 			return HttpResponseRedirect(reverse_lazy(self.success_url))
 		else:
-			return self.render_to_response(self.get_context_data(form=form, crear_asiento_form_set=crear_asiento_form_set))
+			return self.render_to_response(self.get_context_data(form=form, crear_asiento_form_set=crear_asiento_form_set, error='El haber no debe quedar vacío, verifique los datos.'))
 
 class crearAsiento1(crearAsiento):
 	model_pk = nivel_cinco
@@ -170,6 +182,18 @@ class crearAsiento1(crearAsiento):
 				form.numero_comp = t + 1
 			form.save()
 			crear_asiento_form_set.instance = form
+			formset = crear_asiento_form_set.save(commit=False)
+			for f in formset:
+				if f.debe_b != None:
+					f.haber_b = 0.00
+					f.haber_d = 0.00
+					f.auxiliar = 1
+
+				elif f.haber_b != None:
+					f.debe_b = 0.00
+					f.debe_d = 0.00
+					f.auxiliar = 2
+
 			crear_asiento_form_set.save()
 			try:
 				pk1 = self.kwargs['pk']
@@ -264,6 +288,18 @@ class crearAsiento2(CreateView):
 				form.numero_comp = t + 1
 			form.save()
 			crear_asiento_form_set.instance = form
+			formset = crear_asiento_form_set.save(commit=False)
+			for f in formset:
+				if f.debe_b != None:
+					f.haber_b = 0.00
+					f.haber_d = 0.00
+					f.auxiliar = 1
+
+				elif f.haber_b != None:
+					f.debe_b = 0.00
+					f.debe_d = 0.00
+					f.auxiliar = 2
+
 			crear_asiento_form_set.save()
 			try:
 				for i in selec:
@@ -357,6 +393,18 @@ class crearAsiento3(CreateView):
 				form.numero_comp = t + 1
 			form.save()
 			crear_asiento_form_set.instance = form
+			formset = crear_asiento_form_set.save(commit=False)
+			for f in formset:
+				if f.debe_b != None:
+					f.haber_b = 0.00
+					f.haber_d = 0.00
+					f.auxiliar = 1
+
+				elif f.haber_b != None:
+					f.debe_b = 0.00
+					f.debe_d = 0.00
+					f.auxiliar = 2
+					
 			crear_asiento_form_set.save()
 			try:
 				for i in selec:

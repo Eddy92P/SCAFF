@@ -593,8 +593,8 @@ class asiento(models.Model):
 		choices=(('C','IU Compras'),('S','IU Servicio'),('RC','RC-IVA'),('A','Alquileres'),('Comp','Compras'),('B','Boletos'),('I','Importaciones'),('G','Gasolina'),('V','Ventas'),('SC','Sin Derecho a Crédito Fiscal'))
 		)
 	auxiliar = models.PositiveIntegerField(
-		null=False,
-		blank=False
+		null=True,
+		blank=True
 		)
 	auxiliar_s = models.DecimalField(
 		null=True,
