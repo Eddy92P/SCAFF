@@ -435,7 +435,6 @@ class updateAsiento(UpdateView):
 	def get_success_url(self):
 		return reverse_lazy(self.success_url, kwargs = {'pk': self.get_object().encabezadoas.pk})
 
-
 	def get(self, request, *args, **kwargs):
 		self.object = self.get_object()
 		form_class = self.get_form_class()
@@ -451,8 +450,19 @@ class updateAsiento(UpdateView):
 		if form.is_valid() and crear_asiento_form_set.is_valid():
 			self.object = form.save()
 			crear_asiento_form_set.instance = self.object
-			for fmset in crear_asiento_form_set:
-				fmset.save()	
+			formset = crear_asiento_form_set.save(commit=False)
+			for f in formset:
+				if f.debe_b != None:
+					f.haber_b = 0.00
+					f.haber_d = 0.00
+					f.auxiliar = 1
+
+				elif f.haber_b != None:
+					f.debe_b = 0.00
+					f.debe_d = 0.00
+					f.auxiliar = 2
+					
+			crear_asiento_form_set.save()	
 			return HttpResponseRedirect(reverse_lazy(self.success_url))
 		else:
 			return self.render_to_response(self.get_context_data(form=form, crear_asiento_form_set=crear_asiento_form_set))
