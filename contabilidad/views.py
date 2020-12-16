@@ -2523,8 +2523,7 @@ class estadoResultado(PDFTemplateView):
 		utilidad_d = 0
 		utilidad_b = aux - aux1
 		utilidad_d = aux2 - aux3
-		for i in res:
-			print(i.debe_b_t(f1, f2))
+		
 		context['f1'] = f1
 		context['f2'] = f2
 		context.update({'utilidad_b': utilidad_b})
