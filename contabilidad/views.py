@@ -96,12 +96,12 @@ class crearAsiento(CreateView):
 			crear_asiento_form_set.instance = form
 			formset = crear_asiento_form_set.save(commit=False)
 			for f in formset:
-				if f.debe_b != None:
+				if (f.debe_b != None) & (f.debe_b != 0):
 					f.haber_b = 0.00
 					f.haber_d = 0.00
 					f.auxiliar = 1
 
-				elif f.haber_b != None:
+				elif (f.haber_b != None) & (f.haber_b != 0):
 					f.debe_b = 0.00
 					f.debe_d = 0.00
 					f.auxiliar = 2
@@ -184,12 +184,12 @@ class crearAsiento1(crearAsiento):
 			crear_asiento_form_set.instance = form
 			formset = crear_asiento_form_set.save(commit=False)
 			for f in formset:
-				if f.debe_b != None:
+				if (f.debe_b != None) & (f.debe_b != 0):
 					f.haber_b = 0.00
 					f.haber_d = 0.00
 					f.auxiliar = 1
 
-				elif f.haber_b != None:
+				elif (f.haber_b != None) & (f.haber_b != 0):
 					f.debe_b = 0.00
 					f.debe_d = 0.00
 					f.auxiliar = 2
@@ -290,12 +290,12 @@ class crearAsiento2(CreateView):
 			crear_asiento_form_set.instance = form
 			formset = crear_asiento_form_set.save(commit=False)
 			for f in formset:
-				if f.debe_b != None:
+				if (f.debe_b != None) & (f.debe_b != 0):
 					f.haber_b = 0.00
 					f.haber_d = 0.00
 					f.auxiliar = 1
 
-				elif f.haber_b != None:
+				elif (f.haber_b != None) & (f.haber_b != 0):
 					f.debe_b = 0.00
 					f.debe_d = 0.00
 					f.auxiliar = 2
@@ -395,12 +395,12 @@ class crearAsiento3(CreateView):
 			crear_asiento_form_set.instance = form
 			formset = crear_asiento_form_set.save(commit=False)
 			for f in formset:
-				if f.debe_b != None:
+				if (f.debe_b != None) & (f.debe_b != 0):
 					f.haber_b = 0.00
 					f.haber_d = 0.00
 					f.auxiliar = 1
 
-				elif f.haber_b != None:
+				elif (f.haber_b != None) & (f.haber_b != 0):
 					f.debe_b = 0.00
 					f.debe_d = 0.00
 					f.auxiliar = 2
