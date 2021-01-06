@@ -293,7 +293,7 @@ class Alta_baja_activo(models.Model):
 		)
 
 	def __unicode__(self):
-		return "Activo: " + str(self.tipo_bien) + " Ubicación: " + str(self.ubicacion) + " Fecha_alta: " + str(self.fecha_alta) + " Valor inicial: " + str(self.valor_inic)
+		return "Activo: " + unicode(self.tipo_bien) + " Ubicación: " + unicode(self.ubicacion) + " Fecha_alta: " + str(self.fecha_alta) + " Valor inicial: " + str(self.valor_inic)
 
 	def cap(self, fecha):
 		return self.capitalizacion_set.filter(alta_activo__tipo_bien__rubro=self.tipo_bien.rubro, fecha_cap__lte=fecha)

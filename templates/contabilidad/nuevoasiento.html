@@ -1,5 +1,6 @@
 {% extends "base/baseform4.html" %}
 
+
 	{% block tituloform %}
 		Nuevo Asiento Contable
 	{% endblock tituloform %}
@@ -38,7 +39,15 @@
                 {{ field }}
             </div>
         {% endfor %}
-        {% endcomment %}                        
+        {% endcomment %}
+        <div class="card-header bg-light">
+            <i><h4 style="text-decoration-line: underline;"><b>Consideraciones a tomar en cuenta para llenar el asiento</b></h4></i>
+            <p style="color: red;">* No se deben ingresar cuentas sin antes haber llenado todos los datos del encabezado.</p>
+            <p>* Al seleccionar las opciones para facturas, debe seleccionar en el orden en que se muestran, caso contrario deberá refrescar la página y volver a realizar la acción.</p>
+            <p>* En caso de que por alguna razón no cuadren los totales, intente presionar cualquier tecla.</p>
+            <p>* Los botones de <b>"añadir fila" y "quitar fila"</b> son para aumentar o quitar filas al formulario, para poder ingresar más o menos datos, esta acción no tiene ningun efecto a nivel de base de datos en el caso de querer eliminar registros.</p>
+        </div>  
+
         <div class="panel panel-default">
                 <div class="panel-body">
                     <table class="table2">
@@ -472,7 +481,7 @@
 
         <div class="col-lg-12 text-right">
                 <input type="submit" class="btn btn-primary" value="Guardar" />
-                <a href="#" class="btn btn-default">Limpiar Formulario</a> 
+                <input type="button" value = "Limpiar el Formulario" class="btn btn-default" onclick="history.go(0)" /> 
                 <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger">Salir</a>   
         </div>
         
@@ -1356,8 +1365,49 @@
     });
 
     $(document).ready(function(){
-        try
-        {
+        var state_moneda = $("#id_moneda").val()
+        $(document).on("keyup", function(){
+            var tipo_c = $("#id_cotizacion").val();
+                $(".table tbody tr").each(function(){
+                    if(state_moneda == "2")
+                    {
+                        var p = $(this).find('input');
+                        var debe_b_t = 0;
+                        var haber_b_t = 0;
+                        var debe_b = p.eq(2);
+                        var haber_b = p.eq(3);
+                        var debe_dls = p.eq(4).val();
+                        var haber_dls = p.eq(5).val();
+                        debe_b_t = parseFloat(debe_dls) * parseFloat(tipo_c);
+                        var res = parseFloat(debe_b_t).toFixed(3);
+                        var res1 = String(res) + '1';
+                        debe_b.val(parseFloat(res1).toFixed(2));
+                        haber_b_t = parseFloat(haber_dls) * parseFloat(tipo_c);
+                        var res2 = parseFloat(haber_b_t).toFixed(3);
+                        var res3 = String(res2) + '1';
+                        haber_b.val(parseFloat(res3).toFixed(2));
+                    }
+                    if(state_moneda == "1")
+                    {
+                        var p = $(this).find('input');
+                        var debe_dls_t = 0;
+                        var haber_dls_t = 0;
+                        var debe_b = p.eq(2).val();
+                        var haber_b = p.eq(3).val();
+                        var debe_dls = p.eq(4);
+                        var haber_dls = p.eq(5);
+                        debe_dls_t = parseFloat(debe_b)/parseFloat(tipo_c);
+                        var res = parseFloat(debe_dls_t).toFixed(3);
+                        var res1 = String(res) + '1';
+                        debe_dls.val(parseFloat(res1).toFixed(2))
+                        haber_dls_t = parseFloat(haber_b)/parseFloat(tipo_c);
+                        var res2 = parseFloat(haber_dls_t).toFixed(3);
+                        var res3 = String(res2) + '1';
+                        haber_dls.val(parseFloat(res3).toFixed(2));
+                    }
+                
+                });
+            });
         $("#id_moneda").on("change", function(){
             var moneda = $(this).val();
             $(document).on("keyup", function(){
@@ -1403,11 +1453,6 @@
                 });
             });
         });
-        }
-        catch
-        {
-            console.error(error);
-        }
     });
     $(document).on('submit', function(){
         console.log('hola')

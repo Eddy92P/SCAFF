@@ -153,6 +153,13 @@
         {% if error %}
             <div class="alert alert-danger" role="alert"><strong>Advertencia!!!</strong> {{ error }}</div>
         {% endif %}
+        <div class="card-header bg-light">
+            <i><h4 style="text-decoration-line: underline;"><b>Consideraciones a tomar en cuenta para llenar el Ingreso</b></h4></i>
+            <p style="color: red;">* No se deben ingresar items sin antes haber llenado todos los datos del encabezado.</p>
+            <p>* El botón de <b>IVA</b> se debe seleccionar una vez llenado todo el formulario.</p>
+            <p>* En caso de que por alguna razón no cuadren los totales, intente presionar cualquier tecla.</p>
+            <p>* Los botones de <b>"añadir fila" y "quitar fila"</b> son para aumentar o quitar filas al formulario, esto para poder ingresar más datos o menos datos, esta acción no tiene ningun efecto a nivel de base de datos en el caso de querer eliminar registros.</p>
+        </div> 
         <div class="panel panel-default">
                 <div class="panel-body">
                     <table class="table2">
@@ -453,7 +460,7 @@
 
         <div class="col-lg-12 text-right">
                 <input type="submit" class="btn btn-primary" value="Guardar" />
-                <a href="#" class="btn btn-default">Limpiar Formulario</a>   
+                <input type="button" value = "Limpiar el Formulario" class="btn btn-default" onclick="history.go(0)" />    
         </div>
         
 <script type="text/javascript">

@@ -55,7 +55,7 @@
 	        <button type="submit" class="btn btn-primary btninter">
 	            {% bootstrap_icon "glyphicon glyphicon-ok" %} Guardar
 	        </button>
-	        <a href="#" class="btn btn-default">Limpiar Formulario</a>
+	        <input type="button" value = "Limpiar el Formulario" class="btn btn-default" onclick="history.go(0)" /> 
 	        <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger">Salir</a>
 	    </div>	
 	    {% endbuttons %}
