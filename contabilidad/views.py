@@ -2765,80 +2765,110 @@ class estadoEvolucionP(PDFTemplateView):
 		fecha = f.strftime("%d/%m/%Y")
 		context['campo'] = fecha
 		context['asi'] = asiento.objects.filter(encabezadoas__fecha=f)
-
-		try:
 		
-			if (f.month!=10) | (f.month!=11) | (f.month!=12):
-				c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			else:
-				c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			
-			aux = c1_a['total']  #capital social anterior gestión
+		if (f.month!=10) | (f.month!=11) | (f.month!=12):
+			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+		else:
+			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+		
+		
+		if c1_a['total']:
+			aux = c1_a['total'] #capital social anterior gestión
+		else:
+			aux = 0
+		if c2_a['total']:
 			aux1 = c2_a['total'] #ajuste de capital anterior gestión
+		else:
+			aux1 = 0
+		if c3_a['total']:
 			aux2 = c3_a['total'] #reserva legal anterior gestión
+		else:
+			aux2 = 0
+		if c4_a['total']:
 			aux3 = c4_a['total'] #ajuste reservas patrimoniales anterior gestión
+		else:
+			aux3 = 0
+		if c5_a['total']:
 			aux4 = c5_a['total'] #resultados acumulados anterior gestión
-	
-	
-			patrimonio_neto_a = aux + aux1 + aux2 + aux3 + aux4
+		else:
+			aux4 = 0
+
+		patrimonio_neto_a = aux + aux1 + aux2 + aux3 + aux4
+		
+		if (f.month!=10) | (f.month!=11) | (f.month!=12):
+			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+		else:
+			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
 			
-			if (f.month!=10) | (f.month!=11) | (f.month!=12):
-				c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			else:
-				c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-				
+		if c1['total']:
 			aux5 = c1['total']  #capital social
+		else:
+			aux5 = 0
+		if c2['total']:
 			aux6 = c2['total']	#ajuste de capital	
+		else:
+			aux6 = 0
+		if c3['total']:
 			aux7 = c3['total']	#reserva legal	
+		else:
+			aux7 = 0
+		if c4['total']:
 			aux8 = c4['total']	#ajuste reservas patrimoniales	
+		else:
+			aux8 = 0
+		if c5['total']:
 			aux9 = c5['total']	#resultados acumulados	
+		else:
+			aux9 = 0
+		if c6['total']:
 			aux10 = c6['total']	#resultado del ejercicio
-	
-			capital_social = aux + aux5
-			ajuste_capital = aux1 + aux6
-			reserva_legal = aux2 + aux7
-			ajuste_reserv = aux3 + aux8
-			resultados_acum = aux4 + aux5 + aux7 + aux9 + aux10
-			patrimonio_total = patrimonio_neto_a + aux6 + aux8 + aux9 + aux10
-	
-			context['patri_n'] = patrimonio_neto_a
-			context['cap_soc_a'] = aux
-			context['ajuste_cap_a'] = aux1
-			context['res_leg_a'] = aux2
-			context['ajust_res_a'] = aux3
-			context['res_acum_a'] = aux4
-			context['cap_soc'] = aux5
-			context['ajuste_cap'] = aux6
-			context['res_leg'] = aux7
-			context['ajust_res'] = aux8
-			context['res_acum'] = aux9
-			context['resultados_ejer'] = aux10
-			context['cap_soc_t'] = capital_social
-			context['ajuste_cap_t'] = ajuste_capital
-			context['res_leg_t'] = reserva_legal
-			context['ajust_res_t'] = ajuste_reserv
-			context['res_acum_t'] = resultados_acum
-			context['patri_t'] = patrimonio_total
-		except:
-			raise Http404
+		else:
+			aux10 = 0
+
+		capital_social = aux + aux5
+		ajuste_capital = aux1 + aux6
+		reserva_legal = aux2 + aux7
+		ajuste_reserv = aux3 + aux8
+		resultados_acum = aux4 + aux5 + aux7 + aux9 + aux10
+		patrimonio_total = patrimonio_neto_a + aux6 + aux8 + aux9 + aux10
+
+		context['patri_n'] = patrimonio_neto_a
+		context['cap_soc_a'] = aux
+		context['ajuste_cap_a'] = aux1
+		context['res_leg_a'] = aux2
+		context['ajust_res_a'] = aux3
+		context['res_acum_a'] = aux4
+		context['cap_soc'] = aux5
+		context['ajuste_cap'] = aux6
+		context['res_leg'] = aux7
+		context['ajust_res'] = aux8
+		context['res_acum'] = aux9
+		context['resultados_ejer'] = aux10
+		context['cap_soc_t'] = capital_social
+		context['ajuste_cap_t'] = ajuste_capital
+		context['res_leg_t'] = reserva_legal
+		context['ajust_res_t'] = ajuste_reserv
+		context['res_acum_t'] = resultados_acum
+		context['patri_t'] = patrimonio_total
+		
 		return context
 
 class libroDiario(PDFTemplateView):
