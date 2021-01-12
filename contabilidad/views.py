@@ -2764,7 +2764,7 @@ class estadoEvolucionP(PDFTemplateView):
 		res = 0
 		fecha = f.strftime("%d/%m/%Y")
 		context['campo'] = fecha
-		context['asi'] = asiento.objects.filter(encabezadoas__fecha=f)
+		context['asi'] = asiento.objects.filter(encabezadoas__fecha__lte=f)
 		
 		if (f.month!=10) | (f.month!=11) | (f.month!=12):
 			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
@@ -2868,7 +2868,7 @@ class estadoEvolucionP(PDFTemplateView):
 		context['ajust_res_t'] = ajuste_reserv
 		context['res_acum_t'] = resultados_acum
 		context['patri_t'] = patrimonio_total
-		
+
 		return context
 
 class libroDiario(PDFTemplateView):
