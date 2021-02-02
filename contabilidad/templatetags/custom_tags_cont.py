@@ -172,3 +172,11 @@ def saldo_b_u_er(nivel_uno, f1, f2):
 @register.simple_tag
 def saldo_d_u_er(nivel_uno, f1, f2):	
 	return nivel_uno.saldo_d_ter(f1, f2)
+
+@register.simple_tag
+def mostr_saldo_b_u_er(nivel_uno, f1, f2):	
+	return nivel_uno.mostrar_saldo_b_ter(f1, f2)
+	
+@register.simple_tag
+def mostr_saldo_d_u_er(nivel_uno, f1, f2):	
+	return nivel_uno.mostrar_saldo_d_ter(f1, f2)

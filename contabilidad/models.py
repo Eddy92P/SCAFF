@@ -61,6 +61,8 @@ class nivel_uno(models.Model):
 		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
 		if res['total'] == None:
 			return 0.0
+		elif res['total'] < 0:
+			return str(abs(res['total'] + self.saldo_b_ter(f1, f2))) + " CR"
 		else:
 			return res['total']
 
@@ -68,6 +70,8 @@ class nivel_uno(models.Model):
 		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
 		if res['total'] == None:
 			return 0.0
+		elif res['total'] < 0:
+			return str(abs(res['total'] + self.saldo_d_ter(f1, f2))) + " CR"
 		else:
 			return res['total']
 
@@ -112,6 +116,24 @@ class nivel_uno(models.Model):
 		res = nivel_uno.objects.filter(id__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
 		if res['total'] == None:
 			return 0.0
+		else:
+			return res['total']
+
+	def mostrar_saldo_b_ter(self, f1, f2):
+		res = nivel_uno.objects.filter(id__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
+		if res['total'] == None:
+			return 0.0
+		elif res['total'] < 0:
+			return str(abs(res['total'])) + " CR"
+		else:
+			return res['total']
+
+	def mostrar_saldo_d_ter(self, f1, f2):
+		res = nivel_uno.objects.filter(id__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
+		if res['total'] == None:
+			return 0.0
+		elif res['total'] < 0:
+			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
@@ -209,6 +231,8 @@ class nivel_dos(models.Model):
 		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
 		if res['total'] == None:
 			return 0.0
+		elif res['total'] < 0:
+			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
@@ -216,6 +240,8 @@ class nivel_dos(models.Model):
 		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
 		if res['total'] == None:
 			return 0.0
+		elif res['total'] < 0:
+			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
@@ -284,6 +310,8 @@ class nivel_tres(models.Model):
 		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_cuatro__nivel_cinco__asiento__haber_b')))
 		if res['total'] == None:
 			return 0.0
+		elif res['total'] < 0:
+			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
@@ -291,6 +319,8 @@ class nivel_tres(models.Model):
 		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_cuatro__nivel_cinco__asiento__haber_d')))
 		if res['total'] == None:
 			return 0.0
+		elif res['total'] < 0:
+			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
@@ -360,6 +390,8 @@ class nivel_cuatro(models.Model):
 		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_cinco__asiento__debe_b') - F('nivel_cinco__asiento__haber_b')))
 		if res['total'] == None:
 			return 0.0
+		elif res['total'] < 0:
+			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
@@ -367,6 +399,8 @@ class nivel_cuatro(models.Model):
 		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_cinco__asiento__debe_d') - F('nivel_cinco__asiento__haber_d')))
 		if res['total'] == None:
 			return 0.0
+		elif res['total'] < 0:
+			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
@@ -441,6 +475,8 @@ class nivel_cinco(models.Model):
 		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('asiento__debe_b') - F('asiento__haber_b')))
 		if res['total'] == None:
 			return 0.0
+		elif res['total'] < 0:
+			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
@@ -448,6 +484,8 @@ class nivel_cinco(models.Model):
 		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('asiento__debe_d') - F('asiento__haber_d')))
 		if res['total'] == None:
 			return 0.0
+		elif res['total'] < 0:
+			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
@@ -660,6 +698,8 @@ class asiento(models.Model):
 		res = asiento.objects.filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('debe_b') - F('haber_b')))
 		if res['total'] == None:
 			return 0.0
+		elif res['total'] < 0:
+			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
@@ -667,6 +707,8 @@ class asiento(models.Model):
 		res = asiento.objects.filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('debe_d') - F('haber_d')))
 		if res['total'] == None:
 			return 0.0
+		elif res['total'] < 0:
+			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 

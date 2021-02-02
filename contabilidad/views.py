@@ -2851,23 +2851,90 @@ class estadoEvolucionP(PDFTemplateView):
 		patrimonio_total = patrimonio_neto_a + aux6 + aux8 + aux9 + aux10
 
 		context['patri_n'] = patrimonio_neto_a
-		context['cap_soc_a'] = aux
-		context['ajuste_cap_a'] = aux1
-		context['res_leg_a'] = aux2
-		context['ajust_res_a'] = aux3
-		context['res_acum_a'] = aux4
-		context['cap_soc'] = aux5
-		context['ajuste_cap'] = aux6
-		context['res_leg'] = aux7
-		context['ajust_res'] = aux8
-		context['res_acum'] = aux9
-		context['resultados_ejer'] = aux10
-		context['cap_soc_t'] = capital_social
-		context['ajuste_cap_t'] = ajuste_capital
-		context['res_leg_t'] = reserva_legal
-		context['ajust_res_t'] = ajuste_reserv
-		context['res_acum_t'] = resultados_acum
-		context['patri_t'] = patrimonio_total
+		if aux < 0:
+			context['cap_soc_a'] = str(abs(aux)) + " CR"
+		else:
+			context['cap_soc_a'] = aux
+
+		if aux1 < 0:
+			context['ajuste_cap_a'] = str(abs(aux1)) + " CR"
+		else:
+			context['ajuste_cap_a'] = aux1
+
+		if aux2 < 0:
+			context['res_leg_a'] = str(abs(aux2)) + " CR"
+		else:
+			context['res_leg_a'] = aux2
+
+		if aux3 < 0:
+			context['ajust_res_a'] = str(abs(aux3)) + " CR"
+		else:
+			context['ajust_res_a'] = aux3
+
+		if aux4 < 0:
+			context['res_acum_a'] = str(abs(aux4)) + " CR"
+		else:
+			context['res_acum_a'] = aux4
+
+		if aux5 < 0:
+			context['cap_soc'] = str(abs(aux5)) + " CR"
+		else:
+			context['cap_soc'] = aux5
+
+		if aux6 < 0:
+			context['ajuste_cap'] = str(abs(aux6)) + " CR"
+		else:
+			context['ajuste_cap'] = aux6
+
+		if aux7 < 0:
+			context['res_leg'] = str(abs(aux7)) + " CR"
+		else:
+			context['res_leg'] = aux7
+
+		if aux8 < 0:
+			context['ajust_res'] = str(abs(aux8)) + " CR"
+		else:
+			context['ajust_res'] = aux8
+
+		if aux9 < 0:
+			context['res_acum'] = str(abs(aux9)) + " CR"
+		else:
+			context['res_acum'] = aux9
+
+		if aux10 < 0:
+			context['resultados_ejer'] = str(abs(aux10)) + " CR"
+		else:
+			context['resultados_ejer'] = aux10
+
+		if capital_social < 0:
+			context['cap_soc_t'] = str(abs(capital_social)) + " CR"
+		else:
+			context['cap_soc_t'] = capital_social
+
+		if ajuste_capital < 0:	
+			context['ajuste_cap_t'] = str(abs(ajuste_capital)) + " CR"
+		else:
+			context['ajuste_cap_t'] = ajuste_capital
+
+		if reserva_legal < 0:
+			context['res_leg_t'] = str(abs(reserva_legal)) + " CR"
+		else:
+			context['res_leg_t'] = reserva_legal
+
+		if ajuste_reserv < 0:
+			context['ajust_res_t'] = str(abs(ajuste_reserv)) + " CR"
+		else:
+			context['ajust_res_t'] = ajuste_reserv
+
+		if resultados_acum < 0:	
+			context['res_acum_t'] = str(abs(resultados_acum)) + " CR"
+		else:
+			context['res_acum_t'] = resultados_acum
+
+		if patrimonio_total < 0:
+			context['patri_t'] = str(abs(patrimonio_total)) + " CR"
+		else:
+			context['patri_t'] = patrimonio_total
 
 		return context
 

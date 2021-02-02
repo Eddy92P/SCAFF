@@ -164,6 +164,19 @@
                     {% endif %}
                         {% if forloop.last %}
                             <tr>
+                                <td style="border-left: 1px solid black; border-right: 1px solid black;" colspan="2">    
+                                </td>
+                                <td id="fuente" colspan="7" style="border-right: 1px solid black; padding-top: 3px;">
+                                    <b><u>UTILIDAD</u></b>
+                                </td>
+                                <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
+                                    {% mostr_saldo_b_u_er res f1 f2 %}
+                                </td>
+                                <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
+                                    {% mostr_saldo_d_u_er res f1 f2 %}
+                                </td>
+                            </tr>
+                            <tr>
                                 <td style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;" colspan="2"> </td>
                                 <td id="fuente2" style="text-align: right; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; padding-top: 4px" colspan="7"><b>TOTALES</b></td>
                                 <td id="fuente2" style="padding-top: 4px; text-align: right; border-top: 1px solid black; border-right: 1px solid black; border-bottom: 1px solid black;" colspan="2">{% saldo_b_u res f1 f2 %}</td>
@@ -201,6 +214,7 @@
                             {% saldo_d_t j f1 f2 as sald_d_t %}
                             {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
                             {% ifchanged i.descripcion %}
+                            <tr>
                                 <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
                                     <b>{{ i.codigo }}</b>
                                 </td>
@@ -213,12 +227,26 @@
                                 <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
                                     {% saldo_d_t j f1 f2 %}
                                 </td>
+                            </tr>
                             {% endifchanged %}
                             {% endif %}
                             {% endfor %}
                         {% endif %}
                         {% endfor %}
                         {% if forloop.last %}
+                            <tr>
+                                <td style="border-left: 1px solid black; border-right: 1px solid black;" colspan="2">    
+                                </td>
+                                <td id="fuente" colspan="7" style="border-right: 1px solid black; padding-top: 3px;">
+                                    <b><u>UTILIDAD</u></b>
+                                </td>
+                                <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
+                                    {% mostr_saldo_b_u_er res f1 f2 %}
+                                </td>
+                                <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
+                                    {% mostr_saldo_d_u_er res f1 f2 %}
+                                </td>
+                            </tr>
                             <tr>
                                 <td style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;" colspan="2"> </td>
                                 <td id="fuente2" style="text-align: right; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; padding-top: 4px" colspan="7"><b>TOTALES</b></td>
@@ -302,6 +330,19 @@
                             {% endfor %}
                         {% endfor %}
                         {% if forloop.last %}
+                            <tr>
+                                <td style="border-left: 1px solid black; border-right: 1px solid black;" colspan="2">    
+                                </td>
+                                <td id="fuente" colspan="7" style="border-right: 1px solid black; padding-top: 3px;">
+                                    <b><u>UTILIDAD</u></b>
+                                </td>
+                                <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
+                                    {% mostr_saldo_b_u_er res f1 f2 %}
+                                </td>
+                                <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
+                                    {% mostr_saldo_d_u_er res f1 f2 %}
+                                </td>
+                            </tr>
                             <tr>
                                 <td style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;" colspan="2"> </td>
                                 <td id="fuente2" style="text-align: right; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; padding-top: 4px" colspan="7"><b>TOTALES</b></td>
@@ -413,6 +454,19 @@
                             {% endfor %}
                         {% endfor %}
                         {% if forloop.last %}
+                            <tr>
+                                <td style="border-left: 1px solid black; border-right: 1px solid black;" colspan="2">    
+                                </td>
+                                <td id="fuente" colspan="7" style="border-right: 1px solid black; padding-top: 3px;">
+                                    <b><u>UTILIDAD</u></b>
+                                </td>
+                                <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
+                                    {% mostr_saldo_b_u_er res f1 f2 %}
+                                </td>
+                                <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
+                                    {% mostr_saldo_d_u_er res f1 f2 %}
+                                </td>
+                            </tr>
                             <tr>
                                 <td style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;" colspan="2"> </td>
                                 <td id="fuente2" style="text-align: right; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; padding-top: 4px" colspan="7"><b>TOTALES</b></td>
@@ -550,6 +604,19 @@
                             {% endfor %}
                         {% endfor %}
                         {% if forloop.last %}
+                            <tr>
+                                <td style="border-left: 1px solid black; border-right: 1px solid black;" colspan="2">    
+                                </td>
+                                <td id="fuente" colspan="7" style="border-right: 1px solid black; padding-top: 3px;">
+                                    <b><u>UTILIDAD</u></b>
+                                </td>
+                                <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
+                                    {% mostr_saldo_b_u_er res f1 f2 %}
+                                </td>
+                                <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
+                                    {% mostr_saldo_d_u_er res f1 f2 %}
+                                </td>
+                            </tr>
                             <tr>
                                 <td style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;" colspan="2"> </td>
                                 <td id="fuente2" style="text-align: right; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; padding-top: 4px" colspan="7"><b>TOTALES</b></td>

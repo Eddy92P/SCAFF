@@ -1057,145 +1057,149 @@ class resumenKardex(PDFTemplateView):
 		saldo_c_t = []
 		saldo_sub_t = []
 
-		aux_a = item.objects.filter(ingresoitem__encingresoitem__fecha__lte=f3).distinct().order_by('codigo').annotate(total=Sum('ingresoitem__cantidad'))
-		aux1_a = item.objects.filter(salidaitem__encsalidaitem__fecha__lte=f3).distinct().order_by('codigo').annotate(total=Sum('salidaitem__cantidad'))
-		aux2_a = item.objects.filter(ingresoitem__encingresoitem__fecha__lte=f3).distinct().order_by('codigo').annotate(total=Sum('ingresoitem__sub_total'))
-		aux3_a = item.objects.filter(salidaitem__encsalidaitem__fecha__lte=f3).distinct().order_by('codigo').annotate(total=Sum('salidaitem__sub_total'))
+		try:
+			aux_a = item.objects.filter(ingresoitem__encingresoitem__fecha__lte=f3).distinct().order_by('codigo').annotate(total=Sum('ingresoitem__cantidad'))
+			aux1_a = item.objects.filter(salidaitem__encsalidaitem__fecha__lte=f3).distinct().order_by('codigo').annotate(total=Sum('salidaitem__cantidad'))
+			aux2_a = item.objects.filter(ingresoitem__encingresoitem__fecha__lte=f3).distinct().order_by('codigo').annotate(total=Sum('ingresoitem__sub_total'))
+			aux3_a = item.objects.filter(salidaitem__encsalidaitem__fecha__lte=f3).distinct().order_by('codigo').annotate(total=Sum('salidaitem__sub_total'))
+				
+			resp = item.objects.filter(ingresoitem__encingresoitem__fecha__range=(f1, f2)).order_by('codigo').distinct()
+			resp_a = item.objects.filter(ingresoitem__encingresoitem__fecha__lte=f3).order_by('codigo').distinct()
+	
+			aux = item.objects.filter(ingresoitem__encingresoitem__fecha__range=(f1, f2)).distinct().order_by('codigo').annotate(total=Sum('ingresoitem__cantidad'))
+			aux1 = item.objects.filter(salidaitem__encsalidaitem__fecha__range=(f1, f2)).distinct().order_by('codigo').annotate(total=Sum('salidaitem__cantidad'))
+			aux2 = item.objects.filter(ingresoitem__encingresoitem__fecha__range=(f1, f2)).distinct().order_by('codigo').annotate(total=Sum('ingresoitem__sub_total'))
+			aux3 = item.objects.filter(salidaitem__encsalidaitem__fecha__range=(f1, f2)).distinct().order_by('codigo').annotate(total=Sum('salidaitem__sub_total'))
+	
+			for q in aux_a:
+				cantidad_e_a.append(q.total)
+	
+			if aux1_a:
+				for i in aux_a:
+					cont = 0
+					if i in aux1_a:
+						cantidad_s_a.append(aux1_a[cont].total)
+						cont+=1
+					else:
+						cantidad_s_a.append(0)
 			
-		resp = item.objects.filter(ingresoitem__encingresoitem__fecha__range=(f1, f2)).order_by('codigo').distinct()
-		resp_a = item.objects.filter(ingresoitem__encingresoitem__fecha__lte=f3).order_by('codigo').distinct()
-
-		aux = item.objects.filter(ingresoitem__encingresoitem__fecha__range=(f1, f2)).distinct().order_by('codigo').annotate(total=Sum('ingresoitem__cantidad'))
-		aux1 = item.objects.filter(salidaitem__encsalidaitem__fecha__range=(f1, f2)).distinct().order_by('codigo').annotate(total=Sum('salidaitem__cantidad'))
-		aux2 = item.objects.filter(ingresoitem__encingresoitem__fecha__range=(f1, f2)).distinct().order_by('codigo').annotate(total=Sum('ingresoitem__sub_total'))
-		aux3 = item.objects.filter(salidaitem__encsalidaitem__fecha__range=(f1, f2)).distinct().order_by('codigo').annotate(total=Sum('salidaitem__sub_total'))
-
-		for q in aux_a:
-			cantidad_e_a.append(q.total)
-
-		if aux1_a:
-			for i in aux_a:
-				cont = 0
-				if i in aux1_a:
-					cantidad_s_a.append(aux1_a[cont].total)
-					cont+=1
-				else:
-					cantidad_s_a.append(0)
-		
-		else:
-			for i in aux_a:
-				cantidad_s_a.append(0)
-
-
-		for x in aux2_a:
-			sub_total_e_a.append(x.total)
-
-		if aux3_a:
-			cont1 = 0
-			for i in aux2_a:
-				if i in aux3_a:
-					sub_total_s_a.append(aux3_a[cont1].total)
-					cont1+=1
-				else:
-					sub_total_s_a.append(0)
-		else:
-			for i in aux2_a:
-				sub_total_s_a.append(0)
-		
-		for r in resp:
-			if r in resp_a:
-				saldo_c_a.append(cantidad_e_a[d] - cantidad_s_a[d])
-				saldo_sub_a.append(sub_total_e_a[d] - sub_total_s_a[d])
-				d+=1
 			else:
-				saldo_c_a.append(0)
-				saldo_sub_a.append(0)
-
-		for i in saldo_sub_a:
-			tot_saldo_a = tot_saldo_a + i
+				for i in aux_a:
+					cantidad_s_a.append(0)
+	
+	
+			for x in aux2_a:
+				sub_total_e_a.append(x.total)
+	
+			if aux3_a:
+				cont1 = 0
+				for i in aux2_a:
+					if i in aux3_a:
+						sub_total_s_a.append(aux3_a[cont1].total)
+						cont1+=1
+					else:
+						sub_total_s_a.append(0)
+			else:
+				for i in aux2_a:
+					sub_total_s_a.append(0)
 			
-		for i in aux:
-			cantidad_e.append(i.total)
-
-		if aux1:
-			cont2 = 0
+			for r in resp:
+				if r in resp_a:
+					saldo_c_a.append(cantidad_e_a[d] - cantidad_s_a[d])
+					saldo_sub_a.append(sub_total_e_a[d] - sub_total_s_a[d])
+					d+=1
+				else:
+					saldo_c_a.append(0)
+					saldo_sub_a.append(0)
+	
+			for i in saldo_sub_a:
+				tot_saldo_a = tot_saldo_a + i
+				
 			for i in aux:
-				if i in aux1:
-					cantidad_s.append(aux1[cont2].total)
-					cont2+=1
-				else:
+				cantidad_e.append(i.total)
+	
+			if aux1:
+				cont2 = 0
+				for i in aux:
+					if i in aux1:
+						cantidad_s.append(aux1[cont2].total)
+						cont2+=1
+					else:
+						cantidad_s.append(0)
+			else:
+				for i in aux1:
 					cantidad_s.append(0)
-		else:
-			for i in aux1:
-				cantidad_s.append(0)
-
-		for k in item.objects.filter(ingresoitem__encingresoitem__fecha__range=(f1, f2)).distinct().order_by('codigo'):
-			saldo_c.append(cantidad_e[b] - cantidad_s[b])
-			b+=1
-
-		for m in aux2:
-			sub_total_e.append(m.total)
-
-		if aux3:
-			cont3 = 0
-			for i in aux2:
-				if i in aux3:
-					sub_total_s.append(aux3[cont3].total)
-					cont3+=1
-				else:
+	
+			for k in item.objects.filter(ingresoitem__encingresoitem__fecha__range=(f1, f2)).distinct().order_by('codigo'):
+				saldo_c.append(cantidad_e[b] - cantidad_s[b])
+				b+=1
+	
+			for m in aux2:
+				sub_total_e.append(m.total)
+	
+			if aux3:
+				cont3 = 0
+				for i in aux2:
+					if i in aux3:
+						sub_total_s.append(aux3[cont3].total)
+						cont3+=1
+					else:
+						sub_total_s.append(0)
+	
+			else:
+				for i in aux2:
 					sub_total_s.append(0)
-
-		else:
-			for i in aux2:
-				sub_total_s.append(0)
-
-		for i in sub_total_e:
-			tot_saldo_e = tot_saldo_e + i
-
-		for i in sub_total_s:
-			tot_saldo_s = tot_saldo_s + i
-
-		for o in item.objects.filter(ingresoitem__encingresoitem__fecha__range=(f1, f2)).distinct().order_by('codigo'):
-			saldo_sub.append(sub_total_e[c] - sub_total_s[c])
-			c+=1
-
-		res = item.objects.filter(ingresoitem__encingresoitem__fecha__range=(f1, f2)).distinct().order_by('codigo').annotate(total_cant_e=Sum('ingresoitem__cantidad'), total_sub_e=Sum('ingresoitem__sub_total'))
-		res1 = item.objects.filter(salidaitem__encsalidaitem__fecha__range=(f1, f2)).distinct().order_by('codigo').annotate(total_cant_s=Sum('salidaitem__cantidad'), total_sub_s=Sum('salidaitem__sub_total'))
-
-		if res1:
-			x = 0
-			for i in res:
-				if i in res1:
-					salida.append(res1[x])
-					x+=1
-				else:
+	
+			for i in sub_total_e:
+				tot_saldo_e = tot_saldo_e + i
+	
+			for i in sub_total_s:
+				tot_saldo_s = tot_saldo_s + i
+	
+			for o in item.objects.filter(ingresoitem__encingresoitem__fecha__range=(f1, f2)).distinct().order_by('codigo'):
+				saldo_sub.append(sub_total_e[c] - sub_total_s[c])
+				c+=1
+	
+			res = item.objects.filter(ingresoitem__encingresoitem__fecha__range=(f1, f2)).distinct().order_by('codigo').annotate(total_cant_e=Sum('ingresoitem__cantidad'), total_sub_e=Sum('ingresoitem__sub_total'))
+			res1 = item.objects.filter(salidaitem__encsalidaitem__fecha__range=(f1, f2)).distinct().order_by('codigo').annotate(total_cant_s=Sum('salidaitem__cantidad'), total_sub_s=Sum('salidaitem__sub_total'))
+	
+			if res1:
+				x = 0
+				for i in res:
+					if i in res1:
+						salida.append(res1[x])
+						x+=1
+					else:
+						salida.append(0)
+			else:
+				for i in res:
 					salida.append(0)
-		else:
-			for i in res:
-				salida.append(0)
+	
+	
+			for p in item.objects.filter(ingresoitem__encingresoitem__fecha__range=(f1, f2)).distinct().order_by('codigo'):
+				saldo_c_t.append(saldo_c[f] + saldo_c_a[f])
+				saldo_sub_t.append(saldo_sub[f] + saldo_sub_a[f])
+				f+=1
+	
+			for i in saldo_sub_t:
+				tot_saldo = tot_saldo + i
+	
+			lista = zip(res, salida, saldo_c_t, saldo_sub_t, saldo_c_a, saldo_sub_a)
+	
+	
+			context['res'] = lista
+			context['total_a'] = tot_saldo_a
+			context['total_e'] = tot_saldo_e
+			context['total_s'] = tot_saldo_s
+			context['total_saldo'] = tot_saldo
+			context['fecha1'] = fecha1
+			context['fecha2'] = fecha2
+			context['fecha3'] = fecha3
 
+			return context
 
-		for p in item.objects.filter(ingresoitem__encingresoitem__fecha__range=(f1, f2)).distinct().order_by('codigo'):
-			saldo_c_t.append(saldo_c[f] + saldo_c_a[f])
-			saldo_sub_t.append(saldo_sub[f] + saldo_sub_a[f])
-			f+=1
-
-		for i in saldo_sub_t:
-			tot_saldo = tot_saldo + i
-
-		lista = zip(res, salida, saldo_c_t, saldo_sub_t, saldo_c_a, saldo_sub_a)
-
-
-		context['res'] = lista
-		context['total_a'] = tot_saldo_a
-		context['total_e'] = tot_saldo_e
-		context['total_s'] = tot_saldo_s
-		context['total_saldo'] = tot_saldo
-		context['fecha1'] = fecha1
-		context['fecha2'] = fecha2
-		context['fecha3'] = fecha3
-		
-		return context
+		except Exception as e:
+			return None
 
 class reporteKardexTemplate(FormView):
 	form_class = repGeneralForm
