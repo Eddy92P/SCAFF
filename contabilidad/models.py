@@ -75,6 +75,50 @@ class nivel_uno(models.Model):
 		else:
 			return res['total']
 
+	def suma_patrimonio_pasivo_bs(self, f1, f2):
+		total_pasivo = nivel_uno.objects.filter(id=2, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
+
+		total_patrimonio = nivel_uno.objects.filter(id=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
+
+		if (total_pasivo is None) and (total_patrimonio is None):
+			result = 0.0
+
+		elif total_pasivo is None:
+			result = total_patrimonio['total']
+
+		elif total_patrimonio is None:
+			result = total_pasivo['total']
+
+		else:
+			result = total_pasivo['total'] + total_patrimonio['total']
+
+		if result < 0:
+			return str(abs(result)) + " CR"
+		else:
+			return result
+
+	def suma_patrimonio_pasivo_dls(self, f1, f2):
+		total_pasivo = nivel_uno.objects.filter(id=2, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
+
+		total_patrimonio = nivel_uno.objects.filter(id=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
+
+		if (total_pasivo is None) and (total_patrimonio is None):
+			result = 0.0
+
+		elif total_pasivo is None:
+			result = total_patrimonio['total']
+
+		elif total_patrimonio is None:
+			result = total_pasivo['total']
+
+		else:
+			result = total_pasivo['total'] + total_patrimonio['total']
+
+		if result < 0:
+			return str(abs(result)) + " CR"
+		else:
+			return result
+
 
 	#Totales para estado de resultados
 	def debe_b_ter(self, f1, f2):

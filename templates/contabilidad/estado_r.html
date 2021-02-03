@@ -144,14 +144,14 @@
                 <table>
                     {% if campo3 == 'G' %}
                     {% for res in niv %}
+                    {% if res.nivel_dos_set.all %}
                     <tr>
                         <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
-                            <b><u>{{ res.codigo }}</u></b>
+                            <b><u>{{ res.id }}</u></b>
                         </td>
                         <td id="fuente" style="border-right: 1px solid black; text-align: left; padding-top: 3px;" colspan="7">
                             <b><u>{{ res.descripcion }}</u></b>
                         </td>
-                        {% if res.nivel_dos_set.all %}
                         {% for i in res.nivel_dos_set.all %}
                         {% ifchanged res.descripcion %}
                             <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
@@ -168,15 +168,9 @@
                             </td>
                         {% endifchanged %}
                         {% endfor %}
-                        {% else %}
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                        {% endif %}
+                        
                     </tr>
+                    {% endif %}
                         {% if forloop.last %}
                             <tr>
                                 <td style="border-right: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;" colspan="2"> </td>
@@ -211,14 +205,14 @@
 
                     {% elif campo3 == 'R' %}
                     {% for res in niv %}
+                    {% if res.nivel_dos_set.all %}
                     <tr>
                         <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
-                            <b><u>{{ res.codigo }}</u></b>
+                            <b><u>{{ res.id }}</u></b>
                         </td>
                         <td id="fuente" style="border-right: 1px solid black; text-align: left; padding-top: 3px;" colspan="7">
                             <b><u>{{ res.descripcion }}</u></b>
                         </td>
-                        {% if res.nivel_dos_set.all %}
                         {% for i in res.nivel_dos_set.all %}
                         {% ifchanged res.descripcion %}
                             <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
@@ -235,26 +229,22 @@
                             </td>
                         {% endifchanged %}
                         {% endfor %}
-                        {% else %}
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                        {% endif %}
                     </tr>
+                    {% endif %}
                         {% for i in res.nivel_dos_set.all %}
-                        <tr>  
-                            <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
-                                <b><u>{{ i.codigo }}</u></b>
-                            </td>
-                            <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
-                                <b><u>{{ i.descripcion }}</u></b>
-                            </td>
-                            {% if i.nivel_tres_set.all %}
+                        {% if i.nivel_tres_set.all %}
                             {% for j in i.nivel_tres_set.all %}
+                            {% saldo_b_t j f1 f2 as sald_b_t %}
+                            {% saldo_d_t j f1 f2 as sald_d_t %}
+                            {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
                             {% ifchanged i.descripcion %}
+                            <tr>  
+                                <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
+                                    <b><u>{{ i.codigo }}</u></b>
+                                </td>
+                                <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
+                                    <b><u>{{ i.descripcion }}</u></b>
+                                </td>
                                 <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
                                     {% debe_b_t j f1 f2 %}
                                 </td>
@@ -267,17 +257,11 @@
                                 <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
                                     {% haber_d_t j f1 f2 %}
                                 </td>
+                            </tr>
                             {% endifchanged %}
-                            {% endfor %}
-                            {% else %}
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
                             {% endif %}
-                        </tr>
+                            {% endfor %}
+                        {% endif %}
                         {% endfor %}
                         {% if forloop.last %}
                             <tr>
@@ -313,14 +297,14 @@
 
                     {% elif campo3 == 'T' %}
                     {% for res in niv %}
+                    {% if res.nivel_dos_set.all %}
                     <tr>
                         <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
-                            <b><u>{{ res.codigo }}</u></b>
+                            <b><u>{{ res.id }}</u></b>
                         </td>
                         <td id="fuente" style="border-right: 1px solid black; text-align: left; padding-top: 3px;" colspan="7">
                             <b><u>{{ res.descripcion }}</u></b>
                         </td>
-                        {% if res.nivel_dos_set.all %}
                         {% for i in res.nivel_dos_set.all %}
                         {% ifchanged res.descripcion %}
                             <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
@@ -337,83 +321,70 @@
                             </td>
                         {% endifchanged %}
                         {% endfor %}
-                        {% else %}
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                        {% endif %}
                     </tr>
+                    {% endif %}                    
                         {% for i in res.nivel_dos_set.all %}
-                        <tr>  
-                            <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
-                                <b><u>{{ i.codigo }}</u></b>
-                            </td>
-                            <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
-                                <b><u>{{ i.descripcion }}</u></b>
-                            </td>
-                            {% if i.nivel_tres_set.all %}
+                        {% if i.nivel_tres_set.all %}
                             {% for j in i.nivel_tres_set.all %}
+                            {% saldo_b_t j f1 f2 as sald_b_t %}
+                            {% saldo_d_t j f1 f2 as sald_d_t %}
+                            {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
                             {% ifchanged i.descripcion %}
-                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                <tr>  
+                                    <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
+                                        <b><u>{{ i.codigo }}</u></b>
+                                    </td>
+                                    <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
+                                        <b><u>{{ i.descripcion }}</u></b>
+                                    </td>
+                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
                                     {% debe_b_t j f1 f2 %}
-                                </td>
-                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                    {% haber_b_t j f1 f2 %}
-                                </td>
-                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                    {% debe_d_t j f1 f2 %}
-                                </td>
-                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                    {% haber_d_t j f1 f2 %}
-                                </td>
+                                    </td>
+                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                        {% haber_b_t j f1 f2 %}
+                                    </td>
+                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                        {% debe_d_t j f1 f2 %}
+                                    </td>
+                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                        {% haber_d_t j f1 f2 %}
+                                    </td>
+                                </tr>
                             {% endifchanged %}
-                            {% endfor %}
-                            {% else %}
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
                             {% endif %}
-                        </tr>
+                            {% endfor %}
+                        {% endif %}
                             {% for j in i.nivel_tres_set.all %}
-                            <tr> 
-                                <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
-                                    {{ j.codigo }}
-                                </td>
-                                <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
-                                    {{ j.descripcion }}
-                                </td>
-                                {% if j.nivel_cuatro_set.all %}
+                            {% if j.nivel_cuatro_set.all %}
                                 {% for k in j.nivel_cuatro_set.all %}
+                                {% saldo_b_t k f1 f2 as sald_b_t %}
+                                {% saldo_d_t k f1 f2 as sald_d_t %}
+                                {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
                                 {% ifchanged j.descripcion %}
-                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                        {% debe_b_c k f1 f2 %}
-                                    </td>
-                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                        {% haber_b_c k f1 f2 %}
-                                    </td>
-                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                        {% debe_d_c k f1 f2 %}
-                                    </td>
-                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                        {% haber_d_c k f1 f2 %}
-                                    </td>
+                                    <tr> 
+                                        <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
+                                            {{ j.codigo }}
+                                        </td>
+                                        <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
+                                            {{ j.descripcion }}
+                                        </td>
+                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                            {% debe_b_c k f1 f2 %}
+                                        </td>
+                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                            {% haber_b_c k f1 f2 %}
+                                        </td>
+                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                            {% debe_d_c k f1 f2 %}
+                                        </td>
+                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                            {% haber_d_c k f1 f2 %}
+                                        </td>
+                                    </tr>
                                 {% endifchanged %}
-                                {% endfor %}
-                                {% else %}
-                                <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                                </td>
-                                <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                                </td>
                                 {% endif %}
-                            </tr>
+                                {% endfor %}
+                            {% endif %}
                             {% endfor %}
                         {% endfor %}
                         {% if forloop.last %}
@@ -450,14 +421,15 @@
 
                     {% elif campo3 == 'C' %}
                     {% for res in niv %}
+                    {% if res.nivel_dos_set.all %}
                     <tr>
                         <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
-                            <b><u>{{ res.codigo }}</u></b>
+                            <b><u>{{ res.id }}</u></b>
                         </td>
                         <td id="fuente" style="border-right: 1px solid black; text-align: left; padding-top: 3px;" colspan="7">
                             <b><u>{{ res.descripcion }}</u></b>
                         </td>
-                        {% if res.nivel_dos_set.all %}
+                        
                         {% for i in res.nivel_dos_set.all %}
                         {% ifchanged res.descripcion %}
                             <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
@@ -474,117 +446,101 @@
                             </td>
                         {% endifchanged %}
                         {% endfor %}
-                        {% else %}
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                        {% endif %}
                     </tr>
+                    {% endif %}
                         {% for i in res.nivel_dos_set.all %}
-                        <tr>  
-                            <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
-                                <b><u>{{ i.codigo }}</u></b>
-                            </td>
-                            <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
-                                <b><u>{{ i.descripcion }}</u></b>
-                            </td>
-                            {% if i.nivel_tres_set.all %}
+                        {% if i.nivel_tres_set.all %}
                             {% for j in i.nivel_tres_set.all %}
+                            {% saldo_b_t j f1 f2 as sald_b_t %}
+                            {% saldo_d_t j f1 f2 as sald_d_t %}
+                            {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
                             {% ifchanged i.descripcion %}
-                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                    {% debe_b_t j f1 f2 %}
-                                </td>
-                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                    {% haber_b_t j f1 f2 %}
-                                </td>
-                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                    {% debe_d_t j f1 f2 %}
-                                </td>
-                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                    {% haber_d_t j f1 f2 %}
-                                </td>
-                            {% endifchanged %}
-                            {% endfor %}
-                            {% else %}
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                            {% endif %}
-                        </tr>
-                            {% for j in i.nivel_tres_set.all %}
-                            <tr> 
-                                <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
-                                    {{ j.codigo }}
-                                </td>
-                                <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
-                                    {{ j.descripcion }}
-                                </td>
-                                {% if j.nivel_cuatro_set.all %}
-                                {% for k in j.nivel_cuatro_set.all %}
-                                {% ifchanged j.descripcion %}
-                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                        {% debe_b_c k f1 f2 %}
-                                    </td>
-                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                        {% haber_b_c k f1 f2 %}
-                                    </td>
-                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                        {% debe_d_c k f1 f2 %}
-                                    </td>
-                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                        {% haber_d_c k f1 f2 %}
-                                    </td>
-                                {% endifchanged %}
-                                {% endfor %}
-                                {% else %}
-                                <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                                </td>
-                                <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                                </td>
-                                {% endif %}
-                            </tr>
-                                {% for k in j.nivel_cuatro_set.all %}
-                                <tr>
+                                <tr>  
                                     <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
-                                        {{ k.codigo }}
+                                        <b><u>{{ i.codigo }}</u></b>
                                     </td>
                                     <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
-                                        {{ k.descripcion }}
+                                        <b><u>{{ i.descripcion }}</u></b>
                                     </td>
-                                    {% if k.nivel_cinco_set.all %}
-                                    {% for l in k.nivel_cinco_set.all %}
-                                    {% ifchanged k.descripcion %}
-                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                            {% debe_b_ci l f1 f2 %}
-                                        </td>
-                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                            {% haber_b_ci l f1 f2 %}
-                                        </td>
-                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                            {% debe_d_ci l f1 f2 %}
-                                        </td>
-                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                            {% haber_d_ci l f1 f2 %}
-                                        </td>
-                                    {% endifchanged %}
-                                    {% endfor %}
-                                    {% else %}
-                                    <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                        0.0
+                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                        {% debe_b_t j f1 f2 %}
                                     </td>
-                                    <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                        0.0
+                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                        {% haber_b_t j f1 f2 %}
                                     </td>
-                                    {% endif %}
+                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                        {% debe_d_t j f1 f2 %}
+                                    </td>
+                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                        {% haber_d_t j f1 f2 %}
+                                    </td>
                                 </tr>
+                            {% endifchanged %}
+                            {% endif %}
+                            {% endfor %}
+                        {% endif %} 
+                            {% for j in i.nivel_tres_set.all %}
+                            {% if j.nivel_cuatro_set.all %}
+                                {% for k in j.nivel_cuatro_set.all %}
+                                {% saldo_b_t k f1 f2 as sald_b_t %}
+                                {% saldo_d_t k f1 f2 as sald_d_t %}
+                                {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                                {% ifchanged j.descripcion %}
+                                    <tr> 
+                                        <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
+                                            {{ j.codigo }}
+                                        </td>
+                                        <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
+                                            {{ j.descripcion }}
+                                        </td>
+                                
+                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                            {% debe_b_c k f1 f2 %}
+                                        </td>
+                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                            {% haber_b_c k f1 f2 %}
+                                        </td>
+                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                            {% debe_d_c k f1 f2 %}
+                                        </td>
+                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                            {% haber_d_c k f1 f2 %}
+                                        </td>
+                                {% endifchanged %}
+                                {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                                {% for k in j.nivel_cuatro_set.all %}
+                                {% if k.nivel_cinco_set.all %}
+                                    {% for l in k.nivel_cinco_set.all %}
+                                    {% saldo_b_t l f1 f2 as sald_b_t %}
+                                    {% saldo_d_t l f1 f2 as sald_d_t %}
+                                    {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                                    {% ifchanged k.descripcion %}
+                                        <tr>
+                                            <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
+                                                {{ k.codigo }}
+                                            </td>
+                                            <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
+                                                {{ k.descripcion }}
+                                            </td>
+                                            <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                                {% debe_b_ci l f1 f2 %}
+                                            </td>
+                                            <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                                {% haber_b_ci l f1 f2 %}
+                                            </td>
+                                            <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                                {% debe_d_ci l f1 f2 %}
+                                            </td>
+                                            <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                                {% haber_d_ci l f1 f2 %}
+                                            </td>
+                                        </tr>
+                                    {% endifchanged %}
+                                    {% endif %}
+                                    {% endfor %} 
+                                {% endif %}
                                 {% endfor %}
                             {% endfor %}
                         {% endfor %}
@@ -623,14 +579,14 @@
 
                     {% elif campo3 == 'SC' %}
                     {% for res in niv %}
+                    {% if res.nivel_dos_set.all %}
                     <tr>
                         <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
-                            <b><u>{{ res.codigo }}</u></b>
+                            <b><u>{{ res.id }}</u></b>
                         </td>
                         <td id="fuente" style="border-right: 1px solid black; text-align: left; padding-top: 3px;" colspan="7">
                             <b><u>{{ res.descripcion }}</u></b>
                         </td>
-                        {% if res.nivel_dos_set.all %}
                         {% for i in res.nivel_dos_set.all %}
                         {% ifchanged res.descripcion %}
                             <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
@@ -647,151 +603,133 @@
                             </td>
                         {% endifchanged %}
                         {% endfor %}
-                        {% else %}
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                        {% endif %}
                     </tr>
+                    {% endif %}
                         {% for i in res.nivel_dos_set.all %}
-                        <tr>  
-                            <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
-                                <b><u>{{ i.codigo }}</u></b>
-                            </td>
-                            <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
-                                <b><u>{{ i.descripcion }}</u></b>
-                            </td>
-                            {% if i.nivel_tres_set.all %}
+                        {% if i.nivel_tres_set.all %}
                             {% for j in i.nivel_tres_set.all %}
+                            {% saldo_b_t j f1 f2 as sald_b_t %}
+                            {% saldo_d_t j f1 f2 as sald_d_t %}
+                            {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
                             {% ifchanged i.descripcion %}
-                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                    {% debe_b_t j f1 f2 %}
-                                </td>
-                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                    {% haber_b_t j f1 f2 %}
-                                </td>
-                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                    {% debe_d_t j f1 f2 %}
-                                </td>
-                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                    {% haber_d_t j f1 f2 %}
-                                </td>
-                            {% endifchanged %}
-                            {% endfor %}
-                            {% else %}
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                            </td>
-                            {% endif %}
-                        </tr>
-                            {% for j in i.nivel_tres_set.all %}
-                            <tr> 
-                                <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
-                                    {{ j.codigo }}
-                                </td>
-                                <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
-                                    {{ j.descripcion }}
-                                </td>
-                                {% if j.nivel_cuatro_set.all %}
-                                {% for k in j.nivel_cuatro_set.all %}
-                                {% ifchanged j.descripcion %}
-                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                        {% debe_b_c k f1 f2 %}
-                                    </td>
-                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                        {% haber_b_c k f1 f2 %}
-                                    </td>
-                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                        {% debe_d_c k f1 f2 %}
-                                    </td>
-                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                        {% haber_d_c k f1 f2 %}
-                                    </td>
-                                {% endifchanged %}
-                                {% endfor %}
-                                {% else %}
-                                <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                                </td>
-                                <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    0.0
-                                </td>
-                                {% endif %}
-                            </tr>
-                                {% for k in j.nivel_cuatro_set.all %}
-                                <tr>
+                                <tr>  
                                     <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
-                                        {{ k.codigo }}
+                                        <b><u>{{ i.codigo }}</u></b>
                                     </td>
                                     <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
-                                        {{ k.descripcion }}
+                                        <b><u>{{ i.descripcion }}</u></b>
                                     </td>
-                                    {% if k.nivel_cinco_set.all %}
-                                    {% for l in k.nivel_cinco_set.all %}
-                                    {% ifchanged k.descripcion %}
-                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                            {% debe_b_ci l f1 f2 %}
-                                        </td>
-                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                            {% haber_b_ci l f1 f2 %}
-                                        </td>
-                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                            {% debe_d_ci l f1 f2 %}
-                                        </td>
-                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                            {% haber_d_ci l f1 f2 %}
-                                        </td>
-                                    {% endifchanged %}
-                                    {% endfor %}
-                                    {% else %}
-                                    <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                        0.0
+                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                        {% debe_b_t j f1 f2 %}
                                     </td>
-                                    <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                        0.0
+                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                        {% haber_b_t j f1 f2 %}
                                     </td>
-                                    {% endif %}
+                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                        {% debe_d_t j f1 f2 %}
+                                    </td>
+                                    <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                        {% haber_d_t j f1 f2 %}
+                                    </td>
                                 </tr>
-                                    {% for l in k.nivel_cinco_set.all %}
-                                    <tr>
+                            {% endifchanged %}
+                            {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                            {% for j in i.nivel_tres_set.all %}
+                            {% if j.nivel_cuatro_set.all %}
+                                {% for k in j.nivel_cuatro_set.all %}
+                                {% saldo_b_t k f1 f2 as sald_b_t %}
+                                {% saldo_d_t k f1 f2 as sald_d_t %}
+                                {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                                {% ifchanged j.descripcion %}
+                                    <tr> 
                                         <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
-                                            {{ l.codigo }}
+                                            {{ j.codigo }}
                                         </td>
                                         <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
-                                            {{ l.descripcion }}
+                                            {{ j.descripcion }}
                                         </td>
-                                        {% if l.asiento_set.all %}
-                                        {% for m in l.asiento_set.all %}
-                                        {% ifchanged l.descripcion %}
-                                            <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                                {% debe_b_a m f1 f2 %}
-                                            </td>
-                                            <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                                {% haber_b_a m f1 f2 %}
-                                            </td>
-                                            <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                                {% debe_d_a m f1 f2 %}
-                                            </td>
-                                            <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
-                                                {% haber_d_a m f1 f2 %}
-                                            </td>
-                                        {% endifchanged %}
-                                        {% endfor %}
-                                        {% else %}
-                                        <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                            0.0
+                                
+                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                            {% debe_b_c k f1 f2 %}
                                         </td>
-                                        <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                            0.0
+                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                            {% haber_b_c k f1 f2 %}
                                         </td>
-                                        {% endif %}
+                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                            {% debe_d_c k f1 f2 %}
+                                        </td>
+                                        <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                            {% haber_d_c k f1 f2 %}
+                                        </td>
                                     </tr>
+                                {% endifchanged %}
+                                {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                                {% for k in j.nivel_cuatro_set.all %}
+                                {% if k.nivel_cinco_set.all %}
+                                    {% for l in k.nivel_cinco_set.all %}
+                                    {% saldo_b_t l f1 f2 as sald_b_t %}
+                                    {% saldo_d_t l f1 f2 as sald_d_t %}
+                                    {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                                    {% ifchanged k.descripcion %}
+                                        <tr>
+                                            <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
+                                                {{ k.codigo }}
+                                            </td>
+                                            <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
+                                                {{ k.descripcion }}
+                                            </td>
+                                            <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                                {% debe_b_ci l f1 f2 %}
+                                            </td>
+                                            <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                                {% haber_b_ci l f1 f2 %}
+                                            </td>
+                                            <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                                {% debe_d_ci l f1 f2 %}
+                                            </td>
+                                            <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                                {% haber_d_ci l f1 f2 %}
+                                            </td>
+                                        </tr>
+                                    {% endifchanged %}
+                                    {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                    {% for l in k.nivel_cinco_set.all %}
+                                    {% if l.asiento_set.all %}
+                                        {% for m in l.asiento_set.all %}
+                                        {% saldo_b_t m f1 f2 as sald_b_t %}
+                                        {% saldo_d_t m f1 f2 as sald_d_t %}
+                                        {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                                        {% ifchanged l.descripcion %}
+                                            <tr>
+                                                <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
+                                                    {{ l.codigo }}
+                                                </td>
+                                                <td style="border-right: 1px solid black; text-align: left; padding-top: 3px;" id="fuente" colspan="7">
+                                                    {{ l.descripcion }}
+                                                </td>
+                                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                                    {% debe_b_a m f1 f2 %}
+                                                </td>
+                                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                                    {% haber_b_a m f1 f2 %}
+                                                </td>
+                                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                                    {% debe_d_a m f1 f2 %}
+                                                </td>
+                                                <td id="fuente2" style="border-right: 1px solid black; text-align: right; padding-top: 3px;" colspan="2">
+                                                    {% haber_d_a m f1 f2 %}
+                                                </td>
+                                            </tr>
+                                        {% endifchanged %}
+                                        {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
                                     {% endfor %}
                                 {% endfor %}
                             {% endfor %}

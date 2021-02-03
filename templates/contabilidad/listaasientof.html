@@ -83,11 +83,7 @@
                                         <span class="glyphicon glyphicon-edit" aria-hidden="true">
                                         </a>
 										{% endif %}
-										{% if perms.contabilidad.delete_asiento %}
-				  						<a href="{% url 'contabilidad:borrarcuenta' asiento.id %}" type="button" class="btn btn-danger"title="Eliminar">
-                                        <span class="glyphicon glyphicon-remove" aria-hidden="true">
-                                        </a>
-										{% endif %}
+										
 										{% if perms.contabilidad.add_factura %}
                                         <div class="btn-group" role="group">
                                         <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

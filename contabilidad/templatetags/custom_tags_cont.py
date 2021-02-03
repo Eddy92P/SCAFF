@@ -180,3 +180,11 @@ def mostr_saldo_b_u_er(nivel_uno, f1, f2):
 @register.simple_tag
 def mostr_saldo_d_u_er(nivel_uno, f1, f2):	
 	return nivel_uno.mostrar_saldo_d_ter(f1, f2)
+
+@register.simple_tag
+def sum_patrimonio_pasivo_bs(nivel_uno, f1, f2):	
+	return nivel_uno.suma_patrimonio_pasivo_bs(f1, f2)
+	
+@register.simple_tag
+def sum_patrimonio_pasivo_dls(nivel_uno, f1, f2):	
+	return nivel_uno.suma_patrimonio_pasivo_dls(f1, f2)
