@@ -2180,8 +2180,10 @@ class listaLibroMayor(CreateView, ListView):
 			saldo = []
 			saldo_aux = []
 			b = 0
-			if ini == '2':
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(nivel_cinco__codigo=campo2)).order_by('encabezadoas__fecha'):
+			print(campo2)
+			niv_cinco = nivel_cinco.objects.get(Q(codigo=campo2) | Q(descripcion=campo2))
+			if (niv_cinco.nivel_uno.id == 2) or (niv_cinco.nivel_uno.id == 4):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.haber_b - i.debe_b
@@ -2193,7 +2195,7 @@ class listaLibroMayor(CreateView, ListView):
 					aux7 = aux7 + i.debe_d
 					aux8 = aux8 + i.haber_d
 
-				for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(nivel_cinco__codigo=campo2)).order_by('encabezadoas__fecha'):
+				for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).order_by('encabezadoas__fecha'):
 					aux = len(saldo)
 					if aux == 0:
 						saldo.append(aux2[b])
@@ -2204,7 +2206,7 @@ class listaLibroMayor(CreateView, ListView):
 						saldo_aux.append(saldo_aux[b-1] + aux3[b])
 						b += 1
 			else:
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(nivel_cinco__codigo=campo2)).order_by('encabezadoas__fecha'):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.debe_b - i.haber_b
@@ -2215,7 +2217,7 @@ class listaLibroMayor(CreateView, ListView):
 					aux5 = aux5 + i.haber_b
 					aux7 = aux7 + i.debe_d
 					aux8 = aux8 + i.haber_d
-				for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(nivel_cinco__codigo=campo2)).order_by('encabezadoas__fecha'):
+				for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).order_by('encabezadoas__fecha'):
 					aux = len(saldo)
 					if aux == 0:
 						saldo.append(aux2[b])
@@ -2225,7 +2227,7 @@ class listaLibroMayor(CreateView, ListView):
 						saldo.append(saldo[b-1] + aux2[b])
 						saldo_aux.append(saldo_aux[b-1] + aux3[b])
 						b += 1
-			lista = zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(nivel_cinco__codigo=campo2)).order_by('encabezadoas__fecha'), saldo, saldo_aux)
+			lista = zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).order_by('encabezadoas__fecha'), saldo, saldo_aux)
 			object_list = lista
 		else:
 			lista = zip(self.model.objects.all().order_by('id'), " ", " ")
@@ -2767,11 +2769,11 @@ class estadoEvolucionP(PDFTemplateView):
 		context['asi'] = asiento.objects.filter(encabezadoas__fecha__lte=f)
 		
 		if (f.month!=10) | (f.month!=11) | (f.month!=12):
-			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
 		else:
 			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
 			c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
@@ -2804,19 +2806,19 @@ class estadoEvolucionP(PDFTemplateView):
 		patrimonio_neto_a = aux + aux1 + aux2 + aux3 + aux4
 		
 		if (f.month!=10) | (f.month!=11) | (f.month!=12):
-			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
 		else:
-			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
 			
 		if c1['total']:
 			aux5 = c1['total']  #capital social
@@ -2851,90 +2853,23 @@ class estadoEvolucionP(PDFTemplateView):
 		patrimonio_total = patrimonio_neto_a + aux6 + aux8 + aux9 + aux10
 
 		context['patri_n'] = patrimonio_neto_a
-		if aux < 0:
-			context['cap_soc_a'] = str(abs(aux)) + " CR"
-		else:
-			context['cap_soc_a'] = aux
-
-		if aux1 < 0:
-			context['ajuste_cap_a'] = str(abs(aux1)) + " CR"
-		else:
-			context['ajuste_cap_a'] = aux1
-
-		if aux2 < 0:
-			context['res_leg_a'] = str(abs(aux2)) + " CR"
-		else:
-			context['res_leg_a'] = aux2
-
-		if aux3 < 0:
-			context['ajust_res_a'] = str(abs(aux3)) + " CR"
-		else:
-			context['ajust_res_a'] = aux3
-
-		if aux4 < 0:
-			context['res_acum_a'] = str(abs(aux4)) + " CR"
-		else:
-			context['res_acum_a'] = aux4
-
-		if aux5 < 0:
-			context['cap_soc'] = str(abs(aux5)) + " CR"
-		else:
-			context['cap_soc'] = aux5
-
-		if aux6 < 0:
-			context['ajuste_cap'] = str(abs(aux6)) + " CR"
-		else:
-			context['ajuste_cap'] = aux6
-
-		if aux7 < 0:
-			context['res_leg'] = str(abs(aux7)) + " CR"
-		else:
-			context['res_leg'] = aux7
-
-		if aux8 < 0:
-			context['ajust_res'] = str(abs(aux8)) + " CR"
-		else:
-			context['ajust_res'] = aux8
-
-		if aux9 < 0:
-			context['res_acum'] = str(abs(aux9)) + " CR"
-		else:
-			context['res_acum'] = aux9
-
-		if aux10 < 0:
-			context['resultados_ejer'] = str(abs(aux10)) + " CR"
-		else:
-			context['resultados_ejer'] = aux10
-
-		if capital_social < 0:
-			context['cap_soc_t'] = str(abs(capital_social)) + " CR"
-		else:
-			context['cap_soc_t'] = capital_social
-
-		if ajuste_capital < 0:	
-			context['ajuste_cap_t'] = str(abs(ajuste_capital)) + " CR"
-		else:
-			context['ajuste_cap_t'] = ajuste_capital
-
-		if reserva_legal < 0:
-			context['res_leg_t'] = str(abs(reserva_legal)) + " CR"
-		else:
-			context['res_leg_t'] = reserva_legal
-
-		if ajuste_reserv < 0:
-			context['ajust_res_t'] = str(abs(ajuste_reserv)) + " CR"
-		else:
-			context['ajust_res_t'] = ajuste_reserv
-
-		if resultados_acum < 0:	
-			context['res_acum_t'] = str(abs(resultados_acum)) + " CR"
-		else:
-			context['res_acum_t'] = resultados_acum
-
-		if patrimonio_total < 0:
-			context['patri_t'] = str(abs(patrimonio_total)) + " CR"
-		else:
-			context['patri_t'] = patrimonio_total
+		context['cap_soc_a'] = aux
+		context['ajuste_cap_a'] = aux1
+		context['res_leg_a'] = aux2
+		context['ajust_res_a'] = aux3
+		context['res_acum_a'] = aux4
+		context['cap_soc'] = aux5
+		context['ajuste_cap'] = aux6
+		context['res_leg'] = aux7
+		context['ajust_res'] = aux8
+		context['res_acum'] = aux9
+		context['resultados_ejer'] = aux10
+		context['cap_soc_t'] = capital_social
+		context['ajuste_cap_t'] = ajuste_capital
+		context['res_leg_t'] = reserva_legal
+		context['ajust_res_t'] = ajuste_reserv
+		context['res_acum_t'] = resultados_acum
+		context['patri_t'] = patrimonio_total
 
 		return context
 
@@ -2996,217 +2931,3 @@ class RepPlanCuentas(PDFTemplateView):
 		context['res'] = res
 
 		return context
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""class crearAsiento1(CreateView):
-	model_pk = nivel_cinco
-	model = encabezadoas
-	form_class = crearEncabezado1Form
-	template_name = 'contabilidad/nuevoasiento1.html'
-	success_url = 'contabilidad:listaasiento'
-	def get_context_data(self, **kwargs):
-		pk1 = self.kwargs['pk']
-		context = super(crearAsiento1, self).get_context_data(**kwargs)
-		context['cot'] = Cotizacion.objects.latest('fecha')
-		context['comp_c'] = comprobante_esc_antconc.objects.get(id=pk1)
-		if 'form' in context:
-			context['pk1'] = pk1
-		return context
-			
-	def get(self, request, *args, **kwargs):
-		pk1 = self.kwargs['pk']
-		try:
-			self.comp = comprobante_esc_antconc.objects.get(pk=pk1)
-			self.cot = Cotizacion.objects.latest('fecha')
-		except Exception as e:
-			self.comp = None
-			self.cot = None
-		self.object = None
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		crear_asiento_form_set = crearAsientoFormSet()
-		return self.render_to_response(self.get_context_data(form=form, crear_asiento_form_set=crear_asiento_form_set))
-
-	def get_form_kwargs(self):
-		pk1 = self.kwargs['pk']
-		kwargs = super(crearAsiento1,self).get_form_kwargs()
-		kwargs.update({'comp':self.comp})
-		kwargs.update({'cot':self.cot})
-		return kwargs
-
-	def post(self, request, *args, **kwargs):
-		pk1 = self.kwargs['pk']
-		try:
-			self.comp = comprobante_esc_antconc.objects.get(pk=pk1)
-			self.cot = Cotizacion.objects.latest('fecha')
-		except Exception as e:
-			self.comp = None
-			self.cot = None
-		self.object=None
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		crear_asiento_form_set = crearAsientoFormSet(request.POST)
-		#print(form.is_valid())
-		#print(crear_asiento_form_set.is_valid())
-		print(crear_asiento_form_set.errors)
-		if form.is_valid() and crear_asiento_form_set.is_valid():
-			pk1=self.kwargs['pk']
-			self.object = form.save(commit=False)
-			self.object.comprobante_esc_antconc = comprobante_esc_antconc.objects.get(id=pk1)
-			self.object = form.save()
-			crear_asiento_form_set.instance = self.object
-			crear_asiento_form_set.save()
-			return HttpResponseRedirect(reverse_lazy(self.success_url))
-		else:
-			return self.render_to_response(self.get_context_data(form=form, crear_asiento_form_set=crear_asiento_form_set))
-
-class crearAsiento2(CreateView):
-	model_pk = nivel_cinco
-	model = encabezadoas
-	form_class = crearEncabezado2Form
-	template_name = 'contabilidad/nuevoasiento2.html'
-	success_url = 'contabilidad:listaasiento'
-	def get_context_data(self, **kwargs):
-		pk1 = self.kwargs['pk']
-		context = super(crearAsiento2, self).get_context_data(**kwargs)
-		context['cot'] = Cotizacion.objects.latest('fecha')
-		context['comp_g'] = comprobante_esc_gen.objects.get(id=pk1)
-		if 'form' in context:
-			context['pk1'] = pk1
-		return context
-			
-	def get(self, request, *args, **kwargs):
-		pk1 = self.kwargs['pk']
-		print(pk1)
-		try:
-			self.comp = comprobante_esc_gen.objects.get(pk=pk1)
-			self.cot = Cotizacion.objects.latest('fecha')
-		except Exception as e:
-			self.comp = None
-			self.cot = None
-		self.object = None
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		crear_asiento_form_set = crearAsientoFormSet()
-		return self.render_to_response(self.get_context_data(form=form, crear_asiento_form_set=crear_asiento_form_set))
-
-	def get_form_kwargs(self):
-		pk1 = self.kwargs['pk']
-		kwargs = super(crearAsiento2,self).get_form_kwargs()
-		kwargs.update({'comp':self.comp})
-		kwargs.update({'cot':self.cot})
-		return kwargs
-
-	def post(self, request, *args, **kwargs):
-		pk1 = self.kwargs['pk']
-		try:
-			self.comp = comprobante_esc_gen.objects.get(pk=pk1)
-			self.cot = Cotizacion.objects.latest('fecha')
-		except Exception as e:
-			self.comp = None
-			self.cot = None
-		self.object=None
-		form_class = self.get_form_class()
-		form = self.get_form(form_class)
-		crear_asiento_form_set = crearAsientoFormSet(request.POST)
-		#print(form.is_valid())
-		#print(crear_asiento_form_set.is_valid())
-		#print(crear_asiento_form_set.errors)
-		if form.is_valid() and crear_asiento_form_set.is_valid():
-			pk1=self.kwargs['pk']
-			self.object = form.save(commit=False)
-			self.object.comprobante_esc_gen = comprobante_esc_gen.objects.get(id=pk1)
-			self.object = form.save()
-			crear_asiento_form_set.instance = self.object
-			crear_asiento_form_set.save()
-			return HttpResponseRedirect(reverse_lazy(self.success_url))
-		else:
-			return self.render_to_response(self.get_context_data(form=form, crear_asiento_form_set=crear_asiento_form_set))"""
-

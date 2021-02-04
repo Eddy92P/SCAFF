@@ -12,7 +12,7 @@ from django.db import models
 from django.db.models import F
 from django.db.models import Sum
 from django.db.models import Avg
-from django.db.models import Q
+from django.db.models import Q, When, Case
 
 class nivel_uno(models.Model):
 	descripcion = models.CharField(
@@ -59,65 +59,57 @@ class nivel_uno(models.Model):
 
 	def saldo_b_t(self, f1, f2):
 		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
+
 		if res['total'] == None:
 			return 0.0
-		elif res['total'] < 0:
-			return str(abs(res['total'] + self.saldo_b_ter(f1, f2))) + " CR"
 		else:
-			return res['total']
+			return res['total'] - self.saldo_b_ter(f1, f2)
 
 	def saldo_d_t(self, f1, f2):
 		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
+
 		if res['total'] == None:
 			return 0.0
-		elif res['total'] < 0:
-			return str(abs(res['total'] + self.saldo_d_ter(f1, f2))) + " CR"
 		else:
-			return res['total']
+			return res['total'] - self.saldo_d_ter(f1, f2)
 
 	def suma_patrimonio_pasivo_bs(self, f1, f2):
-		total_pasivo = nivel_uno.objects.filter(id=2, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
+		total_pasivo = nivel_uno.objects.filter(id=2, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b')))
 
-		total_patrimonio = nivel_uno.objects.filter(id=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
+		total_patrimonio = nivel_uno.objects.filter(id=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b')))
 
 		if (total_pasivo is None) and (total_patrimonio is None):
 			result = 0.0
 
 		elif total_pasivo is None:
-			result = total_patrimonio['total']
+			result = total_patrimonio['total'] + self.saldo_b_ter(f1, f2)
 
 		elif total_patrimonio is None:
-			result = total_pasivo['total']
+			result = total_pasivo['total'] + self.saldo_b_ter(f1, f2)
 
 		else:
-			result = total_pasivo['total'] + total_patrimonio['total']
+			result = total_pasivo['total'] + total_patrimonio['total'] + self.saldo_b_ter(f1, f2)
 
-		if result < 0:
-			return str(abs(result)) + " CR"
-		else:
-			return result
+		return result
 
 	def suma_patrimonio_pasivo_dls(self, f1, f2):
-		total_pasivo = nivel_uno.objects.filter(id=2, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
+		total_pasivo = nivel_uno.objects.filter(id=2, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d')))
 
-		total_patrimonio = nivel_uno.objects.filter(id=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
+		total_patrimonio = nivel_uno.objects.filter(id=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d')))
 
 		if (total_pasivo is None) and (total_patrimonio is None):
 			result = 0.0
 
 		elif total_pasivo is None:
-			result = total_patrimonio['total']
+			result = total_patrimonio['total'] + self.saldo_d_ter(f1, f2)
 
 		elif total_patrimonio is None:
-			result = total_pasivo['total']
+			result = total_pasivo['total'] + self.saldo_d_ter(f1, f2)
 
 		else:
-			result = total_pasivo['total'] + total_patrimonio['total']
+			result = total_pasivo['total'] + total_patrimonio['total'] + self.saldo_d_ter(f1, f2)
 
-		if result < 0:
-			return str(abs(result)) + " CR"
-		else:
-			return result
+		return result
 
 
 	#Totales para estado de resultados
@@ -149,15 +141,19 @@ class nivel_uno(models.Model):
 		else:
 			return res['total']
 
+	# Utilidad neta
 	def saldo_b_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(id__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
+		res = nivel_uno.objects.filter(id__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b')))
+
 		if res['total'] == None:
 			return 0.0
 		else:
 			return res['total']
 
+	# Utilidad neta
 	def saldo_d_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(id__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
+		res = nivel_uno.objects.filter(id__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d')))
+
 		if res['total'] == None:
 			return 0.0
 		else:
@@ -272,20 +268,18 @@ class nivel_dos(models.Model):
 			return res['total']
 
 	def saldo_b_t(self, f1, f2):
-		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
+		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b'))), When(nivel_uno__id=2, then=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b'))), When(nivel_uno__id=3, then=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b')) + self.nivel_uno.saldo_b_ter(f1, f2))))
+
 		if res['total'] == None:
 			return 0.0
-		elif res['total'] < 0:
-			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
 	def saldo_d_t(self, f1, f2):
-		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
+		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d'))), When(nivel_uno__id=2, then=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d'))),  When(nivel_uno__id=3, then=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b')) + self.nivel_uno.saldo_d_ter(f1, f2))))
+
 		if res['total'] == None:
 			return 0.0
-		elif res['total'] < 0:
-			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
@@ -351,20 +345,18 @@ class nivel_tres(models.Model):
 			return res['total']
 
 	def saldo_b_t(self, f1, f2):
-		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_cuatro__nivel_cinco__asiento__haber_b')))
+		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_cuatro__nivel_cinco__asiento__haber_b'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cuatro__nivel_cinco__asiento__haber_b') - F('nivel_cuatro__nivel_cinco__asiento__debe_b')))))
+
 		if res['total'] == None:
 			return 0.0
-		elif res['total'] < 0:
-			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
 	def saldo_d_t(self, f1, f2):
-		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_cuatro__nivel_cinco__asiento__haber_d')))
+		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_cuatro__nivel_cinco__asiento__haber_d'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cuatro__nivel_cinco__asiento__haber_d') - F('nivel_cuatro__nivel_cinco__asiento__debe_d')))))
+
 		if res['total'] == None:
 			return 0.0
-		elif res['total'] < 0:
-			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
@@ -431,20 +423,18 @@ class nivel_cuatro(models.Model):
 			return res['total']
 
 	def saldo_b_t(self, f1, f2):
-		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_cinco__asiento__debe_b') - F('nivel_cinco__asiento__haber_b')))
+		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_b') - F('nivel_cinco__asiento__haber_b'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_b') - F('nivel_cinco__asiento__debe_b')))))
+
 		if res['total'] == None:
 			return 0.0
-		elif res['total'] < 0:
-			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
 	def saldo_d_t(self, f1, f2):
-		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('nivel_cinco__asiento__debe_d') - F('nivel_cinco__asiento__haber_d')))
+		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_d') - F('nivel_cinco__asiento__haber_d'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_d') - F('nivel_cinco__asiento__debe_d')))))
+
 		if res['total'] == None:
 			return 0.0
-		elif res['total'] < 0:
-			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
@@ -516,20 +506,18 @@ class nivel_cinco(models.Model):
 			return res['total']
 
 	def saldo_b_t(self, f1, f2):
-		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('asiento__debe_b') - F('asiento__haber_b')))
+		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('asiento__debe_b') - F('asiento__haber_b'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('asiento__haber_b') - F('asiento__debe_b')))))
+
 		if res['total'] == None:
 			return 0.0
-		elif res['total'] < 0:
-			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
 	def saldo_d_t(self, f1, f2):
-		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('asiento__debe_d') - F('asiento__haber_d')))
+		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('asiento__debe_d') - F('asiento__haber_d'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('asiento__haber_d') - F('asiento__debe_d')))))
+
 		if res['total'] == None:
 			return 0.0
-		elif res['total'] < 0:
-			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
@@ -733,26 +721,25 @@ class asiento(models.Model):
 
 	def saldo_d_t_p(self, f1, f2):
 		res = asiento.objects.filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('haber_d') - F('debe_d')))
+
 		if res['total'] == None:
 			return 0.0
 		else:
 			return res['total']
 
 	def saldo_b_t(self, f1, f2):
-		res = asiento.objects.filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+		res = asiento.objects.filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=1, then=Sum(F('debe_b') - F('haber_b'))), When(Q(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=2) | Q(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=3), then=Sum(F('haber_b') - F('debe_b')))))
+
 		if res['total'] == None:
 			return 0.0
-		elif res['total'] < 0:
-			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
 	def saldo_d_t(self, f1, f2):
-		res = asiento.objects.filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('debe_d') - F('haber_d')))
+		res = asiento.objects.filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=1, then=Sum(F('debe_d') - F('haber_d'))), When(Q(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=2) | Q(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=3), then=Sum(F('haber_d') - F('debe_d')))))
+
 		if res['total'] == None:
 			return 0.0
-		elif res['total'] < 0:
-			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
@@ -1182,361 +1169,3 @@ class bancarizacion(models.Model):
 	estado = models.BooleanField(
 		default = False
 		)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""class Factura_boleto(models.Model):
-	asiento = models.OneToOneField(asiento)
-	sucursal = models.CharField(
-		max_length=60,
-		null=False,
-		blank=False,
-		default="Oficina Central(Potosí)"
-		)
-	fecha_fac = models.DateField(
-		null=False,
-		blank=False
-		)
-	nit_linea = models.CharField(
-		max_length=13,
-		null=False,
-		blank=False,
-		default='0',
-		validators=[
-			RegexValidator(
-				regex=r'^[0-9]',
-				message='El campo solo debe contener números',
-				code='Numero Invalido')
-			]
-		)
-	nomb_razon = models.CharField(
-		max_length=80,
-		null=False,
-		blank=False,
-		validators=[
-			RegexValidator(
-				regex=r'^[a-zA-ZñÑáéíóúÁÉÍÓÚ]',
-				message='El campo solo debe contener letras',
-				code='Numero Invalido')
-			]
-		)
-	nro_boleto = models.CharField(
-		max_length=30,
-		null=False,
-		blank=False,
-		default='0',
-		validators=[
-			RegexValidator(
-				regex=r'^[0-9]',
-				message='El campo solo debe contener números',
-				code='Numero Invalido')
-			]
-		)
-	nro_dui = models.CharField(
-		max_length=1,
-		null=False,
-		blank=False,
-		default='0',
-		validators=[
-			RegexValidator(
-				regex=r'^[0-9]',
-				message='El campo solo debe contener números',
-				code='Numero Invalido')
-			]
-		)
-	nro_aut = models.CharField(
-		max_length=50,
-		null=False,
-		blank=False,
-		default='1',
-		validators=[
-			RegexValidator(
-				regex=r'^[0-9]',
-				message='El campo solo debe contener números',
-				code='Numero Invalido')
-			]
-		)
-	importe_boleto = models.FloatField(
-		null=False,
-		blank=False,
-		default=0
-		)
-	importe_credit = models.FloatField(
-		blank=True,
-		default=0
-		)
-	subtot = models.FloatField(
-		blank=True,
-		default=0
-		)
-	descuento = models.FloatField(
-		blank=True,
-		default=0
-		)
-	base_credito = models.FloatField(
-		blank=True,
-		default=0
-		)
-	credit_fisc = models.FloatField(
-		null=False,
-		blank=False,
-		default=0
-		)
-	cod_cont = models.CharField(
-		max_length=50,
-		null=False,
-		blank=False,
-		default='0',
-		validators=[
-			RegexValidator(
-				regex=r'^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9]',
-				message='El campo solo debe contener números y letras',
-				code='Numero Invalido')
-			]
-		)
-	tipo_fac = models.CharField(
-		max_length=1,
-		null=False,
-		blank=False,
-		choices=(('1','Compras para mercado interno con destino a actividades gravadas'),('2','Compras para mercado interno con destino a actividades no gravadas'),('3','Compras sujetas a proporcionalidad'),('4','Compras para exportaciones'),('5','Compras tanto para el mercado interno como para exportaciones'))
-		)
-
-class Factura_import(models.Model):
-	asiento = models.OneToOneField(asiento)
-	sucursal = models.CharField(
-		max_length=60,
-		null=False,
-		blank=False,
-		default="Oficina Central(Potosí)"
-		)
-	fecha = models.DateField(
-		null=False,
-		blank=False
-		)
-	nit_prov = models.CharField(
-		max_length=13,
-		null=False,
-		blank=False,
-		default='0',
-		validators=[
-			RegexValidator(
-				regex=r'^[0-9]',
-				message='El campo solo debe contener números',
-				code='Numero Invalido')
-			]
-		)
-	nomb_razon = models.CharField(
-		max_length=80,
-		null=False,
-		blank=False,
-		validators=[
-			RegexValidator(
-				regex=r'^[a-zA-ZñÑáéíóúÁÉÍÓÚ]',
-				message='El campo solo debe contener letras',
-				code='Numero Invalido')
-			]
-		)
-	nro_fact = models.CharField(
-		max_length=30,
-		null=False,
-		blank=False,
-		default='0',
-		validators=[
-			RegexValidator(
-				regex=r'^[0-9]',
-				message='El campo solo debe contener números',
-				code='Numero Invalido')
-			]
-		)
-	cod_aduana = models.CharField(
-		max_length=3,
-		null=False,
-		blank=False,
-		validators=[
-			RegexValidator(
-				regex=r'^[0-9]',
-				message='El campo solo debe tener números',
-				code='Numero Invalido'
-				)
-			]
-		)
-	tipo_tram = models.CharField(
-		max_length=1,
-		null=False,
-		blank=False,
-		default='C',
-		validators=[
-			RegexValidator(
-				regex=r'^[a-zA-ZñÑáéíóúÁÉÍÓÚ]',
-				message='El campo sólo debe tener letras',
-				code='Numero Invalido'
-				)
-			]
-		)
-	nro_tramite = models.CharField(
-		max_length=4,
-		null=False,
-		blank=False,
-		validators=[
-			RegexValidator(
-				regex=r'^[0-9]',
-				message='El campo sólo debe tener números',
-				code='Numero Invalido'
-				)
-			]
-		)
-	nro_dui = models.CharField(
-		max_length=20,
-		null=False,
-		blank=False,
-		validators=[
-			RegexValidator(
-				regex=r'^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9]',
-				message='El campo solo debe contener números y letras',
-				code='Numero Invalido')
-			]
-		)
-	nro_aut = models.CharField(
-		max_length=50,
-		null=False,
-		blank=False,
-		default='3',
-		validators=[
-			RegexValidator(
-				regex=r'^[0-9]',
-				message='El campo solo debe contener números',
-				code='Numero Invalido')
-			]
-		)
-	importe_fac = models.FloatField(
-		null=False,
-		blank=False,
-		default=0
-		)
-	importe_credit = models.FloatField(
-		blank=True,
-		default=0
-		)
-	subtot = models.FloatField(
-		blank=True,
-		default=0
-		)
-	descuento = models.FloatField(
-		blank=True,
-		default=0
-		)
-	base_credito = models.FloatField(
-		blank=True,
-		default=0
-		)
-	credit_fisc = models.FloatField(
-		null=False,
-		blank=False,
-		default=0
-		)
-	cod_cont = models.CharField(
-		max_length=50,
-		null=False,
-		blank=False,
-		default='0',
-		validators=[
-			RegexValidator(
-				regex=r'^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9]',
-				message='El campo solo debe contener números y letras',
-				code='Numero Invalido')
-			]
-		)
-	tipo_fac = models.CharField(
-		max_length=1,
-		null=False,
-		blank=False,
-		choices=(('1','Compras para mercado interno con destino a actividades gravadas'),('2','Compras para mercado interno con destino a actividades no gravadas'),('3','Compras sujetas a proporcionalidad'),('4','Compras para exportaciones'),('5','Compras tanto para el mercado interno como para exportaciones'))
-		)"""

@@ -194,10 +194,10 @@
                                     <b>UTILIDAD DEL PERIODO</b>
                                 </td>
                                 <td style="font-size: 4; border-bottom: 1px solid black; border-right: 1px solid black; padding-top: 3px; text-align: center; border-top: 1px solid black" colspan="4">
-                                    {% mostr_saldo_b_u_er res f1 f2 %}
+                                    {% saldo_b_u_er res f1 f2 %}
                                 </td>
                                 <td style="font-size: 4; border-bottom: 1px solid black; border-right: 1px solid black; padding-top: 3px; text-align: center; border-top: 1px solid black" colspan="4">
-                                    {% mostr_saldo_d_u_er res f1 f2 %}
+                                    {% saldo_d_u_er res f1 f2 %}
                                 </td>
                             </tr>
                         {% endif %}
@@ -234,9 +234,9 @@
                         {% for i in res.nivel_dos_set.all %}
                         {% if i.nivel_tres_set.all %}
                             {% for j in i.nivel_tres_set.all %}
-                            {% saldo_b_t j f1 f2 as sald_b_t %}
-                            {% saldo_d_t j f1 f2 as sald_d_t %}
-                            {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                            {% debe_b_t j f1 f2 as deb_b_t %}
+                            {% haber_b_t j f1 f2 as hab_b_t %}
+                            {% if deb_b_t != 0.0 or hab_b_t != 0.0 %}
                             {% ifchanged i.descripcion %}
                             <tr>  
                                 <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
@@ -286,10 +286,10 @@
                                     <b>UTILIDAD DEL PERIODO</b>
                                 </td>
                                 <td style="font-size: 4; border-bottom: 1px solid black; border-right: 1px solid black; padding-top: 3px; text-align: center; border-top: 1px solid black" colspan="4">
-                                    {% mostr_saldo_b_u_er res f1 f2 %}
+                                    {% saldo_b_u_er res f1 f2 %}
                                 </td>
                                 <td style="font-size: 4; border-bottom: 1px solid black; border-right: 1px solid black; padding-top: 3px; text-align: center; border-top: 1px solid black" colspan="4">
-                                    {% mostr_saldo_d_u_er res f1 f2 %}
+                                    {% saldo_d_u_er res f1 f2 %}
                                 </td>
                             </tr>
                         {% endif %}
@@ -326,9 +326,9 @@
                         {% for i in res.nivel_dos_set.all %}
                         {% if i.nivel_tres_set.all %}
                             {% for j in i.nivel_tres_set.all %}
-                            {% saldo_b_t j f1 f2 as sald_b_t %}
-                            {% saldo_d_t j f1 f2 as sald_d_t %}
-                            {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                            {% debe_b_t j f1 f2 as deb_b_t %}
+                            {% haber_b_t j f1 f2 as hab_b_t %}
+                            {% if deb_b_t != 0.0 or hab_b_t != 0.0 %}
                             {% ifchanged i.descripcion %}
                                 <tr>  
                                     <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
@@ -357,9 +357,9 @@
                             {% for j in i.nivel_tres_set.all %}
                             {% if j.nivel_cuatro_set.all %}
                                 {% for k in j.nivel_cuatro_set.all %}
-                                {% saldo_b_t k f1 f2 as sald_b_t %}
-                                {% saldo_d_t k f1 f2 as sald_d_t %}
-                                {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                                {% debe_b_c k f1 f2 as deb_b_c %}
+                                {% haber_b_c k f1 f2 as hab_b_c %}
+                                {% if deb_b_c != 0.0 or hab_b_c != 0.0 %}
                                 {% ifchanged j.descripcion %}
                                     <tr> 
                                         <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
@@ -410,10 +410,10 @@
                                     <b>UTILIDAD DEL PERIODO</b>
                                 </td>
                                 <td style="font-size: 4; border-bottom: 1px solid black; border-right: 1px solid black; padding-top: 3px; text-align: center; border-top: 1px solid black" colspan="4">
-                                    {% mostr_saldo_b_u_er res f1 f2 %}
+                                    {% saldo_b_u_er res f1 f2 %}
                                 </td>
                                 <td style="font-size: 4; border-bottom: 1px solid black; border-right: 1px solid black; padding-top: 3px; text-align: center; border-top: 1px solid black" colspan="4">
-                                    {% mostr_saldo_d_u_er res f1 f2 %}
+                                    {% saldo_d_u_er res f1 f2 %}
                                 </td>
                             </tr>
                         {% endif %}
@@ -451,9 +451,9 @@
                         {% for i in res.nivel_dos_set.all %}
                         {% if i.nivel_tres_set.all %}
                             {% for j in i.nivel_tres_set.all %}
-                            {% saldo_b_t j f1 f2 as sald_b_t %}
-                            {% saldo_d_t j f1 f2 as sald_d_t %}
-                            {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                            {% debe_b_t j f1 f2 as deb_b_t %}
+                            {% haber_b_t j f1 f2 as hab_b_t %}
+                            {% if deb_b_t != 0.0 or hab_b_t != 0.0 %}
                             {% ifchanged i.descripcion %}
                                 <tr>  
                                     <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
@@ -482,9 +482,9 @@
                             {% for j in i.nivel_tres_set.all %}
                             {% if j.nivel_cuatro_set.all %}
                                 {% for k in j.nivel_cuatro_set.all %}
-                                {% saldo_b_t k f1 f2 as sald_b_t %}
-                                {% saldo_d_t k f1 f2 as sald_d_t %}
-                                {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                                {% debe_b_c k f1 f2 as deb_b_c %}
+                                {% haber_b_c k f1 f2 as hab_b_c %}
+                                {% if deb_b_c != 0.0 or hab_b_c != 0.0 %}
                                 {% ifchanged j.descripcion %}
                                     <tr> 
                                         <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
@@ -513,9 +513,9 @@
                                 {% for k in j.nivel_cuatro_set.all %}
                                 {% if k.nivel_cinco_set.all %}
                                     {% for l in k.nivel_cinco_set.all %}
-                                    {% saldo_b_t l f1 f2 as sald_b_t %}
-                                    {% saldo_d_t l f1 f2 as sald_d_t %}
-                                    {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                                    {% debe_b_ci l f1 f2 as deb_b_ci %}
+                                    {% haber_b_ci l f1 f2 as hab_b_ci %}
+                                    {% if deb_b_ci != 0.0 or hab_b_ci != 0.0 %}
                                     {% ifchanged k.descripcion %}
                                         <tr>
                                             <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
@@ -567,10 +567,10 @@
                                     <b>UTILIDAD DEL PERIODO</b>
                                 </td>
                                 <td style="font-size: 4; border-bottom: 1px solid black; border-right: 1px solid black; padding-top: 3px; text-align: center; border-top: 1px solid black" colspan="4">
-                                    {% mostr_saldo_b_u_er res f1 f2 %}
+                                    {% saldo_b_u_er res f1 f2 %}
                                 </td>
                                 <td style="font-size: 4; border-bottom: 1px solid black; border-right: 1px solid black; padding-top: 3px; text-align: center; border-top: 1px solid black" colspan="4">
-                                    {% mostr_saldo_d_u_er res f1 f2 %}
+                                    {% saldo_d_u_er res f1 f2 %}
                                 </td>
                             </tr>
                         {% endif %}
@@ -608,9 +608,9 @@
                         {% for i in res.nivel_dos_set.all %}
                         {% if i.nivel_tres_set.all %}
                             {% for j in i.nivel_tres_set.all %}
-                            {% saldo_b_t j f1 f2 as sald_b_t %}
-                            {% saldo_d_t j f1 f2 as sald_d_t %}
-                            {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                            {% debe_b_t j f1 f2 as deb_b_t %}
+                            {% haber_b_t j f1 f2 as hab_b_t %}
+                            {% if deb_b_t != 0.0 or hab_b_t != 0.0 %}
                             {% ifchanged i.descripcion %}
                                 <tr>  
                                     <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
@@ -639,9 +639,9 @@
                             {% for j in i.nivel_tres_set.all %}
                             {% if j.nivel_cuatro_set.all %}
                                 {% for k in j.nivel_cuatro_set.all %}
-                                {% saldo_b_t k f1 f2 as sald_b_t %}
-                                {% saldo_d_t k f1 f2 as sald_d_t %}
-                                {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                                {% debe_b_c k f1 f2 as deb_b_c %}
+                                {% haber_b_c k f1 f2 as hab_b_c %}
+                                {% if deb_b_c != 0.0 or hab_b_c != 0.0 %}
                                 {% ifchanged j.descripcion %}
                                     <tr> 
                                         <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
@@ -671,9 +671,9 @@
                                 {% for k in j.nivel_cuatro_set.all %}
                                 {% if k.nivel_cinco_set.all %}
                                     {% for l in k.nivel_cinco_set.all %}
-                                    {% saldo_b_t l f1 f2 as sald_b_t %}
-                                    {% saldo_d_t l f1 f2 as sald_d_t %}
-                                    {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                                    {% debe_b_ci l f1 f2 as deb_b_ci %}
+                                    {% haber_b_ci l f1 f2 as hab_b_ci %}
+                                    {% if deb_b_ci != 0.0 or hab_b_ci != 0.0 %}
                                     {% ifchanged k.descripcion %}
                                         <tr>
                                             <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
@@ -702,9 +702,9 @@
                                     {% for l in k.nivel_cinco_set.all %}
                                     {% if l.asiento_set.all %}
                                         {% for m in l.asiento_set.all %}
-                                        {% saldo_b_t m f1 f2 as sald_b_t %}
-                                        {% saldo_d_t m f1 f2 as sald_d_t %}
-                                        {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                                        {% debe_b_a m f1 f2 as deb_b_a %}
+                                        {% haber_b_a m f1 f2 as hab_b_a %}
+                                        {% if deb_b_a != 0.0 or hab_b_a != 0.0 %}
                                         {% ifchanged l.descripcion %}
                                             <tr>
                                                 <td id="fuente" style="text-align: left; padding-top: 3px; border-left: 1px solid black; border-right: 1px solid black" colspan="2">
@@ -757,10 +757,10 @@
                                     <b>UTILIDAD DEL PERIODO</b>
                                 </td>
                                 <td style="font-size: 4; border-bottom: 1px solid black; border-right: 1px solid black; padding-top: 3px; text-align: center; border-top: 1px solid black" colspan="4">
-                                    {% mostr_saldo_b_u_er res f1 f2 %}
+                                    {% saldo_b_u_er res f1 f2 %}
                                 </td>
                                 <td style="font-size: 4; border-bottom: 1px solid black; border-right: 1px solid black; padding-top: 3px; text-align: center; border-top: 1px solid black" colspan="4">
-                                    {% mostr_saldo_d_u_er res f1 f2 %}
+                                    {% saldo_d_u_er res f1 f2 %}
                                 </td>
                             </tr>
                         {% endif %}
