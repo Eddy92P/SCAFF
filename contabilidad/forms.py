@@ -27,6 +27,7 @@ class crearEncabezadoForm(forms.ModelForm):
 			'haber_dls':forms.TextInput(attrs={'class':'form-control'}),
 			'dif_bs':forms.TextInput(attrs={'class':'form-control'}),
 			'dif_dls':forms.TextInput(attrs={'class':'form-control'}),
+			'cerrado':forms.HiddenInput(),
 			}
 		labels = {
 			'tipo_cambio':'Tipo de Cambio',
@@ -135,8 +136,8 @@ class crearAsientoForm(forms.ModelForm):
 		
             	
 		
-crearAsientoFormSet = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=5)
-updateAsientoFormSet = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=0)
+crearAsientoFormSet = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=1, min_num=1, validate_min=True)
+updateAsientoFormSet = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=1)
 
 
 class searchForm(forms.Form):
@@ -511,6 +512,22 @@ class crearBancarizacionForm(forms.ModelForm):
 			self.fields['importe'].initial = factura.importe_fac
 		else:
 			self.fields['importe'].initial = 0
+
+class crearGestion(forms.ModelForm):
+	class Meta:
+		model = gestion
+		exclude = ['cerrado']
+		labels = {
+			'year': 'Gestion',
+		}
+
+class crearCierreGestionForm(forms.ModelForm):
+	class Meta:
+		model = gestion
+		fields = ['cerrado']
+		labels = {
+			'cerrado': 'Cerrar Gestion'
+		}
 
 class repCostoServicioForm(forms.Form):
 	campo = forms.CharField(label="Desde", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))

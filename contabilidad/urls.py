@@ -54,6 +54,11 @@ urlpatterns = [
         permission_required('auth.view_contabilidad')(login_required(listaAsiento.as_view())), 
         name='listaasiento'
     ),
+    url(r'^listaasientoanulado/$',
+        #aqui el decorador de permisos
+        permission_required('auth.view_contabilidad')(login_required(listaAsientoAnulado.as_view())), 
+        name='listaasientoanulado'
+    ),
     url(r'^updateasiento/(?P<pk>\d+)/$',
         permission_required('auth.view_contabilidad')(login_required(updateAsiento.as_view())), 
         name='updateasiento'
@@ -418,5 +423,17 @@ urlpatterns = [
         #aqui el decorador de permisos
         permission_required('auth.view_contabilidad')(login_required(uploadNivelcinco.as_view())), 
         name='nivel_cincoupload'
+    ),
+    url(r'^nuevagestion/$',
+        permission_required('auth.view_contabilidad')(login_required(crearGestion.as_view())), 
+        name='nuevagestion'
+    ),
+    url(r'^listagestion/$',
+        permission_required('auth.view_contabilidad')(login_required(listaGestion.as_view())), 
+        name='listagestion'
+    ),
+    url(r'^cierregestion/(?P<pk>\d+)/$',
+        permission_required('auth.view_contabilidad')(login_required(updateCierreGestion.as_view())), 
+        name='cierregestion'
     ),
 ]

@@ -45,7 +45,7 @@
             <p style="color: red;">* No se deben ingresar cuentas sin antes haber llenado todos los datos del encabezado.</p>
             <p>* Al seleccionar las opciones para facturas, debe seleccionar en el orden en que se muestran, caso contrario deberá refrescar la página y volver a realizar la acción.</p>
             <p>* En caso de que por alguna razón no cuadren los totales, intente presionar cualquier tecla.</p>
-            <p>* Los botones de <b>"añadir fila" y "quitar fila"</b> son para aumentar o quitar filas al formulario, para poder ingresar más o menos datos, esta acción no tiene ningun efecto a nivel de base de datos en el caso de querer eliminar registros.</p>
+            <p>* Se pueden eliminar registros de la base de datos mediante el botón <b>"quitar fila"</b> y para actualizar los <b>TOTALES</b> debe volver a ingresar al formulario y presionar cualquier tecla.</p>
         </div>  
 
         <div class="panel panel-default">
@@ -168,6 +168,11 @@
                                         {{ form.tipo_trans }}
                 
                                 </td>
+                                <td style="padding-top: 15px" class="col-lg-1" type="date">
+                                    <label>Anulado</label>
+                                        {{ form.anulado }}
+                
+                                </td>
                                 <td class="col-lg-1">
                                     <a href="{% url 'contabilidad:listacuenta5' %}" type="button" data-toggle="modal" class="btn btn-primary" title="PLAN DE CUENTAS">
                                            <span class="glyphicon glyphicon-list-alt">
@@ -186,6 +191,9 @@
  
                         {{ crear_asiento_form_set.management_form }}
                         <tbody>
+                        {% if error %}
+                            <div class="alert alert-danger" role="alert"><strong>Advertencia!!!</strong> {{ error }}</div>
+                        {% endif %}
                         {% for crear_asiento_form in crear_asiento_form_set %}
                                 <tr class="formset_row">
                                      {{ crear_asiento_form.id }}
@@ -357,9 +365,12 @@
                                                 {% endif %}
                                                 {{ crear_asiento_form.auxiliar_s }}
                                         </td>
-                                                                             
+                                        <td>
+                                            {{ crear_asiento_form.DELETE }}
+                                        </td>                                   
                                 </tr>
                                 {{ crear_asiento_form_set.media }}
+
                                 
                         {% endfor %}
 

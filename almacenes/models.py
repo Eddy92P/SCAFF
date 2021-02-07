@@ -855,6 +855,7 @@ class encingresoitem(models.Model):
 	estado = models.BooleanField(
 		default=False
 		)
+	cerrado = models.BooleanField(default=False)
 
 	def tipo(self):
 		return "E"
@@ -1025,7 +1026,7 @@ class encsalidaitem(models.Model):
 	estado_act = models.BooleanField(
 		default=False
 		)
-	
+	cerrado = models.BooleanField(default=False)
 
 	def tipo(self):
 		return "S"

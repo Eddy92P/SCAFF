@@ -82,7 +82,7 @@
 				  			{% endif %}
 				  					<td>
 				  						<div class="btn-group">
-				  							{% if perms.almacenes.change_salidaitem %}
+				  							{% if perms.almacenes.change_salidaitem and obj.cerrado == False %}
                                         		<a href="{% url 'almacenes:updatesalida' obj.id %}" type="button" class="btn btn-primary" title="editar">
                                             	<span class="glyphicon glyphicon-edit" aria-hidden="true">
                                         		</a>
@@ -90,7 +90,7 @@
                                         		<a target="_blank" href="{% url 'almacenes:comprobante_s' obj.id %}" type="button" class="btn btn-warning" title="GENERAR COMPROBANTE PDF">
                                             	<span class="glyphicon glyphicon-export" aria-hidden="true">
                                         		</a>
-                                        	{% if perms.contabilidad.add_asiento %}
+                                        	{% if perms.contabilidad.add_asiento and obj.cerrado == False %}
                                         		<a href="{% url 'contabilidad:nuevoasiento_alm_s' obj.id %}" type="button" class="btn btn-info" title="Mandar a Contabilidad">
                                             	<span class="glyphicon glyphicon-send" aria-hidden="true">
                                         		</a>

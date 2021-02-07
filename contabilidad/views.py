@@ -58,10 +58,12 @@ class crearAsiento(CreateView):
 					aux2.append(0)
 			aux3 = zip(aux1, aux2)
 			aux6 = zip(aux4, aux5)
+			total_ingreso_objects = ingreso.ingresoitem_set.all().count()
+			crearAsientoFormSetIng = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=total_ingreso_objects)
 			if ingreso.iva == True:
-				crear_asiento_form_set = crearAsientoFormSet(initial=[{'nivel_cinco': i, 'debe_b': j} for i, j in aux3])
+				crear_asiento_form_set = crearAsientoFormSetIng(initial=[{'nivel_cinco': i, 'debe_b': j} for i, j in aux3])
 			else:
-				crear_asiento_form_set = crearAsientoFormSet(initial=[{'nivel_cinco': i, 'debe_b': j} for i, j in aux6])
+				crear_asiento_form_set = crearAsientoFormSetIng(initial=[{'nivel_cinco': i, 'debe_b': j} for i, j in aux6])
 		except Exception as e:
 			crear_asiento_form_set = crearAsientoFormSet()
 		return self.render_to_response(self.get_context_data(form=form, crear_asiento_form_set=crear_asiento_form_set))
@@ -77,9 +79,9 @@ class crearAsiento(CreateView):
 			aux = 0
 			aux1 = 0
 			aux2 = 0
-			e = self.model.objects.filter(tipo_trans='E').count()
-			i = self.model.objects.filter(tipo_trans='I').count()
-			t = self.model.objects.filter(tipo_trans='T').count()
+			e = self.model.objects.filter(tipo_trans='E').exclude(anulado=True).count()
+			i = self.model.objects.filter(tipo_trans='I').exclude(anulado=True).count()
+			t = self.model.objects.filter(tipo_trans='T').exclude(anulado=True).count()
 			if (e == None) & (form.tipo_trans=='E'):
 				form.numero_comp = 1
 			elif (e!= None) & (form.tipo_trans=='E'):
@@ -150,7 +152,9 @@ class crearAsiento1(crearAsiento):
 				aux4.append(i.sub_total)
 				aux4.append(0)
 			aux3 = zip(aux1, aux2, aux4)
-			crear_asiento_form_set = crearAsientoFormSet(initial=[{'nivel_cinco': i, 'debe_b': k, 'haber_b': j} for i, j, k in aux3])
+			total_salida_objects = aux.salida_item_set.all().count()
+			crearAsientoFormSetSal = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=total_salida_objects)
+			crear_asiento_form_set = crearAsientoFormSetSal(initial=[{'nivel_cinco': i, 'debe_b': k, 'haber_b': j} for i, j, k in aux3])
 		except Exception as e:
 			crear_asiento_form_set = crearAsientoFormSet()
 		return self.render_to_response(self.get_context_data(form=form, crear_asiento_form_set=crear_asiento_form_set))
@@ -165,9 +169,9 @@ class crearAsiento1(crearAsiento):
 			aux = 0
 			aux1 = 0
 			aux2 = 0
-			e = self.model.objects.filter(tipo_trans='E').count()
-			i = self.model.objects.filter(tipo_trans='I').count()
-			t = self.model.objects.filter(tipo_trans='T').count()
+			e = self.model.objects.filter(tipo_trans='E').exclude(anulado=True).count()
+			i = self.model.objects.filter(tipo_trans='I').exclude(anulado=True).count()
+			t = self.model.objects.filter(tipo_trans='T').exclude(anulado=True).count()
 			if (e == None) & (form.tipo_trans=='E'):
 				form.numero_comp = 1
 			elif (e!= None) & (form.tipo_trans=='E'):
@@ -221,7 +225,6 @@ class crearAsiento2(CreateView):
 		form_class = self.get_form_class()
 		form = self.get_form(form_class)
 		selec = self.request.GET.getlist('envia')
-		print(selec)
 		campo = self.request.GET.get('campo')
 		f = datetime.datetime.strptime(campo, "%Y-%m-%d")
 		fecha = f.date()
@@ -271,9 +274,9 @@ class crearAsiento2(CreateView):
 			aux = 0
 			aux1 = 0
 			aux2 = 0
-			e = self.model.objects.filter(tipo_trans='E').count()
-			i = self.model.objects.filter(tipo_trans='I').count()
-			t = self.model.objects.filter(tipo_trans='T').count()
+			e = self.model.objects.filter(tipo_trans='E').exclude(anulado=True).count()
+			i = self.model.objects.filter(tipo_trans='I').exclude(anulado=True).count()
+			t = self.model.objects.filter(tipo_trans='T').exclude(anulado=True).count()
 			if (e == None) & (form.tipo_trans=='E'):
 				form.numero_comp = 1
 			elif (e!= None) & (form.tipo_trans=='E'):
@@ -376,9 +379,9 @@ class crearAsiento3(CreateView):
 			aux = 0
 			aux1 = 0
 			aux2 = 0
-			e = self.model.objects.filter(tipo_trans='E').count()
-			i = self.model.objects.filter(tipo_trans='I').count()
-			t = self.model.objects.filter(tipo_trans='T').count()
+			e = self.model.objects.filter(tipo_trans='E').exclude(anulado=True).count()
+			i = self.model.objects.filter(tipo_trans='I').exclude(anulado=True).count()
+			t = self.model.objects.filter(tipo_trans='T').exclude(anulado=True).count()
 			if (e == None) & (form.tipo_trans=='E'):
 				form.numero_comp = 1
 			elif (e!= None) & (form.tipo_trans=='E'):
@@ -451,6 +454,9 @@ class updateAsiento(UpdateView):
 			self.object = form.save()
 			crear_asiento_form_set.instance = self.object
 			formset = crear_asiento_form_set.save(commit=False)
+			for obj in crear_asiento_form_set.deleted_objects:
+				obj.delete()
+
 			for f in formset:
 				if (f.debe_b != None) & (f.debe_b != 0):
 					f.haber_b = 0.00
@@ -461,11 +467,11 @@ class updateAsiento(UpdateView):
 					f.debe_b = 0.00
 					f.debe_d = 0.00
 					f.auxiliar = 2
-					
-			crear_asiento_form_set.save()	
+
+			crear_asiento_form_set.save()
 			return HttpResponseRedirect(reverse_lazy(self.success_url))
 		else:
-			return self.render_to_response(self.get_context_data(form=form, crear_asiento_form_set=crear_asiento_form_set))
+			return self.render_to_response(self.get_context_data(form=form, crear_asiento_form_set=crear_asiento_form_set, error=crear_asiento_form_set.non_form_errors()))
 
 class listaAsiento(CreateView, ListView):
 	model = encabezadoas
@@ -480,6 +486,7 @@ class listaAsiento(CreateView, ListView):
 		if 'form' not in context:
 			context['form'] = self.form_class()
 		return context
+
 	def get(self, request, *args, **kwargs):
 		self.object = self.get_object
 		form = self.form_class()
@@ -487,6 +494,19 @@ class listaAsiento(CreateView, ListView):
 			form = self.form_class(request.GET)
 		self.object_list = self.get_queryset()
 		return self.render_to_response(self.get_context_data(object_list=self.object_list, form=form))
+
+	def get_queryset(self):
+		object_list = self.model.objects.filter(anulado=False)
+		return object_list
+
+class listaAsientoAnulado(listaAsiento):
+	model = encabezadoas
+	form_class = searchForm
+	template_name = 'contabilidad/listaasiento.html'
+
+	def get_queryset(self):
+		object_list = self.model.objects.filter(anulado=True)
+		return object_list
 
 class listaAsientoForeign(CreateView, ListView):
 	model = asiento
@@ -2145,95 +2165,6 @@ class listaProveedorMov(CreateView, ListView):
 			object_list = self.model.objects.all().order_by('id')
 		return object_list
 
-class listaLibroMayor(CreateView, ListView):
-	model = asiento
-	form_class = searchFormLib
-	template_name = 'contabilidad/listalibrom.html'
-	def get_context_data(self, **kwargs):
-		context = super(listaLibroMayor, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
-		if 'form' not in context:
-			context['form'] = self.form_class()
-		return context
-	def get(self, request, *args, **kwargs):
-		self.object = self.get_object
-		form = self.form_class()
-		if request.GET:
-			form = self.form_class(request.GET)
-		self.object_list = self.get_queryset()
-		return self.render_to_response(self.get_context_data(object_list=self.object_list, form=form))
-	def get_queryset(self):
-		campo = self.request.GET.get('search')
-		campo1 = self.request.GET.get('search1')
-		campo2 = self.request.GET.get('search2')
-		if(campo2):
-			ini = campo2[0]
-			aux2 = []
-			aux3 = []
-			aux4 = 0
-			aux5 = 0
-			aux7 = 0
-			aux8 = 0
-			saldo = []
-			saldo_aux = []
-			b = 0
-			print(campo2)
-			niv_cinco = nivel_cinco.objects.get(Q(codigo=campo2) | Q(descripcion=campo2))
-			if (niv_cinco.nivel_uno.id == 2) or (niv_cinco.nivel_uno.id == 4):
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).order_by('encabezadoas__fecha'):
-					aux = 0
-					aux1 = 0
-					aux = i.haber_b - i.debe_b
-					aux1 = i.haber_d - i.debe_d
-					aux2.append(aux)
-					aux3.append(aux1)
-					aux4 = aux4 + i.debe_b
-					aux5 = aux5 + i.haber_b
-					aux7 = aux7 + i.debe_d
-					aux8 = aux8 + i.haber_d
-
-				for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).order_by('encabezadoas__fecha'):
-					aux = len(saldo)
-					if aux == 0:
-						saldo.append(aux2[b])
-						saldo_aux.append(aux3[b])
-						b += 1
-					elif b <= aux:
-						saldo.append(saldo[b-1] + aux2[b])
-						saldo_aux.append(saldo_aux[b-1] + aux3[b])
-						b += 1
-			else:
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).order_by('encabezadoas__fecha'):
-					aux = 0
-					aux1 = 0
-					aux = i.debe_b - i.haber_b
-					aux1 = i.debe_d - i.haber_d
-					aux2.append(aux)
-					aux3.append(aux1)
-					aux4 = aux4 + i.debe_b
-					aux5 = aux5 + i.haber_b
-					aux7 = aux7 + i.debe_d
-					aux8 = aux8 + i.haber_d
-				for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).order_by('encabezadoas__fecha'):
-					aux = len(saldo)
-					if aux == 0:
-						saldo.append(aux2[b])
-						saldo_aux.append(aux3[b])
-						b += 1
-					elif b <= aux:
-						saldo.append(saldo[b-1] + aux2[b])
-						saldo_aux.append(saldo_aux[b-1] + aux3[b])
-						b += 1
-			lista = zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).order_by('encabezadoas__fecha'), saldo, saldo_aux)
-			object_list = lista
-		else:
-			lista = zip(self.model.objects.all().order_by('id'), " ", " ")
-			object_list = lista
-		return object_list
-
 class crearBancarizacion(CreateView):
 	model_pk = Factura
 	form_class = crearBancarizacionForm
@@ -2329,6 +2260,135 @@ class listaBancarizacion(CreateView, ListView):
 			object_list = self.model.objects.all().order_by('id')
 		return object_list
 
+class crearGestion(CreateView):
+	form_class = crearGestion
+	template_name = 'contabilidad/nuevagestion.html'
+	success_url = reverse_lazy('contabilidad:listagestion')
+
+class listaGestion(ListView):
+	model = gestion
+	template_name = 'contabilidad/listagestion.html'
+
+class updateCierreGestion(UpdateView):
+	model = gestion
+	form_class = crearCierreGestionForm
+	template_name = 'contabilidad/nuevocierregestion.html'
+	success_url = 'contabilidad:listagestion'
+
+	def get_context_data(self, **kwargs):
+		context = super(updateCierreGestion, self).get_context_data(**kwargs)
+		pk1=self.kwargs['pk']
+		cerrado = self.model.objects.get(id=pk1)
+		if 'form' and 'cerrado' not in context :
+			context['form'] = self.form_class()
+			context['cerrado'] = cerrado
+		return context
+
+	def post(self, request, *args, **kwargs):
+		self.object = self.get_object
+		pk1=self.kwargs['pk']
+		form = self.form_class(request.POST, instance=self.model.objects.get(id=pk1))
+		if form.is_valid():
+			form.save(commit=False)
+			if form.cleaned_data['cerrado'] == True:
+				year = self.model.objects.get(id=pk1).year
+				asientos = encabezadoas.objects.filter(fecha__year=year).update(cerrado=True)
+				ingresos = encingresoitem.objects.filter(fecha__year=year).update(cerrado=True)
+				salidas = encsalidaitem.objects.filter(fecha__year=year).update(cerrado=True)
+			form.save()
+			return HttpResponseRedirect(reverse_lazy(self.success_url))
+		else:
+			return self.render_to_response(self.get_context_data(form=form))
+
+# Reportes
+class listaLibroMayor(CreateView, ListView):
+	model = asiento
+	form_class = searchFormLib
+	template_name = 'contabilidad/listalibrom.html'
+	def get_context_data(self, **kwargs):
+		context = super(listaLibroMayor, self).get_context_data(**kwargs)
+		parametro = self.request.GET.copy()
+		if parametro.has_key('page'):
+			del parametro['page']
+		context['parametro'] = parametro
+		if 'form' not in context:
+			context['form'] = self.form_class()
+		return context
+	def get(self, request, *args, **kwargs):
+		self.object = self.get_object
+		form = self.form_class()
+		if request.GET:
+			form = self.form_class(request.GET)
+		self.object_list = self.get_queryset()
+		return self.render_to_response(self.get_context_data(object_list=self.object_list, form=form))
+	def get_queryset(self):
+		campo = self.request.GET.get('search')
+		campo1 = self.request.GET.get('search1')
+		campo2 = self.request.GET.get('search2')
+		if(campo2):
+			ini = campo2[0]
+			aux2 = []
+			aux3 = []
+			aux4 = 0
+			aux5 = 0
+			aux7 = 0
+			aux8 = 0
+			saldo = []
+			saldo_aux = []
+			b = 0
+			niv_cinco = nivel_cinco.objects.get(Q(codigo=campo2) | Q(descripcion=campo2))
+			if (niv_cinco.nivel_uno.id == 2) or (niv_cinco.nivel_uno.id == 4):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+					aux = 0
+					aux1 = 0
+					aux = i.haber_b - i.debe_b
+					aux1 = i.haber_d - i.debe_d
+					aux2.append(aux)
+					aux3.append(aux1)
+					aux4 = aux4 + i.debe_b
+					aux5 = aux5 + i.haber_b
+					aux7 = aux7 + i.debe_d
+					aux8 = aux8 + i.haber_d
+
+				for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+					aux = len(saldo)
+					if aux == 0:
+						saldo.append(aux2[b])
+						saldo_aux.append(aux3[b])
+						b += 1
+					elif b <= aux:
+						saldo.append(saldo[b-1] + aux2[b])
+						saldo_aux.append(saldo_aux[b-1] + aux3[b])
+						b += 1
+			else:
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+					aux = 0
+					aux1 = 0
+					aux = i.debe_b - i.haber_b
+					aux1 = i.debe_d - i.haber_d
+					aux2.append(aux)
+					aux3.append(aux1)
+					aux4 = aux4 + i.debe_b
+					aux5 = aux5 + i.haber_b
+					aux7 = aux7 + i.debe_d
+					aux8 = aux8 + i.haber_d
+				for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+					aux = len(saldo)
+					if aux == 0:
+						saldo.append(aux2[b])
+						saldo_aux.append(aux3[b])
+						b += 1
+					elif b <= aux:
+						saldo.append(saldo[b-1] + aux2[b])
+						saldo_aux.append(saldo_aux[b-1] + aux3[b])
+						b += 1
+			lista = zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'), saldo, saldo_aux)
+			object_list = lista
+		else:
+			lista = zip(self.model.objects.all().exclude(encabezadoas__anulado=True).order_by('id'), " ", " ")
+			object_list = lista
+		return object_list
+
 class generarComprobante(PDFTemplateView):
 	template_name = "contabilidad/comprobante.html"
 	
@@ -2364,9 +2424,10 @@ class libroMayorP(PDFTemplateView):
 		saldo = []
 		saldo_aux = []
 		b = 0
-		if (ini == '2') | (ini == '4'):
+		niv_cinco = nivel_cinco.objects.get(Q(codigo=campo3) | Q(descripcion=campo3))
+		if (niv_cinco.nivel_uno.id == 2) or (niv_cinco.nivel_uno.id == 4):
 			if campo4 == 'Bs':
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(nivel_cinco__codigo=campo3)).order_by('encabezadoas__fecha'):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.haber_b - i.debe_b
@@ -2376,7 +2437,7 @@ class libroMayorP(PDFTemplateView):
 					aux4 = aux4 + i.debe_b
 					aux5 = aux5 + i.haber_b
 			elif campo4 == 'Dls':
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(nivel_cinco__codigo=campo3)).order_by('encabezadoas__fecha'):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.haber_b - i.debe_b
@@ -2386,7 +2447,7 @@ class libroMayorP(PDFTemplateView):
 					aux7 = aux7 + i.debe_d
 					aux8 = aux8 + i.haber_d
 			elif campo4 == 'BsDl':
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(nivel_cinco__codigo=campo3)).order_by('encabezadoas__fecha'):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.haber_b - i.debe_b
@@ -2397,7 +2458,7 @@ class libroMayorP(PDFTemplateView):
 					aux5 = aux5 + i.haber_b
 					aux7 = aux7 + i.debe_d
 					aux8 = aux8 + i.haber_d
-			for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(nivel_cinco__codigo=campo3)).order_by('encabezadoas__fecha'):
+			for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
 				aux = len(saldo)
 				if aux == 0:
 					saldo.append(aux2[b])
@@ -2409,7 +2470,7 @@ class libroMayorP(PDFTemplateView):
 					b += 1
 		else:
 			if campo4 == 'Bs':
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(nivel_cinco__codigo=campo3)).order_by('encabezadoas__fecha'):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.debe_b - i.haber_b
@@ -2419,7 +2480,7 @@ class libroMayorP(PDFTemplateView):
 					aux4 = aux4 + i.debe_b
 					aux5 = aux5 + i.haber_b
 			elif campo4 == 'Dls':
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(nivel_cinco__codigo=campo3)).order_by('encabezadoas__fecha'):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.debe_b - i.haber_b
@@ -2429,7 +2490,7 @@ class libroMayorP(PDFTemplateView):
 					aux7 = aux7 + i.debe_d
 					aux8 = aux8 + i.haber_d
 			elif campo4 == 'BsDl':
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(nivel_cinco__codigo=campo3)).order_by('encabezadoas__fecha'):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.debe_b - i.haber_b
@@ -2440,7 +2501,7 @@ class libroMayorP(PDFTemplateView):
 					aux5 = aux5 + i.haber_b
 					aux7 = aux7 + i.debe_d
 					aux8 = aux8 + i.haber_d
-			for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(nivel_cinco__codigo=campo3)).order_by('encabezadoas__fecha'):
+			for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
 				aux = len(saldo)
 				if aux == 0:
 					saldo.append(aux2[b])
@@ -2458,7 +2519,7 @@ class libroMayorP(PDFTemplateView):
 		context.update({'campo2': fecha2})
 		context.update({'campo3': campo3})
 		context.update({'campo4': campo4})
-		lista = zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(nivel_cinco__codigo=campo3)).order_by('encabezadoas__fecha'), saldo, saldo_aux)
+		lista = zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'), saldo, saldo_aux)
 		context['asi'] = lista
 		return context
 
@@ -2476,7 +2537,7 @@ class balanceGen(PDFTemplateView):
 		context.update({'campo': fecha1})
 		context.update({'campo2': fecha2})
 		context.update({'campo3': campo3})
-		res = nivel_uno.objects.filter(Q(id__lte=3) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)))).distinct()
+		res = nivel_uno.objects.filter(Q(id__lte=3) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2))) & Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False)).distinct()
 		context['niv'] = res
 		context['f1'] = f1
 		context['f2'] = f2
@@ -2501,9 +2562,9 @@ class estadoResultado(PDFTemplateView):
 		context.update({'campo': fecha1})
 		context.update({'campo2': fecha2})
 		context.update({'campo3': campo3})
-		res = nivel_uno.objects.filter(Q(id__gte=4) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)))).distinct()
+		res = nivel_uno.objects.filter(Q(id__gte=4) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2))) & Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False)).distinct()
 		context['niv'] = res
-		for i in nivel_uno.objects.filter(Q(id__gte=4) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)))).distinct():
+		for i in nivel_uno.objects.filter(Q(id__gte=4) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2))) & Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False)).distinct():
 			for j in i.nivel_dos_set.all():
 				for k in j.nivel_tres_set.all():
 					for l in k.nivel_cuatro_set.all():
@@ -2581,7 +2642,7 @@ class FacturasExcel(TemplateView):
 	def get(self, request, *args, **kwargs):
 		campo = request.GET.get('campo')
 		campo2 = request.GET.get('campo2')
-		res = Factura.objects.filter(Q(fecha_fac__month=campo) & Q(fecha_fac__year=campo2))
+		res = Factura.objects.filter(Q(fecha_fac__month=campo) & Q(fecha_fac__year=campo2)).exclude(asiento__encabezadoas__anulado=True)
 		wb = Workbook()
 		ws = wb.active
 	
@@ -2641,7 +2702,7 @@ class FacturasVExcel(TemplateView):
 	def get(self, request, *args, **kwargs):
 		campo = request.GET.get('campo')
 		campo2 = request.GET.get('campo2')
-		res = Factura_V.objects.filter(Q(fecha_fac__month=campo) & Q(fecha_fac__year=campo2))
+		res = Factura_V.objects.filter(Q(fecha_fac__month=campo) & Q(fecha_fac__year=campo2)).exclude(asiento__encabezadoas__anulado=True)
 		wb = Workbook()
 		ws = wb.active
 	
@@ -2698,9 +2759,9 @@ class RetencionExcel(TemplateView):
 	def get(self, request, *args, **kwargs):
 		campo = request.GET.get('campo')
 		campo2 = request.GET.get('campo2')
-		f1 = datetime.datetime.strptime(campo, "%d-%m-%Y")
-		f2 = datetime.datetime.strptime(campo2, "%d-%m-%Y")
-		res = encabezadoas.objects.filter(Q(fecha__range=(f1,f2)) & Q(Q(asientos__opciones_p='R') | Q(asientos__opciones_p='A')))
+		f1 = datetime.datetime.strptime(campo, "%Y-%m-%d")
+		f2 = datetime.datetime.strptime(campo2, "%Y-%m-%d")
+		res = encabezadoas.objects.filter(Q(fecha__range=(f1,f2)) & Q(Q(asientos__opciones_p='R') | Q(asientos__opciones_p='A'))).exclude(anulado=True)
 		wb = Workbook()
 		ws = wb.active
 	
@@ -2769,17 +2830,17 @@ class estadoEvolucionP(PDFTemplateView):
 		context['asi'] = asiento.objects.filter(encabezadoas__fecha__lte=f)
 		
 		if (f.month!=10) | (f.month!=11) | (f.month!=12):
-			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
 		else:
-			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
 		
 		
 		if c1_a['total']:
@@ -2806,19 +2867,19 @@ class estadoEvolucionP(PDFTemplateView):
 		patrimonio_neto_a = aux + aux1 + aux2 + aux3 + aux4
 		
 		if (f.month!=10) | (f.month!=11) | (f.month!=12):
-			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
 		else:
-			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
 			
 		if c1['total']:
 			aux5 = c1['total']  #capital social
@@ -2883,7 +2944,7 @@ class libroDiario(PDFTemplateView):
 		f2 = datetime.datetime.strptime(campo1, "%Y-%m-%d")
 		fecha1 = f1.strftime("%d/%m/%Y")
 		fecha2 = f2.strftime("%d/%m/%Y")
-		res = asiento.objects.filter(encabezadoas__fecha__range=(f1, f2)).order_by('encabezadoas__numero_comp')
+		res = asiento.objects.filter(encabezadoas__fecha__range=(f1, f2)).exclude(encabezadoas__anulado=True).order_by('encabezadoas__numero_comp')
 		context['lib'] = res
 		context['fecha1'] = fecha1
 		context['fecha2'] = fecha2
@@ -2910,9 +2971,9 @@ class ReporteCostoServicio(PDFTemplateView):
 		fecha1 = f1.strftime("%d/%m/%Y")
 		fecha2 = f2.strftime("%d/%m/%Y")
 
-		res = nivel_cinco.objects.filter(Q(nivel_cuatro__codigo='510101') | Q(nivel_cuatro__codigo='510102') | Q(nivel_cuatro__codigo='510103'), asiento__encabezadoas__fecha__range=(f1, f2)).distinct().order_by('codigo')
+		res = nivel_cinco.objects.filter(Q(nivel_cuatro__codigo='510101') | Q(nivel_cuatro__codigo='510102') | Q(nivel_cuatro__codigo='510103'), asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).distinct().order_by('codigo')
 
-		res1 = nivel_cinco.objects.filter(Q(nivel_cuatro__codigo='510101') | Q(nivel_cuatro__codigo='510102') | Q(nivel_cuatro__codigo='510103'), asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('asiento__debe_b'))
+		res1 = nivel_cinco.objects.filter(Q(nivel_cuatro__codigo='510101') | Q(nivel_cuatro__codigo='510102') | Q(nivel_cuatro__codigo='510103'), asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum('asiento__debe_b'))
 
 		context['res'] = res
 		context['total'] = res1['total']

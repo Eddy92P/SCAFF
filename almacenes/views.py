@@ -630,6 +630,10 @@ class updateIngresoItem(UpdateView):
 			persona = crear_personal_form_set.save(commit=False)
 			crear_ingreso_form_set.instance = form1
 			ingreso = crear_ingreso_form_set.save(commit=False)
+
+			for obj in crear_ingreso_form_set.deleted_objects:
+				obj.delete()
+
 			for formset in ingreso:
 				a = itemalmacen.objects.get_or_create(item = formset.item)
 				i = ingresoitem.objects.filter(item = formset.item, encingresoitem=pk1, id=formset.id).aggregate(total=Sum('cantidad'))
@@ -663,7 +667,7 @@ class updateIngresoItem(UpdateView):
 					crear_ingreso_form_set.save()
 			return HttpResponseRedirect(reverse_lazy(self.success_url))
 		else:
-			return self.render_to_response(self.get_context_data(form=form, crear_ingreso_form_set=crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set))
+			return self.render_to_response(self.get_context_data(form=form, crear_ingreso_form_set=crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error_formset=crear_ingreso_form_set.non_form_errors()))
 
 class salidaItem(CreateView):
 	model_pk = item
@@ -800,6 +804,10 @@ class updateSalidaItem(UpdateView):
 			crear_salida_form_set.instance = form1
 			persona = crear_personal_form_set.save(commit=False)
 			salida = crear_salida_form_set.save(commit=False)
+
+			for obj in crear_salida_form_set.deleted_objects:
+				obj.delete()
+
 			for formset in salida:
 				a = itemalmacen.objects.get(item = formset.item)
 				if a.cantidad < formset.cantidad:
@@ -849,7 +857,7 @@ class updateSalidaItem(UpdateView):
 					
 			return HttpResponseRedirect(reverse_lazy(self.success_url))
 		else:
-			return self.render_to_response(self.get_context_data(form=form, crear_salida_form_set=crear_salida_form_set))
+			return self.render_to_response(self.get_context_data(form=form, crear_salida_form_set=crear_salida_form_set, error_formset=crear_salida_form_set.non_form_errors()))
 
 class listaItemT(CreateView,ListView):
 	model = item

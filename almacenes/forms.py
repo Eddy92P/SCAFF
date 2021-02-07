@@ -114,6 +114,7 @@ class crearEncabezadoIngresoForm(forms.ModelForm):
 			'total_iva':forms.TextInput(attrs={'class':'form-control'}),
 			'importe_iva':forms.TextInput(attrs={'class':'form-control'}),
 			'proveedor':autocomplete.ModelSelect2(url='almacenes:proveedor_autocomplete'),
+			'cerrado':forms.HiddenInput()
 		}
 
 class crearIngresoItemForm(forms.ModelForm):
@@ -132,7 +133,7 @@ class crearIngresoItemForm(forms.ModelForm):
 		})
     
 
-crearIngresoItemFormSet = inlineformset_factory(encingresoitem, ingresoitem, form=crearIngresoItemForm, extra=1)
+crearIngresoItemFormSet = inlineformset_factory(encingresoitem, ingresoitem, form=crearIngresoItemForm, extra=1, min_num=1, validate_min=True)
 updateIngresoItemFormSet = inlineformset_factory(encingresoitem, ingresoitem, form=crearIngresoItemForm, extra=1)
 
 
@@ -170,6 +171,7 @@ class crearEncabezadoSalidaForm(forms.ModelForm):
 			'concepto':forms.TextInput(attrs={'class':'form-control'}),
 			'tipo_salida':forms.Select(attrs={'class':'form-control'}),
 			'cliente':autocomplete.ModelSelect2(url='almacenes:cliente_autocomplete'),
+			'cerrado':forms.HiddenInput()
 		}
 		labels = {
 			'nro_comp':'Número de Comprobante',

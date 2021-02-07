@@ -158,7 +158,7 @@
             <p style="color: red;">* No se deben ingresar items sin antes haber llenado todos los datos del encabezado.</p>
             <p>* El botón de <b>IVA</b> se debe seleccionar una vez llenado todo el formulario.</p>
             <p>* En caso de que por alguna razón no cuadren los totales, intente presionar cualquier tecla.</p>
-            <p>* Los botones de <b>"añadir fila" y "quitar fila"</b> son para aumentar o quitar filas al formulario, esto para poder ingresar más datos o menos datos, esta acción no tiene ningun efecto a nivel de base de datos en el caso de querer eliminar registros.</p>
+            <p>* Se pueden eliminar registros de la base de datos mediante el botón <b>"quitar fila"</b> y para actualizar los <b>TOTALES</b> debe volver a ingresar al formulario y presionar cualquier tecla.</p>
         </div> 
         <div class="panel panel-default">
                 <div class="panel-body">
@@ -297,6 +297,9 @@
  
                         {{ crear_ingreso_form_set.management_form }}
                         <tbody>
+                        {% if error_formset %}
+                            <div class="alert alert-danger" role="alert"><strong>Advertencia!!!</strong> {{ error_formset }}</div>
+                        {% endif %}
                         {% for crear_ingreso_form in crear_ingreso_form_set %}
                                 <tr class="formset_row">
                                      {{ crear_ingreso_form.id }}
@@ -385,6 +388,9 @@
                                                         {% endfor %}
                                                 {% endif %}
                                                 {{ crear_ingreso_form.sub_total }}
+                                        </td>
+                                        <td>
+                                            {{ crear_ingreso_form.DELETE }}
                                         </td>                                        
                                 </tr>
                                 {{ crear_ingreso_form.media }}
@@ -467,7 +473,7 @@
 
     $('.formset_row').formset({ 
     addText: 'añadir fila', 
-    deleteText: 'quitar fila', 
+    deleteText: 'eliminar', 
     prefix: 'ingresoitem_set',
     addCssClass: 'button1',
     deleteCssClass: 'button2'

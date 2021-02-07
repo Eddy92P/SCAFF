@@ -78,7 +78,7 @@
 				  			{% endif %}
 				  				<td>
 				  						<div class="btn-group" role="group">
-				  						{% if perms.contabilidad.change_asiento %}
+				  						{% if perms.contabilidad.change_asiento and asiento.encabezadoas.cerrado == False %}
 				  						<a href="{% url 'contabilidad:updateasiento' asiento.encabezadoas_id %}" type="button" class="btn btn-primary"title="Editar">
                                         <span class="glyphicon glyphicon-edit" aria-hidden="true">
                                         </a>
