@@ -1259,14 +1259,14 @@
                             var porc = 0;
                             var porc1 = 0;
                             var result = 0;
-                            porc1 = parseFloat(h) * 0.87;
-                            porc2 = parseFloat(h) * 0.13;
+                            porc1 = parseFloat(aux1) * 0.87;
+                            porc2 = parseFloat(aux1) * 0.13;
                             var res2 = parseFloat(porc1).toFixed(3);
                             var res3 = String(res2) + '1';
                             var res4 = parseFloat(porc2).toFixed(3);
                             var res5 = String(res4) + '1';
                             result = parseFloat(m) - parseFloat(res3).toFixed(2) - parseFloat(res5).toFixed(2)
-                            $('#'+op).val(parseFloat(res3).toFixed(2));
+                            $('#'+opc3).val(parseFloat(res3).toFixed(2));
                             $('#'+opc4).val(parseFloat(res5).toFixed(2));
                             $('#'+opc5).val(result);
                             $('#'+opc10).select2({
