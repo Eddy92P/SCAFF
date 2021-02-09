@@ -677,7 +677,7 @@ class asiento(models.Model):
 		)
 
 	class Meta:
-		ordering = ['id', 'auxiliar', '-nivel_cinco__nivel_cuatro']
+		ordering = ['auxiliar', 'id', '-nivel_cinco__nivel_cuatro']
 
 	def suma(self):
 		res = self.debe_b - self.haber_b

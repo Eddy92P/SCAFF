@@ -513,6 +513,7 @@
             var fila = $(".table tbody tr");
             var p1 = $(this).find('input');
             var p = $(this).find('select');
+            var toll_venta_fila = $(fila[index-3]).find('input');
             var a = $(fila[index-2]).find('input');
             var q2 = $(fila[index+1]).find('select');
             var q1 = $(fila[index+1]).find('input');
@@ -540,6 +541,14 @@
                     var h = p1.eq(3).val();
                     var m = a.eq(8).val();
                     var op = p1.eq(3).attr("id");
+                    var descuento_venta = p1.eq(2).val();
+                    var descuento_iva_venta = q1.eq(2).val();
+                    var descuento_venta_id = p1.eq(2).attr("id");
+                    var descuento_iva_venta_id = q1.eq(2).attr("id");
+                    var toll_venta = toll_venta_fila.eq(3).val();
+                    var imp_transacc_pagar_venta = a.eq(3).val();
+                    var toll_venta_id = toll_venta_fila.eq(3).attr("id");
+                    var imp_transacc_pagar_venta_id = a.eq(3).attr("id");
                     if(valor=="F")
                     {
                         p1.eq(8).val(aux1);
@@ -1259,14 +1268,14 @@
                             var porc = 0;
                             var porc1 = 0;
                             var result = 0;
-                            porc1 = parseFloat(aux1) * 0.87;
-                            porc2 = parseFloat(aux1) * 0.13;
+                            porc1 = parseFloat(h) * 0.87;
+                            porc2 = parseFloat(h) * 0.13;
                             var res2 = parseFloat(porc1).toFixed(3);
                             var res3 = String(res2) + '1';
                             var res4 = parseFloat(porc2).toFixed(3);
                             var res5 = String(res4) + '1';
                             result = parseFloat(m) - parseFloat(res3).toFixed(2) - parseFloat(res5).toFixed(2)
-                            $('#'+opc3).val(parseFloat(res3).toFixed(2));
+                            $('#'+op).val(parseFloat(res3).toFixed(2));
                             $('#'+opc4).val(parseFloat(res5).toFixed(2));
                             $('#'+opc5).val(result);
                             $('#'+opc10).select2({
@@ -1280,6 +1289,45 @@
                                 url: '{% url 'contabilidad:cuenta' %}',
                             }).then(function (data) {
                                 var option = new Option(data[1].fields.codigo+" "+data[1].fields.descripcion, data[1].pk, true, true);
+                                cuentaSelect.append(option).trigger('change');
+
+                                cuentaSelect.trigger({
+                                    type: 'select2:select',
+                                    params: {
+                                        data: data
+                                    }
+
+                                });
+
+                            });
+                        }
+                        else if(valor=="D" && valor2=="V")
+                        {
+                            var iva_credit = parseFloat(descuento_venta) * 0.13;
+                            var result1 = parseFloat(iva_credit).toFixed(3);
+                            var result2 = String(result1) + '1';
+                            $('#'+descuento_iva_venta_id).val(parseFloat(result2).toFixed(2));
+                            var descuento_result = parseFloat(descuento_venta) - parseFloat(result2).toFixed(2);
+                            $('#'+descuento_venta_id).val(parseFloat(descuento_result).toFixed(2));
+                            var toll_total = parseFloat(toll_venta) + parseFloat(descuento_result);
+                            var result3 = parseFloat(toll_total.toFixed(3));
+                            var result4 = String(result3) + '1';
+                            $('#'+toll_venta_id).val(parseFloat(result4).toFixed(2));
+                            var imp_trans_pag_venta_total = parseFloat(imp_transacc_pagar_venta) + parseFloat(iva_credit);
+                            var result5 = parseFloat(imp_trans_pag_venta_total).toFixed(3);
+                            var result6 = String(result5) + '1';
+                            $('#'+imp_transacc_pagar_venta_id).val(parseFloat(result6).toFixed(2));
+                            $('#'+opc10).select2({
+                            ajax:   {
+                                url: '{% url 'contabilidad:cuenta' %}'
+                                }
+                            });
+                            var cuentaSelect = $('#'+opc10);
+                            $.ajax({
+                                type: 'GET',
+                                url: '{% url 'contabilidad:cuenta' %}',
+                            }).then(function (data) {
+                                var option = new Option(data[0].fields.codigo+" "+data[0].fields.descripcion, data[0].pk, true, true);
                                 cuentaSelect.append(option).trigger('change');
 
                                 cuentaSelect.trigger({
