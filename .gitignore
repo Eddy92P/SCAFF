@@ -4,4 +4,7 @@
 *.xls
 *.xlsx
 *.doc
-migrations
+almacenes/migrations
+contabilidad/migrations
+activos_f/migrations
+usuarios/migrations
