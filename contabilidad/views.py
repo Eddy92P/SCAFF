@@ -79,9 +79,9 @@ class crearAsiento(CreateView):
 			aux = 0
 			aux1 = 0
 			aux2 = 0
-			e = self.model.objects.filter(tipo_trans='E').exclude(anulado=True).count()
-			i = self.model.objects.filter(tipo_trans='I').exclude(anulado=True).count()
-			t = self.model.objects.filter(tipo_trans='T').exclude(anulado=True).count()
+			e = self.model.objects.filter(tipo_trans='E').exclude(anulado=True, cerrado=True).count()
+			i = self.model.objects.filter(tipo_trans='I').exclude(anulado=True, cerrado=True).count()
+			t = self.model.objects.filter(tipo_trans='T').exclude(anulado=True, cerrado=True).count()
 			if (e == None) & (form.tipo_trans=='E'):
 				form.numero_comp = 1
 			elif (e!= None) & (form.tipo_trans=='E'):
@@ -169,9 +169,9 @@ class crearAsiento1(crearAsiento):
 			aux = 0
 			aux1 = 0
 			aux2 = 0
-			e = self.model.objects.filter(tipo_trans='E').exclude(anulado=True).count()
-			i = self.model.objects.filter(tipo_trans='I').exclude(anulado=True).count()
-			t = self.model.objects.filter(tipo_trans='T').exclude(anulado=True).count()
+			e = self.model.objects.filter(tipo_trans='E').exclude(anulado=True, cerrado=True).count()
+			i = self.model.objects.filter(tipo_trans='I').exclude(anulado=True, cerrado=True).count()
+			t = self.model.objects.filter(tipo_trans='T').exclude(anulado=True, cerrado=True).count()
 			if (e == None) & (form.tipo_trans=='E'):
 				form.numero_comp = 1
 			elif (e!= None) & (form.tipo_trans=='E'):
@@ -274,9 +274,9 @@ class crearAsiento2(CreateView):
 			aux = 0
 			aux1 = 0
 			aux2 = 0
-			e = self.model.objects.filter(tipo_trans='E').exclude(anulado=True).count()
-			i = self.model.objects.filter(tipo_trans='I').exclude(anulado=True).count()
-			t = self.model.objects.filter(tipo_trans='T').exclude(anulado=True).count()
+			e = self.model.objects.filter(tipo_trans='E').exclude(anulado=True, cerrado=True).count()
+			i = self.model.objects.filter(tipo_trans='I').exclude(anulado=True, cerrado=True).count()
+			t = self.model.objects.filter(tipo_trans='T').exclude(anulado=True, cerrado=True).count()
 			if (e == None) & (form.tipo_trans=='E'):
 				form.numero_comp = 1
 			elif (e!= None) & (form.tipo_trans=='E'):
@@ -379,9 +379,9 @@ class crearAsiento3(CreateView):
 			aux = 0
 			aux1 = 0
 			aux2 = 0
-			e = self.model.objects.filter(tipo_trans='E').exclude(anulado=True).count()
-			i = self.model.objects.filter(tipo_trans='I').exclude(anulado=True).count()
-			t = self.model.objects.filter(tipo_trans='T').exclude(anulado=True).count()
+			e = self.model.objects.filter(tipo_trans='E').exclude(anulado=True, cerrado=True).count()
+			i = self.model.objects.filter(tipo_trans='I').exclude(anulado=True, cerrado=True).count()
+			t = self.model.objects.filter(tipo_trans='T').exclude(anulado=True, cerrado=True).count()
 			if (e == None) & (form.tipo_trans=='E'):
 				form.numero_comp = 1
 			elif (e!= None) & (form.tipo_trans=='E'):
@@ -2292,13 +2292,54 @@ class updateCierreGestion(UpdateView):
 			form.save(commit=False)
 			if form.cleaned_data['cerrado'] == True:
 				year = self.model.objects.get(id=pk1).year
-				asientos = encabezadoas.objects.filter(fecha__year=year).update(cerrado=True)
-				ingresos = encingresoitem.objects.filter(fecha__year=year).update(cerrado=True)
-				salidas = encsalidaitem.objects.filter(fecha__year=year).update(cerrado=True)
+				asientos = encabezadoas.objects.filter(fecha__year=year).exclude(Q(fecha__month=10) | Q(fecha__month=11) | Q(fecha__month=12)).update(cerrado=True)
+				ingresos = encingresoitem.objects.filter(fecha__year=year).exclude(Q(fecha__month=10) | Q(fecha__month=11) | Q(fecha__month=12)).update(cerrado=True)
+				salidas = encsalidaitem.objects.filter(fecha__year=year).exclude(Q(fecha__month=10) | Q(fecha__month=11) | Q(fecha__month=12)).update(cerrado=True)
 			form.save()
 			return HttpResponseRedirect(reverse_lazy(self.success_url))
 		else:
 			return self.render_to_response(self.get_context_data(form=form))
+
+class renumerarComprobantes(FormView):
+	form_class = renumerarComprobantesForm
+	success_url = 'contabilidad:listaasiento'
+	template_name = 'contabilidad/renum_comp.html'
+
+	def get_context_data(self, **kwargs):
+		context = super(renumerarComprobantes, self).get_context_data(**kwargs)
+		if 'form' not in context:
+			context['form'] = self.form_class()
+		return context
+
+	def post(self, request, *args, **kwargs):
+		form = self.form_class(request.POST)
+		if form.is_valid():
+			ingreso = encabezadoas.objects.filter(tipo_trans='I').exclude(anulado=True)
+			egreso = encabezadoas.objects.filter(tipo_trans='E').exclude(anulado=True)
+			traspaso = encabezadoas.objects.filter(tipo_trans='T').exclude(anulado=True)
+			cont_ing = 1
+			cont_egr = 1
+			cont_trasp = 1
+
+			for i in ingreso:
+				i.numero_comp=cont_ing
+				i.save()
+				cont_ing += 1
+
+			for e in egreso:
+				e.numero_comp=cont_egr
+				e.save()
+				cont_egr += 1
+
+			for t in traspaso:
+				t.numero_comp=cont_trasp
+				t.save()
+				cont_trasp += 1
+
+			return HttpResponseRedirect(reverse_lazy(self.success_url))
+		else:
+			self.render_to_response(self.get_context_data(form=form))
+
 
 # Reportes
 class listaLibroMayor(CreateView, ListView):

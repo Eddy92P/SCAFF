@@ -68,7 +68,7 @@ class crearSubCategoriaForm(ModelForm):
 		widgets = {
 			'almacen':autocomplete.ModelSelect2(url='almacenes:almacen_autocomplete'),
 			'categoria':autocomplete.ModelSelect2(url='almacenes:categoria_autocomplete', forward=['almacen']),
-			
+			'codigo':forms.HiddenInput(),
 		} 
 	
 

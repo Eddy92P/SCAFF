@@ -387,6 +387,19 @@ class subcategoria(models.Model):
 				)
 			]
 		)
+	codigo = models.CharField(
+		max_length=4,
+		null=False,
+		blank=False,
+		default='0',
+		validators=[
+			RegexValidator(
+				regex=r'^[0-9]',
+				message='El campo sólo debe contener números',
+				code='Numero Invalido'
+				)
+			]
+		)
 
 
 	def total_cant_e(self, f1, f2):
@@ -474,6 +487,7 @@ class item(models.Model):
 	unidad = models.ForeignKey(unidad)
 	codigo = models.CharField(
 		max_length=15,
+		unique=False,
 		null=False,
 		blank=False,
 		validators=[
@@ -1058,15 +1072,15 @@ class salidaitem(models.Model):
 		default=0,
 		max_digits=10,
 		decimal_places=2,
-		null=False,
-		blank=False
+		null=True,
+		blank=True
 		)
 	sub_total = models.DecimalField(
 		default=0,
 		max_digits=12,
 		decimal_places=2,
-		null=False,
-		blank=False
+		null=True,
+		blank=True
 		)
 	observaciones = models.CharField(
 		max_length=200,

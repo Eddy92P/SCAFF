@@ -59,7 +59,6 @@
         <div class="card-header bg-light">
             <i><h4 style="text-decoration-line: underline;"><b>Consideraciones a tomar en cuenta para llenar el Ingreso</b></h4></i>
             <p style="color: red;">* No se deben ingresar items sin antes haber llenado todos los datos del encabezado.</p>
-            <p>* El botón de <b>IVA</b> se debe seleccionar una vez llenado todo el formulario.</p>
             <p>* En caso de que por alguna razón no cuadren los totales, intente presionar cualquier tecla.</p>
             <p>* Se pueden eliminar registros de la base de datos mediante el botón <b>"quitar fila"</b> y para actualizar los <b>TOTALES</b> debe volver a ingresar al formulario y presionar cualquier tecla.</p>
         </div>                        
@@ -256,7 +255,10 @@
                                             {% endfor %}
                                         {% endif %}
                                         {{ crear_salida_form.observaciones }}
-                                </td>                                   
+                                </td>
+                                <td>
+                                            {{ crear_ingreso_form.DELETE }}
+                                        </td>                                     
                             </tr>
                             {{ crear_salida_form.media }}      
                         {% endfor %}
@@ -276,7 +278,7 @@
 
     $('.formset_row').formset({ 
     addText: 'añadir fila', 
-    deleteText: 'quitar fila', 
+    deleteText: 'eliminar', 
     prefix: 'salidaitem_set',
     addCssClass: 'button1',
     deleteCssClass: 'button2'

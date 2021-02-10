@@ -381,9 +381,22 @@ class listaCategoria(CreateView,ListView):
 		return object_list
 
 class crearSubCategoria(CreateView):
+	model = subcategoria
 	form_class = crearSubCategoriaForm
 	template_name = 'almacen/nuevasubcategoria.html'
-	success_url = reverse_lazy('almacenes:listasubcategoria')
+	success_url = 'almacenes:listasubcategoria'
+
+	def post(self, request, *args, **kwargs):
+		self.object = self.get_object
+		form = self.form_class(request.POST)
+		if form.is_valid():
+			form = form.save(commit=False)
+			cant = self.model.objects.filter(categoria__id=form.categoria.id).count()
+			form.codigo = str(cant + 1)
+			form.save()
+			return HttpResponseRedirect(reverse_lazy(self.success_url))
+		else:
+			return self.render_to_response(self.get_context_data(form=form))
 
 class updateSubCategoria(UpdateView):
 	model = subcategoria
@@ -435,7 +448,7 @@ class crearItem(CreateView):
 		form = self.form_class(request.POST)
 		if form.is_valid():
 			form = form.save(commit=False)
-			aux = str(form.subcategoria.categoria.id) + '-' + str(form.subcategoria.id) + '-' + form.codigo.zfill(4)
+			aux = str(form.subcategoria.categoria.id) + '-' + form.subcategoria.codigo + '-' + form.codigo.zfill(4)
 			form.codigo = aux
 			form.save()
 			return HttpResponseRedirect(reverse_lazy(self.success_url))
@@ -704,7 +717,10 @@ class salidaItem(CreateView):
 			persona = crear_personal_form_set.save(commit=False)
 			salida = crear_salida_form_set.save(commit=False)
 			for formset in salida:
-				a = itemalmacen.objects.get(item = formset.item)
+				try:
+					a = itemalmacen.objects.get(item = formset.item)
+				except Exception as e:
+					return self.render_to_response(self.get_context_data(form1 = form1, crear_salida_form_set = crear_salida_form_set, crear_personal_form_set = crear_personal_form_set, error='El item ' + str(formset.item)+ ' no se ha ingresado aún'))
 				if a.cantidad < formset.cantidad:
 					return self.render_to_response(self.get_context_data(form1 = form1, crear_salida_form_set = crear_salida_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad excede el stock actual de '+ str(a.cantidad) + ' del item ' + a.item.nombre + ', por favor verifique los datos'))
 				elif a.cantidad < formset.item.minimo:
@@ -714,7 +730,7 @@ class salidaItem(CreateView):
 						aux = ingresoitem.objects.filter(item = formset.item, encingresoitem__fecha__lte=form1.fecha).aggregate(total=Sum('cantidad'))
 						aux1 = salidaitem.objects.filter(item = formset.item, encsalidaitem__fecha__lte=form1.fecha).aggregate(total=Sum('cantidad'))
 						aux2 = ingresoitem.objects.filter(item = formset.item, encingresoitem__fecha__lte=form1.fecha).aggregate(total=Sum('sub_total'))
-						
+
 						if aux1['total'] == None:
 							aux1['total'] = 0
 						res = aux['total'] - aux1['total']
@@ -722,14 +738,12 @@ class salidaItem(CreateView):
 						formset.costo_unit = round(res1, 2)
 						formset.sub_total = Decimal(formset.cantidad) * res1
 						a.cantidad = a.cantidad - formset.cantidad
-						if a.cantidad < formset.item.minimo:
-							return self.render_to_response(self.get_context_data(form = form, crear_salida_form_set = crear_salida_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad excede el minimo permitido de '+ str(formset.item.minimo) + ' del item ' + a.item.nombre + ', por favor verifique los datos'))
-						else:
-							form1.save()
-							crear_salida_form_set.save()
-							crear_personal_form_set.save()
-							form.save_m2m()
-							a.save()
+						
+						form1.save()
+						crear_salida_form_set.save()
+						crear_personal_form_set.save()
+						form.save_m2m()
+						a.save()
 					except Exception as e:
 						raise ValueError('La cantidad de salida excede el saldo existente a la fecha especificada, o la fecha de salida es anterior a la fecha de ingreso, verifique los datos')
 

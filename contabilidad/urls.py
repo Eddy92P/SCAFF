@@ -436,4 +436,8 @@ urlpatterns = [
         permission_required('auth.view_contabilidad')(login_required(updateCierreGestion.as_view())), 
         name='cierregestion'
     ),
+    url(r'^renum_comp/$',
+        permission_required('auth.view_contabilidad')(login_required(renumerarComprobantes.as_view())), 
+        name='renum_comp'
+    ),
 ]

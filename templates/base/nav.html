@@ -126,6 +126,9 @@
             {% endif %}
           </ul>
           </li>
+          {% if perms.contabilidad.add_asiento %}
+          <li><a href="{% url 'contabilidad:renum_comp' %}">Renumerar comprobantes</a></li>
+          {% endif %}
           </ul>
         </li>
         <li class="dropdown">

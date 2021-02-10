@@ -529,6 +529,9 @@ class crearCierreGestionForm(forms.ModelForm):
 			'cerrado': 'Cerrar Gestion'
 		}
 
+class renumerarComprobantesForm(forms.Form):
+	campo = forms.BooleanField(label="Renumerar")
+
 class repCostoServicioForm(forms.Form):
 	campo = forms.CharField(label="Desde", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
 	campo1 = forms.CharField(label="Hasta", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
