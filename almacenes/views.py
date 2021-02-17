@@ -819,6 +819,7 @@ class updateSalidaItem(UpdateView):
 			persona = crear_personal_form_set.save(commit=False)
 			salida = crear_salida_form_set.save(commit=False)
 
+			print(crear_salida_form_set)
 			for obj in crear_salida_form_set.deleted_objects:
 				obj.delete()
 
