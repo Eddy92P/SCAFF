@@ -136,7 +136,7 @@ class crearAsientoForm(forms.ModelForm):
 		
             	
 		
-crearAsientoFormSet = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=4, min_num=1, validate_min=True)
+crearAsientoFormSet = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=7, min_num=1, validate_min=True)
 updateAsientoFormSet = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=1)
 
 

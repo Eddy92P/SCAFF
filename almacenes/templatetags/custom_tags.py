@@ -311,9 +311,19 @@ def costo_u_p_e(ingresoitem, f1, f2):
 def imp_p_e(ingresoitem, f1, f2):
 	return ingresoitem.importe_proveedor_e(f1, f2)
 
+@register.simple_tag
+def total_cat_ing(ingresoitem, f1, f2):
+	return ingresoitem.total1(f1, f2)
 
+@register.simple_tag
+def total_subcat_ing(ingresoitem, f1, f2):
+	return ingresoitem.total(f1, f2)
 
+@register.simple_tag
+def total_cat_sal(salidaitem, f1, f2):
+	return salidaitem.total1(f1, f2)
 
-
-
+@register.simple_tag
+def total_subcat_sal(salidaitem, f1, f2):
+	return salidaitem.total(f1, f2)
 

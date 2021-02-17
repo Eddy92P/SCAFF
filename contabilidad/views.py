@@ -59,7 +59,7 @@ class crearAsiento(CreateView):
 			aux3 = zip(aux1, aux2)
 			aux6 = zip(aux4, aux5)
 			total_ingreso_objects = ingreso.ingresoitem_set.all().count()
-			crearAsientoFormSetIng = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=total_ingreso_objects)
+			crearAsientoFormSetIng = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=total_ingreso_objects*2)
 			if ingreso.iva == True:
 				crear_asiento_form_set = crearAsientoFormSetIng(initial=[{'nivel_cinco': i, 'debe_b': j} for i, j in aux3])
 			else:
@@ -153,7 +153,7 @@ class crearAsiento1(crearAsiento):
 				aux4.append(0)
 			aux3 = zip(aux1, aux2, aux4)
 			total_salida_objects = aux.salida_item_set.all().count()
-			crearAsientoFormSetSal = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=total_salida_objects)
+			crearAsientoFormSetSal = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=total_salida_objects*2)
 			crear_asiento_form_set = crearAsientoFormSetSal(initial=[{'nivel_cinco': i, 'debe_b': k, 'haber_b': j} for i, j, k in aux3])
 		except Exception as e:
 			crear_asiento_form_set = crearAsientoFormSet()

@@ -1,3 +1,4 @@
+{% load custom_tags %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -84,7 +85,7 @@
                 }
                 #fuente2{
                     font-size: 12px;
-                    padding-left: 3px;
+                    padding-left: 2px;
                     text-align: left;
                 }
                 #fuente3{
@@ -161,17 +162,17 @@
                                     <td colspan="3" id="fuente">{{ i.sub_total }}</td>
                                 </tr>
                                 {% endfor %}
-                                {% for m in res1.list %}
+                                {% for m in res3.list %}
                                     {% ifchanged res3.grouper %}
                                         <tr>
                                             <td colspan="21" id="fuente2"><b>TOTAL.- {{ res3.grouper|upper }}</b></td>
-                                            <td colspan="3" id="fuente">{{ m.total }}</td>
+                                            <td colspan="3" id="fuente">{% total_subcat_ing m f1 f2 %}</td>
                                         </tr>
                                     {% endifchanged %}
                                     {% ifchanged res3.grouper.categoria %}
                                         <tr>
                                             <td colspan="21" id="fuente2"><b>TOTAL.- {{ res3.grouper.categoria|upper }}</b></td>
-                                            <td colspan="3" id="fuente">{{ m.total1 }}</td>
+                                            <td colspan="3" id="fuente">{% total_cat_ing m f1 f2 %}</td>
                                         </tr>
                                     {% endifchanged %}
                                 {% endfor %}

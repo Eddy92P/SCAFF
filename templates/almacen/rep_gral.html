@@ -13,7 +13,7 @@
         {% block layout_style %}
             <style type="text/css">
                 @page {
-                    size: {{ pagesize|default:"Letter" }};
+                    size: {{ pagesize|default:"Landscape" }};
                     margin-left: 2.2cm;
                     margin-right: 0.5cm;
                     margin-top: 1cm;
@@ -85,7 +85,7 @@
                 }
                 #fuente2{
                     font-size: 12px;
-                    padding-left: 3px;
+                    padding-left: 2px;
                     text-align: left;
                 }
                 #fuente3{
@@ -137,7 +137,7 @@
                         <tr>
                             <th style="background-color: #219FB5;" colspan="3" rowspan="2">Código</th>
                             <th style="background-color: #219FB5;" colspan="3" rowspan="2">Descripción</th>
-                            <th style="background-color: #219FB5;" colspan="1" rowspan="2">Unid.</th>
+                            <th style="background-color: #219FB5;" colspan="1" rowspan="2">Unid</th>
                             <th style="background-color: #219FB5;" colspan="5">Saldo al {{ fecha3 }}</th>
                             <th style="background-color: #219FB5;" colspan="5">ENTRADAS</th>
                             <th style="background-color: #219FB5;" colspan="5">SALIDAS</th>
@@ -157,11 +157,37 @@
                     <tbody>
                     {% regroup res by subcategoria as res_categ %}
                     {% for res3 in res_categ %}
+                        {% ifchanged res3.grouper.categoria %}
+                                <tr>
+                                    <td id="fuente3" colspan="7"><b>TOTAL.- {{ res3.grouper.categoria.nombre|upper }}</b></td>
+                                    {% cat_a_t res3.grouper.categoria f1 as categoria_a_t %}
+                                    {% if categoria_a_t == 0 %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
+                                    {% else %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% cat_a_t res3.grouper.categoria f1 %}</td>
+                                    {% endif %}
+                                    {% tot_categ_e res3.grouper.categoria f1 f2 as total_categ_e %}
+                                    {% if total_categ_e == 0 %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
+                                    {% else %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% tot_categ_e res3.grouper.categoria f1 f2 %}</td>
+                                    {% endif %}
+                                    {% tot_categ_s res3.grouper.categoria f1 f2 as total_categ_s %}
+                                    {% if total_categ_s == 0 %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
+                                    {% else %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% tot_categ_s res3.grouper.categoria f1 f2 %}</td>
+                                    {% endif %}
+                                    {% cat_t res3.grouper.categoria f1 f2 as categoria_t %}
+                                    {% if categoria_t == 0 %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
+                                    {% else %}
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% cat_t res3.grouper.categoria f1 f2 %}</td>
+                                    {% endif %}
+                                </tr>
+                            {% endifchanged %}
                         <tr>
-                            <td id="fuente3" colspan="7"><b>{{ res3.grouper.categoria.nombre|upper }}</b></td>
-                        </tr>
-                        <tr>
-                            <td id="fuente3" colspan="7"><b>{{ res3.grouper.nombre|upper }}</b></td>
+                            <td id="fuente3" colspan="8"><b>{{ res3.grouper.nombre|upper }}</b></td>
                         </tr>
                         {% for i in res3.list %}
                             <tr>
@@ -211,36 +237,6 @@
                                 {% endif %}
                             </tr>  
                         {% endfor %}
-                            {% ifchanged res3.grouper.categoria.nombre %}
-                                <tr>
-                                    <td id="fuente3" colspan="7"><b>TOTAL.- {{ res3.grouper.categoria.nombre|upper }}</b></td>
-                                    {% cat_a_t res3.grouper.categoria f1 as categoria_a_t %}
-                                    {% if categoria_a_t == 0 %}
-                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
-                                    {% else %}
-                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% cat_a_t res3.grouper.categoria f1 %}</td>
-                                    {% endif %}
-                                    {% tot_categ_e res3.grouper.categoria f1 f2 as total_categ_e %}
-                                    {% if total_categ_e == 0 %}
-                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
-                                    {% else %}
-                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% tot_categ_e res3.grouper.categoria f1 f2 %}</td>
-                                    {% endif %}
-                                    {% tot_categ_s res3.grouper.categoria f1 f2 as total_categ_s %}
-                                    {% if total_categ_s == 0 %}
-                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
-                                    {% else %}
-                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% tot_categ_s res3.grouper.categoria f1 f2 %}</td>
-                                    {% endif %}
-                                    {% cat_t res3.grouper.categoria f1 f2 as categoria_t %}
-                                    {% if categoria_t == 0 %}
-                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5"> </td>
-                                    {% else %}
-                                    <td id="fuente" style="border-style: none; border-left: 1px solid black; border-right: 1px solid black;" colspan="5">{% cat_t res3.grouper.categoria f1 f2 %}</td>
-                                    {% endif %}
-                                </tr>
-                            {% endifchanged %}
-        
                             {% ifchanged res3.grouper.nombre %}
                                 <tr>
                                     <td id="fuente3" colspan="7"><b>TOTAL.- {{ res3.grouper.nombre|upper }}</b></td>
@@ -270,6 +266,7 @@
                                     {% endif %}
                                 </tr>    
                             {% endifchanged %}
+                            
                             {% if forloop.last %}
                                 {% for i in res|slice:":1" %}
                                     <tr>

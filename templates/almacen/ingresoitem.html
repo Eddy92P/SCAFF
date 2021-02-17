@@ -63,10 +63,11 @@
                         if($(this).is(':checked'))
                         {
                             var debe = $("#id_total");
-                            var iva = precio_unit-(precio_unit*0.13);
-                            var iva2 = costo_t-(costo_t*0.13);
+                            var iva = precio_unit - (precio_unit * 0.13);
+                            var iva2 = costo_t - (costo_t * 0.13);
                             c_unit = p.eq(4).val(iva.toFixed(2));
-                            s_total = p.eq(5).val(iva2.toFixed(2));
+                            var s_total_actualizado = p.eq(6).val(iva2.toFixed(2));
+                            s_total = p.eq(7).val(iva2.toFixed(2));
                             var aux = 0;
                             var aux1 = 0;
                             var dif = 0;
@@ -75,7 +76,7 @@
                             $(".table tbody tr").each(function(){
                                 var p = $(this).find('input');
                                 var aux4 = p.eq(2).val();
-                                var aux5 = p.eq(5).val();
+                                var aux5 = p.eq(7).val();
                                 aux += parseFloat(aux4) || 0;
                                 aux1 += parseFloat(aux5) || 0;
                                 aux2.val(aux.toFixed(2));
@@ -105,9 +106,10 @@
                                     precio_unit = costo_t/cant;
                                     var p_unit = p.eq(3).val(precio_unit.toFixed(2));
                                     var c_unit = p.eq(4).val(precio_unit.toFixed(2));
-                                    var s_total = p.eq(5).val(costo_t);
+                                    var s_total_actualizado = p.eq(6).val(costo_t);
+                                    var s_total = p.eq(7).val(costo_t);
                                     var aux4 = p.eq(2).val();
-                                    var aux5 = p.eq(5).val();
+                                    var aux5 = p.eq(7).val();
                                     aux += parseFloat(aux4) || 0;
                                     aux1 += parseFloat(aux5) || 0;
                                     aux2.val(aux.toFixed(2));

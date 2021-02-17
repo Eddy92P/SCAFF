@@ -940,12 +940,12 @@ class ingresoitem(models.Model):
 	def encabezado(self):
 		return self.encingresoitem
 
-	def total(self):
-		res = ingresoitem.objects.filter(item__subcategoria=self.item.subcategoria, encingresoitem__fecha=self.encingresoitem.fecha).aggregate(total=Sum('sub_total'))
+	def total(self, f1, f2):
+		res = ingresoitem.objects.filter(item__subcategoria=self.item.subcategoria, encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('sub_total'))
 		return res['total']
 	
-	def total1(self):
-		res = ingresoitem.objects.filter(item__categoria=self.item.categoria, encingresoitem__fecha=self.encingresoitem.fecha).aggregate(total=Sum('sub_total'))
+	def total1(self, f1, f2):
+		res = ingresoitem.objects.filter(item__categoria=self.item.categoria, encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('sub_total'))
 		return res['total']
 	
 	def total2(self):
@@ -1103,12 +1103,12 @@ class salidaitem(models.Model):
 	def encabezado(self):
 		return self.encsalidaitem
 
-	def total(self):
-		res = salidaitem.objects.filter(item__subcategoria=self.item.subcategoria, encsalidaitem__fecha=self.encsalidaitem.fecha).aggregate(total=Sum('sub_total'))
+	def total(self, f1, f2):
+		res = salidaitem.objects.filter(item__subcategoria=self.item.subcategoria, encsalidaitem__fecha=(f1, f2)).aggregate(total=Sum('sub_total'))
 		return res['total']
 	
-	def total1(self):
-		res = salidaitem.objects.filter(item__categoria=self.item.categoria, encsalidaitem__fecha=self.encsalidaitem.fecha).aggregate(total=Sum('sub_total'))
+	def total1(self, f1, f2):
+		res = salidaitem.objects.filter(item__categoria=self.item.categoria, encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('sub_total'))
 		return res['total']
 	
 	def total2(self):

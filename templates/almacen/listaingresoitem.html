@@ -122,7 +122,7 @@
 				  					<td>
 				  						<div class="btn-group">
 										
-											{% if perms.almacenes.change_ingresoitem %}
+											{% if perms.almacenes.change_ingresoitem and obj.cerrado == False %}
                                         		<a href="{% url 'almacenes:updateingreso' obj.id %}" type="button" class="btn btn-primary" title="editar">
                                             	<span class="glyphicon glyphicon-edit" aria-hidden="true">
                                         		</a>

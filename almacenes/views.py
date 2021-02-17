@@ -948,6 +948,8 @@ class reporteDiarioE(PDFTemplateView):
 		context['res'] = ingresoitem.objects.filter(encingresoitem__fecha__range=(f1, f2)).order_by('encingresoitem__fecha')
 		context['fecha1'] = fecha1
 		context['fecha2'] = fecha2
+		context['f1'] = f1
+		context['f2'] = f2
 
 		return context
 
@@ -973,6 +975,8 @@ class reporteDiarioS(PDFTemplateView):
 		context['res'] = salidaitem.objects.filter(encsalidaitem__fecha__range=(f1, f2)).order_by('encsalidaitem__fecha')
 		context['fecha1'] = fecha1
 		context['fecha2'] = fecha2
+		context['f1'] = f1
+		context['f2'] = f2
 		return context
 
 class reporteKardexVal(PDFTemplateView):

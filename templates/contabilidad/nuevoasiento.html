@@ -514,6 +514,9 @@
             var p1 = $(this).find('input');
             var p = $(this).find('select');
             var toll_venta_fila = $(fila[index-3]).find('input');
+            var monto_descontar_fila = $(fila[index-5]).find('input');
+            var imp_transacc_fila = $(fila[index-4]).find('input');
+            var imp_transacc_pagar_fila = $(fila[index-1]).find('input');
             var a = $(fila[index-2]).find('input');
             var q2 = $(fila[index+1]).find('select');
             var q1 = $(fila[index+1]).find('input');
@@ -546,9 +549,13 @@
                     var descuento_venta_id = p1.eq(2).attr("id");
                     var descuento_iva_venta_id = q1.eq(2).attr("id");
                     var toll_venta = toll_venta_fila.eq(3).val();
-                    var imp_transacc_pagar_venta = a.eq(3).val();
+                    var imp_transacc_pagar_venta = imp_transacc_pagar_fila.eq(3).val();
                     var toll_venta_id = toll_venta_fila.eq(3).attr("id");
-                    var imp_transacc_pagar_venta_id = a.eq(3).attr("id");
+                    var imp_transacc_pagar_venta_id = imp_transacc_pagar_fila.eq(3).attr("id");
+                    var monto_descontar = monto_descontar_fila.eq(2).val();
+                    var monto_descontar_id = monto_descontar_fila.eq(2).attr("id");
+                    var imp_transacc = imp_transacc_fila.eq(2).val();
+                    var imp_transacc_id = imp_transacc_fila.eq(2).attr("id");
                     if(valor=="F")
                     {
                         p1.eq(8).val(aux1);
@@ -595,7 +602,7 @@
                                 type: 'GET',
                                 url: '{% url 'contabilidad:cuenta' %}',
                             }).then(function (data) {
-                                console.log(data)
+                                
                                 var option = new Option(data[6].fields.codigo+" "+data[6].fields.descripcion, data[6].pk, true, true);
                                 cuentaSelect.append(option).trigger('change');
                                 cuentaSelect.trigger({
@@ -1187,7 +1194,7 @@
                                 type: 'GET',
                                 url: '{% url 'contabilidad:cuenta' %}',
                             }).then(function (data) {
-                                console.log(data)
+                                
                                 var option = new Option(data[4].fields.codigo+" "+data[4].fields.descripcion, data[4].pk, true, true);
                                 cuentaSelect.append(option).trigger('change');
                                 cuentaSelect.trigger({
@@ -1303,20 +1310,18 @@
                         }
                         else if(valor=="D" && valor2=="V")
                         {
-                            var iva_credit = parseFloat(descuento_venta) * 0.13;
-                            var result1 = parseFloat(iva_credit).toFixed(3);
-                            var result2 = String(result1) + '1';
-                            $('#'+descuento_iva_venta_id).val(parseFloat(result2).toFixed(2));
-                            var descuento_result = parseFloat(descuento_venta) - parseFloat(result2).toFixed(2);
-                            $('#'+descuento_venta_id).val(parseFloat(descuento_result).toFixed(2));
-                            var toll_total = parseFloat(toll_venta) + parseFloat(descuento_result);
-                            var result3 = parseFloat(toll_total.toFixed(3));
-                            var result4 = String(result3) + '1';
-                            $('#'+toll_venta_id).val(parseFloat(result4).toFixed(2));
-                            var imp_trans_pag_venta_total = parseFloat(imp_transacc_pagar_venta) + parseFloat(iva_credit);
-                            var result5 = parseFloat(imp_trans_pag_venta_total).toFixed(3);
-                            var result6 = String(result5) + '1';
-                            $('#'+imp_transacc_pagar_venta_id).val(parseFloat(result6).toFixed(2));
+                            var monto_descontado = parseFloat(monto_descontar) - parseFloat(descuento_venta);
+                            var imp_transacc_descontado = parseFloat(imp_transacc) - ((parseFloat(descuento_venta) * 0.03).toFixed(2));
+                            var imp_transacc_pagar_descontado = parseFloat(imp_transacc_pagar_venta) - ((parseFloat(descuento_venta) * 0.03).toFixed(2));
+                            var descuento_iva_venta_descontado = parseFloat(descuento_venta) * 0.13;
+                            var descuento_venta_total = parseFloat(descuento_venta) - parseFloat(descuento_iva_venta_descontado)
+
+                            $('#'+monto_descontar_id).val(parseFloat(monto_descontado));
+                            $('#'+imp_transacc_id).val(parseFloat(imp_transacc_descontado));
+                            $('#'+imp_transacc_pagar_venta_id).val(parseFloat(imp_transacc_pagar_descontado));
+                            $('#'+descuento_iva_venta_id).val(parseFloat(descuento_iva_venta_descontado).toFixed(2));
+                            $('#'+descuento_venta_id).val(parseFloat(descuento_venta_total).toFixed(2));
+
                             $('#'+opc10).select2({
                             ajax:   {
                                 url: '{% url 'contabilidad:cuenta' %}'
@@ -1514,7 +1519,6 @@
         });
     });
     $(document).on('submit', function(){
-        console.log('hola')
         $(".table tbody tr").each(function(){
             var p = $(this).find('input');
             var debe = p.eq(2).val();
