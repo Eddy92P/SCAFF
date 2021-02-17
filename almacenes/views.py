@@ -838,9 +838,8 @@ class updateSalidaItem(UpdateView):
 							aux1['total'] = 0
 						res = aux['total'] - aux1['total']
 						res1 = aux2['total']/Decimal(res)
-						if (formset.costo_unit == 0) | (formset.sub_total == 0):
-							formset.costo_unit = round(res1, 2)
-							formset.sub_total = Decimal(formset.cantidad) * res1
+						formset.costo_unit = round(res1, 2)
+						formset.sub_total = Decimal(formset.cantidad) * res1
 						s = salidaitem.objects.filter(item = formset.item, encsalidaitem=pk1, id=formset.id).aggregate(total=Sum('cantidad'))
 						if s['total'] == None:
 							a.cantidad = a.cantidad - formset.cantidad
@@ -862,12 +861,12 @@ class updateSalidaItem(UpdateView):
 								return self.render_to_response(self.get_context_data(form = form, crear_salida_form_set = crear_salida_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad excede el mínimo permitido de '+ str(formset.item.minimo) + ' del item ' + a.item.nombre + ', por favor verifique los datos'))
 							else:
 								a.save()
-						form1.save()
 						crear_salida_form_set.save()
 						crear_personal_form_set.save()
 						form.save_m2m()
 					except Exception as e:
-						raise ValueError('La cantidad de salida excede el saldo existente a la fecha especificada, o la fecha de salida es anterior a la fecha de ingreso, verifique los datos')
+						return self.render_to_response(self.get_context_data(form = form, crear_salida_form_set = crear_salida_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad de salida de uno de los items excede el saldo existente a la fecha especificada, o la fecha de salida es anterior a la fecha de ingreso, verifique los datos'))
+			form1.save()
 					
 			return HttpResponseRedirect(reverse_lazy(self.success_url))
 		else:
