@@ -645,6 +645,10 @@ class updateIngresoItem(UpdateView):
 			ingreso = crear_ingreso_form_set.save(commit=False)
 
 			for obj in crear_ingreso_form_set.deleted_objects:
+				if (obj.cantidad != 0) | (obj.cantidad != None):
+					item_alm = itemalmacen.objects.get(item = obj.item)
+					item_alm.cantidad -= obj.cantidad
+					item_alm.save()
 				obj.delete()
 
 			for formset in ingreso:
@@ -670,7 +674,7 @@ class updateIngresoItem(UpdateView):
 							a[0].save()
 					elif(formset.cantidad < i['total']):
 						aux = i['total'] - formset.cantidad
-						a[0].cantidad = a[0].cantidad + aux
+						a[0].cantidad = a[0].cantidad - aux
 						if a[0].cantidad >= formset.item.maximo:
 							return self.render_to_response(self.get_context_data(form = form, crear_ingreso_form_set = crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad excede el maximo permitido de '+ str(formset.item.maximo) + ' del item ' + a.item.nombre + ', por favor verifique los datos'))
 						else:
@@ -819,8 +823,11 @@ class updateSalidaItem(UpdateView):
 			persona = crear_personal_form_set.save(commit=False)
 			salida = crear_salida_form_set.save(commit=False)
 
-			print(crear_salida_form_set)
 			for obj in crear_salida_form_set.deleted_objects:
+				if (obj.cantidad != 0) | (obj.cantidad != None):
+					item_alm = itemalmacen.objects.get(item = obj.item)
+					item_alm.cantidad += obj.cantidad
+					item_alm.save()
 				obj.delete()
 
 			for formset in salida:
@@ -857,7 +864,7 @@ class updateSalidaItem(UpdateView):
 								a.save()
 						elif(formset.cantidad < s['total']):
 							aux = s['total'] - formset.cantidad
-							a.cantidad = a.cantidad - aux
+							a.cantidad = a.cantidad + aux
 							if a.cantidad < formset.item.minimo:
 								return self.render_to_response(self.get_context_data(form = form, crear_salida_form_set = crear_salida_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad excede el mínimo permitido de '+ str(formset.item.minimo) + ' del item ' + a.item.nombre + ', por favor verifique los datos'))
 							else:
