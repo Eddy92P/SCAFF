@@ -47,7 +47,9 @@ INSTALLED_APPS = [
     'openpyxl',
     'dal',
     'dal_select2',
-    'import_export'
+    'import_export',
+    'debug_toolbar',
+    'memoize',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +60,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+]
+
+INTERNAL_IPS = [
+    # ...
+    '127.0.0.1',
+    # ...
 ]
 
 ROOT_URLCONF = 'SCAFF.urls'
@@ -170,3 +179,45 @@ REST_FRAMEWORK = {
         #'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+"""LOGGING = {
+
+    'version': 1,
+
+    'filters': {
+
+        'require_debug_true': {
+
+            '()': 'django.utils.log.RequireDebugTrue',
+
+        }
+
+     },
+
+     'handlers': {
+
+        'console': {
+
+            'level': 'DEBUG',
+
+            'filters': ['require_debug_true'],
+
+            'class': 'logging.StreamHandler',
+
+         }
+
+    },
+
+    'loggers': {
+
+        'django.db.backends': {
+
+            'level': 'DEBUG',
+
+            'handlers': ['console'],
+
+        }
+
+    }
+
+}"""

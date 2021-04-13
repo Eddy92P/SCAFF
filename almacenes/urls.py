@@ -326,7 +326,87 @@ urlpatterns = [
         permission_required('auth.view_almacenes')(login_required(actualizarInventario.as_view())), 
         name='act_inventario'
     ),
-
+    # Reportes excel
+    url(r'^template_reporte_gral_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepGeneralTemplateExcel.as_view())), 
+        name='template_reporte_gral_excel'
+    ),
+    url(r'^reporte_gral_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepGeneralExcel.as_view())), 
+        name='reporte_gral_excel'
+    ),
+    url(r'^template_reporte_diarioent_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepDiarioEntTemplateExcel.as_view())), 
+        name='template_reporte_diarioent_excel'
+    ),
+    url(r'^reporte_diarioent_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepDiarioEntExcel.as_view())), 
+        name='reporte_diarioent_excel'
+    ),
+    url(r'^template_reporte_diariosal_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepDiarioSalTemplateExcel.as_view())), 
+        name='template_reporte_diariosal_excel'
+    ),
+    url(r'^reporte_diariosal_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepDiarioSalExcel.as_view())), 
+        name='reporte_diariosal_excel'
+    ),
+    url(r'^template_reporte_kardexval_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepKardexValTemplateExcel.as_view())), 
+        name='template_reporte_kardexval_excel'
+    ),
+    url(r'^reporte_kardexval_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepKardexValExcel.as_view())), 
+        name='reporte_kardexval_excel'
+    ),
+    url(r'^template_reporte_reskardexval_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepResKardexValTemplateExcel.as_view())), 
+        name='template_reporte_reskardexval_excel'
+    ),
+    url(r'^reporte_reskardexval_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepResKardexValExcel.as_view())), 
+        name='reporte_reskardexval_excel'
+    ),
+    url(r'^template_reporte_resumen_entsal_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepResumenEntSalTemplateExcel.as_view())), 
+        name='template_reporte_resumen_entsal_excel'
+    ),
+    url(r'^reporte_resumen_entsal_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepResumenEntSalExcel.as_view())), 
+        name='reporte_resumen_entsal_excel'
+    ),
+    url(r'^template_reporte_detalle_ent_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepDetalleEntTemplateExcel.as_view())), 
+        name='template_reporte_detalle_ent_excel'
+    ),
+    url(r'^reporte_detalle_ent_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepDetalleEntExcel.as_view())), 
+        name='reporte_detalle_ent_excel'
+    ),
+    url(r'^template_reporte_detalle_sal_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepDetalleSalTemplateExcel.as_view())), 
+        name='template_reporte_detalle_sal_excel'
+    ),
+    url(r'^reporte_detalle_sal_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepDetalleSalExcel.as_view())), 
+        name='reporte_detalle_sal_excel'
+    ),
+    url(r'^template_reporte_detalle_cliente_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepDetalleClienteTemplateExcel.as_view())), 
+        name='template_reporte_detalle_cliente_excel'
+    ),
+    url(r'^reporte_detalle_cliente_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepDetalleClienteExcel.as_view())), 
+        name='reporte_detalle_cliente_excel'
+    ),
+    url(r'^template_reporte_detalle_proov_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepDetalleProovTemplateExcel.as_view())), 
+        name='template_reporte_detalle_proov_excel'
+    ),
+    url(r'^reporte_detalle_proov_excel/$',
+        permission_required('auth.view_almacenes')(login_required(RepDetalleProovExcel.as_view())), 
+        name='reporte_detalle_proov_excel'
+    ),
 ]
 
 

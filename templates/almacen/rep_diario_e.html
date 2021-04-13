@@ -145,14 +145,13 @@
                     {% for res1 in res_fecha %}
                         {% regroup res1.list by item.subcategoria as res_categ %}
                             {% for res3 in res_categ %}
-                                {% for i in res3.list %}
+                            {% with ingr_list_by_subcat=res3.list %}
+                                {% for i in ingr_list_by_subcat %}
                                 <tr>
                                     <td colspan="2" id="fuente2">{{ i.encingresoitem.fecha_f }}</td>
                                     <td colspan="4" id="fuente2">{{ i.encingresoitem.proveedor.nombre }}</td>
-                                {% for j in i.encingresoitem.personal.all %}
-                                    {% if forloop.first %}
-                                        <td colspan="3" id="fuente2">{{ j.nombre }} {{ j.ap_paterno }}</td>
-                                    {% endif %}
+                                {% for j in i.encingresoitem.personal.all|slice:":1" %}
+                                    <td colspan="3" id="fuente2">{{ j.nombre }} {{ j.ap_paterno }}</td>
                                 {% endfor %}
                                     <td colspan="3" id="fuente2">{{ i.item.codigo }}</td>
                                     <td colspan="4" id="fuente2">{{ i.item.nombre }}</td>
@@ -161,21 +160,22 @@
                                     <td colspan="2" id="fuente">{{ i.costo_unit }}</td>
                                     <td colspan="3" id="fuente">{{ i.sub_total }}</td>
                                 </tr>
-                                {% endfor %}
-                                {% for m in res3.list %}
+                                {% if forloop.last %}
                                     {% ifchanged res3.grouper %}
                                         <tr>
                                             <td colspan="21" id="fuente2"><b>TOTAL.- {{ res3.grouper|upper }}</b></td>
-                                            <td colspan="3" id="fuente">{% total_subcat_ing m f1 f2 %}</td>
+                                            <td colspan="3" id="fuente">{% total_subcat_ing i i.encingresoitem.fecha %}</td>
                                         </tr>
                                     {% endifchanged %}
                                     {% ifchanged res3.grouper.categoria %}
                                         <tr>
                                             <td colspan="21" id="fuente2"><b>TOTAL.- {{ res3.grouper.categoria|upper }}</b></td>
-                                            <td colspan="3" id="fuente">{% total_cat_ing m f1 f2 %}</td>
+                                            <td colspan="3" id="fuente">{% total_cat_ing i i.encingresoitem.fecha %}</td>
                                         </tr>
                                     {% endifchanged %}
+                                {% endif %}
                                 {% endfor %}
+                            {% endwith %}
                             {% endfor %}
                     {% endfor %}
                     </tbody>

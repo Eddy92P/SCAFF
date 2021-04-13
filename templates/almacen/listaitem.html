@@ -33,7 +33,6 @@
 				    <tr>
 				      	<th style="color: #FFFFFF"><i>Código</i></th>
 				      	<th style="color: #FFFFFF"><i>Nombre</i></th>
-				      	<th style="color: #FFFFFF"><i>Control</i></th>
 				      	<th style="color: #FFFFFF"><i>Opciones</i></th>
 				    </tr>
 				  	</thead>
@@ -47,37 +46,11 @@
 				  				<tr style="background-color: #FFFFFF;">
 							      	<td>{{ obj.codigo }}</td>
 							      	<td>{{ obj.nombre }}</td>
-							      	{% if obj.itemalmacen_set.all %}
-							      		{% for res in obj.itemalmacen_set.all %}
-							      		{% if res.cantidad <= obj.minimo %}
-							      			<td>Cantidad mínima en almacen</td>
-							      		{% elif res.cantidad >= obj.maximo %}
-							      			<td>Cantidad máxima en almacen</td>
-							      		{% else %}
-							      			<td> </td>
-							      		{% endif %}
-							      		{% endfor %}
-							      	{% else %}
-							      		<td> </td>
-							      	{% endif %}
 							     
 							{% else %}
 								<tr style="background-color: #E3E3E3;">
 							      	<td>{{ obj.codigo }}</td>
 							      	<td>{{ obj.nombre }}</td>
-							      	{% if obj.itemalmacen_set.all %}
-							      		{% for res in obj.itemalmacen_set.all %}
-							      		{% if res.cantidad <= obj.minimo %}
-							      			<td>Cantidad mínima en almacen</td>
-							      		{% elif res.cantidad >= obj.maximo %}
-							      			<td>Cantidad máxima en almacen</td>
-							      		{% else %}
-							      			<td> </td>
-							      		{% endif %}
-							      		{% endfor %}
-							      	{% else %}
-							      		<td> </td>
-							      	{% endif %}
 							     
 				  			{% endif %}
 				  					<td>

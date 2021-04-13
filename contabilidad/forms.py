@@ -547,3 +547,18 @@ class XlsInputForm(forms.Form):
 			raise forms.ValidationError(u'no es un tipo valido')
 		else:
 			return input_excel
+
+class repBalanceGenForm(forms.Form):
+	CHOICES = (('G', 'Grupo'), ('R', 'Rubro'), ('T', 'Título'), ('C', 'Cuenta'), ('SC', 'Sub-Cta'))
+	campo = forms.CharField(label="Desde", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
+	campo1 = forms.CharField(label="Hasta", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
+	campo2 = forms.ChoiceField(label="Grupo", help_text="", choices=CHOICES)
+
+class repEstadoResultForm(forms.Form):
+	CHOICES = (('G', 'Grupo'), ('R', 'Rubro'), ('T', 'Título'), ('C', 'Cuenta'), ('SC', 'Sub-Cta'))
+	campo = forms.CharField(label="Desde", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
+	campo1 = forms.CharField(label="Hasta", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
+	campo2 = forms.ChoiceField(label="Grupo", help_text="", choices=CHOICES)
+
+class repEvoPatrimForm(forms.Form):
+	campo1 = forms.CharField(label="Hasta", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))

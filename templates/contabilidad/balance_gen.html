@@ -92,7 +92,7 @@
 </head>
 <body>
             <div>
-            {% if niv %}
+            {% if niv.exists %}
             <div>
                 <table>
                     <tr>
@@ -142,7 +142,6 @@
                 <table>
                     {% if campo3 == 'G' %}
                     {% for res in niv %}
-                    {% if res.nivel_dos_set.all %}
                     <tr>
                         <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black; padding-top: 3px;" colspan="2">
                             <b>{{ res.id }}</b>
@@ -150,18 +149,15 @@
                         <td style="border-right: 1px solid black; padding-top: 3px;" id="fuente" colspan="7">
                             <b><u>{{ res.descripcion }}</u></b>
                         </td>
-                        {% for i in res.nivel_dos_set.all %}
-                            {% ifchanged res.descripcion %}
-                                <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
-                                    {% saldo_b_d i f1 f2 %}
-                                </td>
-                                <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px; " colspan="2">
-                                    {% saldo_d_d i f1 f2 %}
-                                </td>
-                            {% endifchanged %}
-                        {% endfor %}
+                        {% ifchanged res.descripcion %}
+                            <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
+                                {% saldo_b_u_excel res f1 f2 %}
+                            </td>
+                            <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px; " colspan="2">
+                                {% saldo_d_u_excel res f1 f2 %}
+                            </td>
+                        {% endifchanged %}
                     </tr>
-                    {% endif %}
                         {% if forloop.last %}
                             <tr>
                                 <td style="border-left: 1px solid black; border-right: 1px solid black;" colspan="2">    
@@ -187,7 +183,6 @@
 
                     {% elif campo3 == 'R' %}
                     {% for res in niv %}
-                    {% if res.nivel_dos_set.all %}
                     <tr>
                         <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black; padding-top: 3px;" colspan="2">
                             <b>{{ res.id }}</b>
@@ -195,24 +190,17 @@
                         <td style="border-right: 1px solid black; padding-top: 3px;" id="fuente" colspan="7">
                             <b><u>{{ res.descripcion }}</u></b>
                         </td>
-                        {% for i in res.nivel_dos_set.all %}
-                            {% ifchanged res.descripcion %}
-                                <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
-                                    {% saldo_b_d i f1 f2 %}
-                                </td>
-                                <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px; " colspan="2">
-                                    {% saldo_d_d i f1 f2 %}
-                                </td>
-                            {% endifchanged %}
-                        {% endfor %}
+                        {% ifchanged res.descripcion %}
+                            <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
+                                {% saldo_b_u_excel res f1 f2 %}
+                            </td>
+                            <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px; " colspan="2">
+                                {% saldo_d_u_excel res f1 f2 %}
+                            </td>
+                        {% endifchanged %}
                     </tr>
-                    {% endif %}
                         {% for i in res.nivel_dos_set.all %}
-                        {% if i.nivel_tres_set.all %}
-                            {% for j in i.nivel_tres_set.all %}
-                            {% saldo_b_t j f1 f2 as sald_b_t %}
-                            {% saldo_d_t j f1 f2 as sald_d_t %}
-                            {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                            {% if i.asiento_exists %}
                             {% ifchanged i.descripcion %}
                             <tr>
                                 <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -222,16 +210,14 @@
                                     <b><u>{{ i.descripcion }}</u></b>
                                 </td>
                                 <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    {% saldo_b_t j f1 f2 %}
+                                    {% saldo_b_d_excel i f1 f2 %}
                                 </td>
                                 <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    {% saldo_d_t j f1 f2 %}
+                                    {% saldo_d_d_excel i f1 f2 %}
                                 </td>
                             </tr>
                             {% endifchanged %}
                             {% endif %}
-                            {% endfor %}
-                        {% endif %}
                         {% endfor %}
                         {% if forloop.last %}
                             <tr>
@@ -258,7 +244,6 @@
 
                     {% elif campo3 == 'T' %}
                     {% for res in niv %}
-                    {% if res.nivel_dos_set.all %}
                     <tr>
                         <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black; padding-top: 3px;" colspan="2">
                             <b>{{ res.id }}</b>
@@ -266,25 +251,17 @@
                         <td style="border-right: 1px solid black; padding-top: 3px;" id="fuente" colspan="7">
                             <b><u>{{ res.descripcion }}</u></b>
                         </td>
-                        
-                        {% for i in res.nivel_dos_set.all %}
                         {% ifchanged res.descripcion %}
                             <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
-                                {% saldo_b_d i f1 f2 %}
+                                {% saldo_b_u_excel res f1 f2 %}
                             </td>
                             <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px; " colspan="2">
-                                {% saldo_d_d i f1 f2 %}
+                                {% saldo_d_u_excel res f1 f2 %}
                             </td>
                         {% endifchanged %}
-                        {% endfor %}
                     </tr>
-                    {% endif %}
                         {% for i in res.nivel_dos_set.all %}
-                        {% if i.nivel_tres_set.all %}
-                            {% for j in i.nivel_tres_set.all %}
-                            {% saldo_b_t j f1 f2 as sald_b_t %}
-                            {% saldo_d_t j f1 f2 as sald_d_t %}
-                            {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                            {% if i.asiento_exists %}
                             {% ifchanged i.descripcion %}
                                 <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
                                     <b>{{ i.codigo }}</b>
@@ -293,21 +270,15 @@
                                     <b><u>{{ i.descripcion }}</u></b>
                                 </td>
                                 <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    {% saldo_b_t j f1 f2 %}
+                                    {% saldo_b_d_excel i f1 f2 %}
                                 </td>
                                 <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    {% saldo_d_t j f1 f2 %}
+                                    {% saldo_d_d_excel i f1 f2 %}
                                 </td>
                             {% endifchanged %}
                             {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                            {% for j in i.nivel_tres_set.all %}
-                            {% if j.nivel_cuatro_set.all %}
-                                {% for k in j.nivel_cuatro_set.all %}
-                                {% saldo_b_c k f1 f2 as sald_b_c %}
-                                {% saldo_d_c k f1 f2 as sald_d_c %}
-                                {% if sald_b_c != 0.0 and sald_d_c != 0.0 %}
+                                {% for j in i.nivel_tres_set.all %}
+                                {% if j.asiento_exists %}
                                 {% ifchanged j.descripcion %}
                                 <tr>
                                     <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -317,17 +288,15 @@
                                         {{ j.descripcion }}
                                     </td>
                                     <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                        {% saldo_b_c k f1 f2 %}
+                                        {% saldo_b_tr_excel j f1 f2 %}
                                     </td>
                                     <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                        {% saldo_d_c k f1 f2 %}
+                                        {% saldo_d_tr_excel j f1 f2 %}
                                     </td>
                                 </tr>
                                 {% endifchanged %}
                                 {% endif %}
                                 {% endfor %}
-                            {% endif %}
-                            {% endfor %}
                         {% endfor %}
                         {% if forloop.last %}
                             <tr>
@@ -355,7 +324,6 @@
 
                     {% if campo3 == 'C' %}
                     {% for res in niv %}
-                    {% if res.nivel_dos_set.all %}
                     <tr>
                         <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black; padding-top: 3px;" colspan="2">
                             <b>{{ res.id }}</b>
@@ -363,24 +331,17 @@
                         <td style="border-right: 1px solid black; padding-top: 3px;" id="fuente" colspan="7">
                             <b><u>{{ res.descripcion }}</u></b>
                         </td>
-                        {% for i in res.nivel_dos_set.all %}
                         {% ifchanged res.descripcion %}
                             <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
-                                {% saldo_b_d i f1 f2 %}
+                                {% saldo_b_u_excel res f1 f2 %}
                             </td>
                             <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px; " colspan="2">
-                                {% saldo_d_d i f1 f2 %}
+                                {% saldo_d_u_excel res f1 f2 %}
                             </td>
                         {% endifchanged %}
-                        {% endfor %}
                     </tr>
-                    {% endif %}
                         {% for i in res.nivel_dos_set.all %}
-                        {% if i.nivel_tres_set.all %}
-                            {% for j in i.nivel_tres_set.all %}
-                            {% saldo_b_t j f1 f2 as sald_b_t %}
-                            {% saldo_d_t j f1 f2 as sald_d_t %}
-                            {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                            {% if i.asiento_exists %}
                             {% ifchanged i.descripcion %}
                             <tr>
                                 <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -390,22 +351,16 @@
                                     <b><u>{{ i.descripcion }}</u></b>
                                 </td>
                                 <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    {% saldo_b_t j f1 f2 %}
+                                    {% saldo_b_d_excel i f1 f2 %}
                                 </td>
                                 <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    {% saldo_d_t j f1 f2 %}
+                                    {% saldo_d_d_excel i f1 f2 %}
                                 </td>
                             </tr>
                             {% endifchanged %}
                             {% endif %}
-                            {% endfor %}
-                        {% endif %}
                             {% for j in i.nivel_tres_set.all %}
-                            {% if j.nivel_cuatro_set.all %}
-                                {% for k in j.nivel_cuatro_set.all %}
-                                {% saldo_b_c k f1 f2 as sald_b_c %}
-                                {% saldo_d_c k f1 f2 as sald_d_c %}
-                                {% if sald_b_c != 0.0 and sald_d_c != 0.0 %}
+                                {% if j.asiento_exists %}
                                 {% ifchanged j.descripcion %}
                                 <tr>
                                     <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -415,44 +370,36 @@
                                         <b><u>{{ j.descripcion }}</u></b>
                                     </td>
                                     <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                        {% saldo_b_c k f1 f2 %}
+                                        {% saldo_b_tr_excel j f1 f2 %}
                                     </td>
                                     <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                        {% saldo_d_c k f1 f2 %}
+                                        {% saldo_d_tr_excel j f1 f2 %}
                                     </td>
                                 </tr>
                                 {% endifchanged %}
                                 {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                                {% for k in j.nivel_cuatro_set.all %}
-                                {% if k.nivel_cinco_set.all %}
-                                    {% for l in k.nivel_cinco_set.all %}
-                                    {% saldo_b_ci l f1 f2 as sald_b_ci %}
-                                    {% saldo_d_ci l f1 f2 as sald_d_ci %}
-                                    {% if sald_b_ci != 0.0 and sald_d_ci != 0.0 %}
-                                    {% ifchanged k.descripcion %}
-                                    <tr>
-                                        <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
-                                            {{ k.codigo }}
-                                        </td>
-                                        <td style="text-align: left; border-right: 1px solid black;" id="fuente" colspan="7">
-                                            {{ k.descripcion }}
-                                        </td>
-                                        <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                            {% saldo_b_ci l f1 f2 %}
-                                        </td>
-                                        <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                            {% saldo_d_ci l f1 f2 %}
-                                        </td>
-                                    </tr>
-                                    {% endifchanged %}
-                                    {% endif %}
+                                    {% for k in j.nivel_cuatro_set.all %}
+                                        {% if k.asiento_exists %}
+                                        {% ifchanged k.descripcion %}
+                                        <tr>
+                                            <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
+                                                {{ k.codigo }}
+                                            </td>
+                                            <td style="text-align: left; border-right: 1px solid black;" id="fuente" colspan="7">
+                                                {{ k.descripcion }}
+                                            </td>
+                                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
+                                                {% saldo_b_c_excel k f1 f2 %}
+                                            </td>
+                                            <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
+                                                {% saldo_d_c_excel k f1 f2 %}
+                                            </td>
+                                        </tr>
+                                        {% endifchanged %}
+                                        {% endif %}
                                     {% endfor %}
-                                {% endif %}
                                 {% endfor %}
                             {% endfor %}
-                        {% endfor %}
                         {% if forloop.last %}
                             <tr>
                                 <td style="border-left: 1px solid black; border-right: 1px solid black;" colspan="2">    
@@ -479,7 +426,6 @@
 
                     {% if campo3 == 'SC' %}
                     {% for res in niv %}
-                    {% if res.nivel_dos_set.all %}
                     <tr>
                         <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black; padding-top: 3px;" colspan="2">
                             <b>{{ res.id }}</b>
@@ -487,24 +433,17 @@
                         <td style="border-right: 1px solid black; padding-top: 3px;" id="fuente" colspan="7">
                             <b><u>{{ res.descripcion }}</u></b>
                         </td>
-                        {% for i in res.nivel_dos_set.all %}
                         {% ifchanged res.descripcion %}
                             <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px;" colspan="2">
-                                {% saldo_b_d i f1 f2 %}
+                                {% saldo_b_u_excel res f1 f2 %}
                             </td>
                             <td id="fuente2" style="text-align: right; border-right: 1px solid black; padding-top: 3px; " colspan="2">
-                                {% saldo_d_d i f1 f2 %}
+                                {% saldo_d_u_excel res f1 f2 %}
                             </td>
                         {% endifchanged %}
-                        {% endfor %}
                     </tr>
-                    {% endif %}
                         {% for i in res.nivel_dos_set.all %}
-                        {% if i.nivel_tres_set.all %}
-                            {% for j in i.nivel_tres_set.all %}
-                            {% saldo_b_t j f1 f2 as sald_b_t %}
-                            {% saldo_d_t j f1 f2 as sald_d_t %}
-                            {% if sald_b_t != 0.0 and sald_d_t != 0.0 %}
+                            {% if i.asiento_exists %}
                             {% ifchanged i.descripcion %}
                             <tr>
                                 <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -514,22 +453,16 @@
                                     <b><u>{{ i.descripcion }}</u></b>
                                 </td>
                                 <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    {% saldo_b_t j f1 f2 %}
+                                    {% saldo_b_d_excel i f1 f2 %}
                                 </td>
                                 <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                    {% saldo_d_t j f1 f2 %}
+                                    {% saldo_d_d_excel i f1 f2 %}
                                 </td>
                             </tr>
                             {% endifchanged %}
                             {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                            {% for j in i.nivel_tres_set.all %}
-                            {% if j.nivel_cuatro_set.all %}
-                                {% for k in j.nivel_cuatro_set.all %}
-                                {% saldo_b_c k f1 f2 as sald_b_c %}
-                                {% saldo_d_c k f1 f2 as sald_d_c %}
-                                {% if sald_b_c != 0.0 and sald_d_c != 0.0 %}
+                                {% for j in i.nivel_tres_set.all %}
+                                {% if j.asiento_exists %}
                                 {% ifchanged j.descripcion %}
                                 <tr>
                                     <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -539,22 +472,16 @@
                                         <b><u>{{ j.descripcion }}</u></b>
                                     </td>
                                     <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                        {% saldo_b_c k f1 f2 %}
+                                        {% saldo_b_tr_excel j f1 f2 %}
                                     </td>
                                     <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                        {% saldo_d_c k f1 f2 %}
+                                        {% saldo_d_tr_excel j f1 f2 %}
                                     </td>
                                 </tr>
                                 {% endifchanged %}
                                 {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                                {% for k in j.nivel_cuatro_set.all %}
-                                {% if k.nivel_cinco_set.all %}
-                                    {% for l in k.nivel_cinco_set.all %}
-                                    {% saldo_b_ci l f1 f2 as sald_b_ci %}
-                                    {% saldo_d_ci l f1 f2 as sald_d_ci %}
-                                    {% if sald_b_ci != 0.0 and sald_d_ci != 0.0 %}
+                                    {% for k in j.nivel_cuatro_set.all %}
+                                    {% if k.asiento_exists %}
                                     {% ifchanged k.descripcion %}
                                     <tr>
                                         <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -564,22 +491,16 @@
                                             <b><u>{{ k.descripcion }}</u></b>
                                         </td>
                                         <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                            {% saldo_b_ci l f1 f2 %}
+                                            {% saldo_b_c_excel k f1 f2 %}
                                         </td>
                                         <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                            {% saldo_d_ci l f1 f2 %}
+                                            {% saldo_d_c_excel k f1 f2 %}
                                         </td>
                                     </tr>
                                     {% endifchanged %}
                                     {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                                    {% for l in k.nivel_cinco_set.all %}
-                                    {% if l.asiento_set.all %}
-                                        {% for m in l.asiento_set.all %}
-                                        {% saldo_b_a m f1 f2 as sald_b_a %}
-                                        {% saldo_d_a m f1 f2 as sald_d_a %}
-                                        {% if sald_b_a != 0.0 and sald_d_a != 0.0 %}
+                                        {% for l in k.nivel_cinco_set.all %}
+                                        {% if l.asiento_exists %}
                                         {% ifchanged l.descripcion %}
                                         <tr>
                                             <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -589,20 +510,18 @@
                                                 {{ l.descripcion }}
                                             </td>
                                             <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                                {% saldo_b_a m f1 f2 %}
+                                                {% saldo_b_ci_excel l f1 f2 %}
                                             </td>
                                             <td id="fuente2" style="text-align: right; border-right: 1px solid black;" colspan="2">
-                                                {% saldo_d_a m f1 f2 %}
+                                                {% saldo_b_ci_excel l f1 f2 %}
                                             </td>
                                         </tr>
                                         {% endifchanged %}
                                         {% endif %}
                                         {% endfor %}
-                                    {% endif %}
                                     {% endfor %}
                                 {% endfor %}
                             {% endfor %}
-                        {% endfor %}
                         {% if forloop.last %}
                             <tr>
                                 <td style="border-left: 1px solid black; border-right: 1px solid black;" colspan="2">    

@@ -158,5 +158,28 @@ urlpatterns = [
         permission_required('auth.view_activos_f')(login_required(ReporteInventario.as_view())), 
         name='reporte_inventario'
     ),
-
+    url(r'^temp_rep_especbien_excel/$',
+        permission_required('auth.view_activos_f')(login_required(ReporteEspecBienExcelTemplate.as_view())), 
+        name='temp_rep_especbien_excel'
+    ),
+    url(r'^rep_especbien_excel/$',
+        permission_required('auth.view_activos_f')(login_required(ReporteEspecBienExcel.as_view())), 
+        name='rep_especbien_excel'
+    ),
+    url(r'^temp_rep_altabaja_excel/$',
+        permission_required('auth.view_activos_f')(login_required(ReporteAltaBajaTemplateExcel.as_view())), 
+        name='temp_rep_altabaja_excel'
+    ),
+    url(r'^rep_altabaja_excel/$',
+        permission_required('auth.view_activos_f')(login_required(ReporteAltaBajaExcel.as_view())), 
+        name='rep_altabaja_excel'
+    ),
+    url(r'^temp_rep_inventario_excel/$',
+        permission_required('auth.view_activos_f')(login_required(ReporteInventarioTemplateExcel.as_view())), 
+        name='temp_rep_inventario_excel'
+    ),
+    url(r'^rep_inventario_excel/$',
+        permission_required('auth.view_activos_f')(login_required(ReporteInventarioExcel.as_view())),
+        name='rep_inventario_excel'
+    ),
 ]

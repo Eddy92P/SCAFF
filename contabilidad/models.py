@@ -14,6 +14,8 @@ from django.db.models import Sum
 from django.db.models import Avg
 from django.db.models import Q, When, Case
 
+from decimal import Decimal
+
 class nivel_uno(models.Model):
 	descripcion = models.CharField(
 		max_length=100,
@@ -28,63 +30,86 @@ class nivel_uno(models.Model):
 			]
 		)
 
+	def nivel_dos_related(self):
+		res = nivel_dos.objects.select_related('nivel_uno').filter(nivel_uno__id=self.id)
+		return res
+
+	def asiento_exists(self):
+		return asiento.objects.filter(nivel_cinco__nivel_uno__id=self.id).exists()
+
 	#Totales para balance general
 	def debe_b_t(self, f1, f2):
-		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b'))
+		res = nivel_uno.objects.filter(id__lte=3, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def haber_b_t(self, f1, f2):
-		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b'))
+		res = nivel_uno.objects.filter(id__lte=3, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_b'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def debe_d_t(self, f1, f2):
-		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d'))
+		res = nivel_uno.objects.filter(id__lte=3, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__debe_d'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def haber_d_t(self, f1, f2):
-		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d'))
+		res = nivel_uno.objects.filter(id__lte=3, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_d'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def saldo_b_t_excel(self, f1, f2):
+		res = nivel_dos.objects.filter(nivel_uno=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__cerrado=False, nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_b') - F('nivel_cinco__asiento__haber_b'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_b') - F('nivel_cinco__asiento__debe_b')))))
+
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def saldo_d_t_excel(self, f1, f2):
+		res = nivel_dos.objects.filter(nivel_uno=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__cerrado=False, nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_d') - F('nivel_cinco__asiento__haber_d'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_d') - F('nivel_cinco__asiento__debe_d')))))
+
+		if res['total'] == None:
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def saldo_b_t(self, f1, f2):
-		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
+		res = nivel_uno.objects.filter(id__lte=3, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum(F('nivel_cinco__asiento__debe_b') - F('nivel_cinco__asiento__haber_b')))
 
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total'] - self.saldo_b_ter(f1, f2)
 
 	def saldo_d_t(self, f1, f2):
-		res = nivel_uno.objects.filter(id__lte=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
+		res = nivel_uno.objects.filter(id__lte=3, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum(F('nivel_cinco__asiento__debe_d') - F('nivel_cinco__asiento__haber_d')))
 
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total'] - self.saldo_d_ter(f1, f2)
 
 	def suma_patrimonio_pasivo_bs(self, f1, f2):
-		total_pasivo = nivel_uno.objects.filter(id=2, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b')))
+		total_pasivo = nivel_uno.objects.filter(id=2, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum(F('nivel_cinco__asiento__haber_b') - F('nivel_cinco__asiento__debe_b')))
 
-		total_patrimonio = nivel_uno.objects.filter(id=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b')))
+		total_patrimonio = nivel_uno.objects.filter(id=3, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum(F('nivel_cinco__asiento__haber_b') - F('nivel_cinco__asiento__debe_b')))
 
-		if (total_pasivo is None) and (total_patrimonio is None):
-			result = 0.0
+		if (total_pasivo['total'] == None) and (total_patrimonio['total'] == None):
+			result = Decimal(0.0)
 
-		elif total_pasivo is None:
+		elif total_pasivo['total'] == None:
 			result = total_patrimonio['total'] + self.saldo_b_ter(f1, f2)
 
-		elif total_patrimonio is None:
+		elif total_patrimonio['total'] == None:
 			result = total_pasivo['total'] + self.saldo_b_ter(f1, f2)
 
 		else:
@@ -93,17 +118,17 @@ class nivel_uno(models.Model):
 		return result
 
 	def suma_patrimonio_pasivo_dls(self, f1, f2):
-		total_pasivo = nivel_uno.objects.filter(id=2, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d')))
+		total_pasivo = nivel_uno.objects.filter(id=2, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum(F('nivel_cinco__asiento__haber_d') - F('nivel_cinco__asiento__debe_d')))
 
-		total_patrimonio = nivel_uno.objects.filter(id=3, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d')))
+		total_patrimonio = nivel_uno.objects.filter(id=3, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum(F('nivel_cinco__asiento__haber_d') - F('nivel_cinco__asiento__debe_d')))
 
-		if (total_pasivo is None) and (total_patrimonio is None):
-			result = 0.0
+		if (total_pasivo['total'] == None) and (total_patrimonio['total'] == None):
+			result = Decimal(0.0)
 
-		elif total_pasivo is None:
+		elif total_pasivo['total'] == None:
 			result = total_patrimonio['total'] + self.saldo_d_ter(f1, f2)
 
-		elif total_patrimonio is None:
+		elif total_patrimonio['total'] == None:
 			result = total_pasivo['total'] + self.saldo_d_ter(f1, f2)
 
 		else:
@@ -113,65 +138,94 @@ class nivel_uno(models.Model):
 
 
 	#Totales para estado de resultados
-	def debe_b_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(id__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b'))
+	def debe_b_t_excel(self, f1, f2):
+		res = nivel_dos.objects.filter(nivel_uno=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__debe_b'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def haber_b_t_excel(self, f1, f2):
+		res = nivel_dos.objects.filter(nivel_uno=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_b'))
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def debe_d_t_excel(self, f1, f2):
+		res = nivel_dos.objects.filter(nivel_uno=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__debe_d'))
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def haber_d_t_excel(self, f1, f2):
+		res = nivel_dos.objects.filter(nivel_uno=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_d'))
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+
+	def debe_b_ter(self, f1, f2):
+		res = nivel_uno.objects.filter(id__gte=4, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__debe_b'))
+		if res['total'] == None:
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def haber_b_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(id__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b'))
+		res = nivel_uno.objects.filter(id__gte=4, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_b'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def debe_d_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(id__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d'))
+		res = nivel_uno.objects.filter(id__gte=4, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__debe_d'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def haber_d_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(id__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d'))
+		res = nivel_uno.objects.filter(id__gte=4, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_d'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	# Utilidad neta
 	def saldo_b_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(id__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b')))
+		res = nivel_uno.objects.filter(id__gte=4, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum(F('nivel_cinco__asiento__haber_b') - F('nivel_cinco__asiento__debe_b')))
 
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	# Utilidad neta
 	def saldo_d_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(id__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d')))
+		res = nivel_uno.objects.filter(id__gte=4, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum(F('nivel_cinco__asiento__haber_d') - F('nivel_cinco__asiento__debe_d')))
 
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def mostrar_saldo_b_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(id__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b')))
+		res = nivel_uno.objects.filter(id__gte=4, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum(F('nivel_cinco__asiento__debe_b') - F('nivel_cinco__asiento__haber_b')))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		elif res['total'] < 0:
 			return str(abs(res['total'])) + " CR"
 		else:
 			return res['total']
 
 	def mostrar_saldo_d_ter(self, f1, f2):
-		res = nivel_uno.objects.filter(id__gte=4, nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum(F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d')))
+		res = nivel_uno.objects.filter(id__gte=4, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum(F('nivel_cinco__asiento__debe_d') - F('nivel_cinco__asiento__haber_d')))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		elif res['total'] < 0:
 			return str(abs(res['total'])) + " CR"
 		else:
@@ -239,47 +293,101 @@ class nivel_dos(models.Model):
 	def __unicode__(self):
 		return self.codigo + " " + self.descripcion
 
-	def debe_b_t(self, f1, f2):
-		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b'))
+	def nivel_tres_related(self):
+		res = nivel_tres.objects.select_related('nivel_dos').filter(nivel_dos__id=self.id)
+		return res
+
+	def asiento_exists(self):
+		return asiento.objects.filter(nivel_cinco__nivel_dos__id=self.id).exists()
+
+	# Saldos estado de resultados
+	def debe_b_t_excel(self, f1, f2):
+		res = nivel_tres.objects.filter(nivel_dos=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__debe_b'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def haber_b_t_excel(self, f1, f2):
+		res = nivel_tres.objects.filter(nivel_dos=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_b'))
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def debe_d_t_excel(self, f1, f2):
+		res = nivel_tres.objects.filter(nivel_dos=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__debe_d'))
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def haber_d_t_excel(self, f1, f2):
+		res = nivel_tres.objects.filter(nivel_dos=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_d'))
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+
+
+	def debe_b_t(self, f1, f2):
+		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__debe_b'))
+		if res['total'] == None:
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def haber_b_t(self, f1, f2):
-		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b'))
+		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_b'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def debe_d_t(self, f1, f2):
-		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d'))
+		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__debe_d'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def haber_d_t(self, f1, f2):
-		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d'))
+		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_d'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def saldo_b_t_excel(self, f1, f2):
+		res = nivel_tres.objects.filter(nivel_dos=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_b') - F('nivel_cinco__asiento__haber_b'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_b') - F('nivel_cinco__asiento__debe_b')))))
+
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def saldo_d_t_excel(self, f1, f2):
+		res = nivel_tres.objects.filter(nivel_dos=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_d') - F('nivel_cinco__asiento__haber_d'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_d') - F('nivel_cinco__asiento__debe_d')))))
+
+		if res['total'] == None:
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def saldo_b_t(self, f1, f2):
-		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b'))), When(nivel_uno__id=2, then=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b'))), When(nivel_uno__id=3, then=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b')) + self.nivel_uno.saldo_b_ter(f1, f2))))
+		res = nivel_dos.objects.select_related('nivel_uno').filter(nivel_uno=self.nivel_uno, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_b') - F('nivel_cinco__asiento__haber_b'))), When(nivel_uno__id=2, then=Sum(F('nivel_cinco__asiento__haber_b') - F('nivel_cinco__asiento__debe_b'))), When(nivel_uno__id=3, then=Sum(F('nivel_cinco__asiento__haber_b') - F('nivel_cinco__asiento__debe_b')) + self.nivel_uno.saldo_b_ter(f1, f2))))
 
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def saldo_d_t(self, f1, f2):
-		res = nivel_dos.objects.filter(nivel_uno=self.nivel_uno, nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d'))), When(nivel_uno__id=2, then=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_d') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_d'))),  When(nivel_uno__id=3, then=Sum(F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__haber_b') - F('nivel_tres__nivel_cuatro__nivel_cinco__asiento__debe_b')) + self.nivel_uno.saldo_d_ter(f1, f2))))
+		res = nivel_dos.objects.select_related('nivel_uno').filter(nivel_uno=self.nivel_uno, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_d') - F('nivel_cinco__asiento__haber_d'))), When(nivel_uno__id=2, then=Sum(F('nivel_cinco__asiento__haber_d') - F('nivel_cinco__asiento__debe_d'))),  When(nivel_uno__id=3, then=Sum(F('nivel_cinco__asiento__haber_d') - F('nivel_cinco__asiento__debe_d')) + self.nivel_uno.saldo_d_ter(f1, f2))))
 
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
@@ -292,6 +400,7 @@ class nivel_tres(models.Model):
 		null=False,
 		blank=False,
 		default="",
+		unique=True,
 		validators=[
 			RegexValidator(
 				regex=r'^[0-9]+$',
@@ -316,47 +425,102 @@ class nivel_tres(models.Model):
 	def __unicode__(self):
 		return self.codigo + " " + self.descripcion
 
-	def debe_b_t(self, f1, f2):
-		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_cuatro__nivel_cinco__asiento__debe_b'))
+	def nivel_cuatro_related(self):
+		res = nivel_cuatro.objects.select_related('nivel_tres').filter(nivel_tres__id=self.id)
+		return res
+
+	def asiento_exists(self):
+		return asiento.objects.filter(nivel_cinco__nivel_tres__id=self.id).exists()
+
+	# Saldos estado de resultados
+	def debe_b_t_excel(self, f1, f2):
+		res = nivel_cuatro.objects.filter(nivel_tres=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__debe_b'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def haber_b_t_excel(self, f1, f2):
+		res = nivel_cuatro.objects.filter(nivel_tres=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_b'))
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def debe_d_t_excel(self, f1, f2):
+		res = nivel_cuatro.objects.filter(nivel_tres=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__debe_d'))
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def haber_d_t_excel(self, f1, f2):
+		res = nivel_cuatro.objects.filter(nivel_tres=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_d'))
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+
+
+
+	def debe_b_t(self, f1, f2):
+		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__debe_b'))
+		if res['total'] == None:
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def haber_b_t(self, f1, f2):
-		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_cuatro__nivel_cinco__asiento__haber_b'))
+		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_b'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def debe_d_t(self, f1, f2):
-		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_cuatro__nivel_cinco__asiento__debe_d'))
+		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__debe_d'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def haber_d_t(self, f1, f2):
-		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_cuatro__nivel_cinco__asiento__haber_d'))
+		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_d'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def saldo_b_t_excel(self, f1, f2):
+		res = nivel_cuatro.objects.filter(nivel_tres=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_b') - F('nivel_cinco__asiento__haber_b'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_b') - F('nivel_cinco__asiento__debe_b')))))
+
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def saldo_d_t_excel(self, f1, f2):
+		res = nivel_cuatro.objects.filter(nivel_tres=self, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_d') - F('nivel_cinco__asiento__haber_d'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_d') - F('nivel_cinco__asiento__debe_d')))))
+
+		if res['total'] == None:
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def saldo_b_t(self, f1, f2):
-		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cuatro__nivel_cinco__asiento__debe_b') - F('nivel_cuatro__nivel_cinco__asiento__haber_b'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cuatro__nivel_cinco__asiento__haber_b') - F('nivel_cuatro__nivel_cinco__asiento__debe_b')))))
+		res = nivel_tres.objects.select_related('nivel_dos').filter(nivel_dos=self.nivel_dos, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_b') - F('nivel_cinco__asiento__haber_b'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_b') - F('nivel_cinco__asiento__debe_b')))))
 
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def saldo_d_t(self, f1, f2):
-		res = nivel_tres.objects.filter(nivel_dos=self.nivel_dos, nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cuatro__nivel_cinco__asiento__debe_d') - F('nivel_cuatro__nivel_cinco__asiento__haber_d'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cuatro__nivel_cinco__asiento__haber_d') - F('nivel_cuatro__nivel_cinco__asiento__debe_d')))))
+		res = nivel_tres.objects.select_related('nivel_dos').filter(nivel_dos=self.nivel_dos, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_d') - F('nivel_cinco__asiento__haber_d'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_d') - F('nivel_cinco__asiento__debe_d')))))
 
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
@@ -370,6 +534,7 @@ class nivel_cuatro(models.Model):
 		null=False,
 		blank=True,
 		default="",
+		unique=True,
 		validators=[
 			RegexValidator(
 				regex=r'^[0-9]+$',
@@ -394,47 +559,103 @@ class nivel_cuatro(models.Model):
 	def __unicode__(self):
 		return self.codigo + " " + self.descripcion
 
-	def debe_b_t(self, f1, f2):
-		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_cinco__asiento__debe_b'))
+	def nivel_cinco_related(self):
+		res = nivel_cinco.objects.select_related('nivel_cuatro').filter(nivel_cuatro__id=self.id)
+		return res
+
+	def asiento_exists(self):
+		return asiento.objects.filter(nivel_cinco__nivel_cuatro__id=self.id).exists()
+
+	# Saldos estado de resultados
+	def debe_b_t_excel(self, f1, f2):
+		res = nivel_cinco.objects.filter(nivel_cuatro=self, asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Sum('asiento__debe_b'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def haber_b_t_excel(self, f1, f2):
+		res = nivel_cinco.objects.filter(nivel_cuatro=self, asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Sum('asiento__haber_b'))
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def debe_d_t_excel(self, f1, f2):
+		res = nivel_cinco.objects.filter(nivel_cuatro=self, asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Sum('asiento__debe_d'))
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def haber_d_t_excel(self, f1, f2):
+		res = nivel_cinco.objects.filter(nivel_cuatro=self, asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Sum('asiento__haber_d'))
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+
+
+
+
+	def debe_b_t(self, f1, f2):
+		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__debe_b'))
+		if res['total'] == None:
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def haber_b_t(self, f1, f2):
-		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_cinco__asiento__haber_b'))
+		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_b'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def debe_d_t(self, f1, f2):
-		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_cinco__asiento__debe_d'))
+		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__debe_d'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def haber_d_t(self, f1, f2):
-		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('nivel_cinco__asiento__haber_d'))
+		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Sum('nivel_cinco__asiento__haber_d'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def saldo_b_t_excel(self, f1, f2):
+		res = nivel_cinco.objects.filter(nivel_cuatro=self, asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('asiento__debe_b') - F('asiento__haber_b'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('asiento__haber_b') - F('asiento__debe_b')))))
+
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def saldo_d_t_excel(self, f1, f2):
+		res = nivel_cinco.objects.filter(nivel_cuatro=self, asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('asiento__debe_d') - F('asiento__haber_d'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('asiento__haber_d') - F('asiento__debe_d')))))
+
+		if res['total'] == None:
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def saldo_b_t(self, f1, f2):
-		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_b') - F('nivel_cinco__asiento__haber_b'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_b') - F('nivel_cinco__asiento__debe_b')))))
+		res = nivel_cuatro.objects.select_related('nivel_tres').filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_b') - F('nivel_cinco__asiento__haber_b'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_b') - F('nivel_cinco__asiento__debe_b')))))
 
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def saldo_d_t(self, f1, f2):
-		res = nivel_cuatro.objects.filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_d') - F('nivel_cinco__asiento__haber_d'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_d') - F('nivel_cinco__asiento__debe_d')))))
+		res = nivel_cuatro.objects.select_related('nivel_tres').filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_d') - F('nivel_cinco__asiento__haber_d'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_d') - F('nivel_cinco__asiento__debe_d')))))
 
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
@@ -448,6 +669,7 @@ class nivel_cinco(models.Model):
 		null=False,
 		blank=True,
 		default="",
+		unique=True,
 		validators=[
 			RegexValidator(
 				regex=r'^[0-9]+$',
@@ -477,47 +699,104 @@ class nivel_cinco(models.Model):
 	def __unicode__(self):
 		return self.codigo + " " + self.descripcion
 
-	def debe_b_t(self, f1, f2):
-		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('asiento__debe_b'))
+	def asiento_related(self):
+		res = asiento.objects.select_related('nivel_cinco').filter(nivel_cinco__id=self.id)
+		return res
+
+	def asiento_exists(self):
+		return asiento.objects.filter(nivel_cinco__id=self.id).exists()
+
+	# Saldos estado de resultados
+	def debe_b_t_excel(self, f1, f2):
+		res = asiento.objects.filter(nivel_cinco=self, encabezadoas__fecha__range=(f1, f2), encabezadoas__anulado=False, encabezadoas__cerrado=False).aggregate(total=Sum('debe_b'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def haber_b_t_excel(self, f1, f2):
+		res = asiento.objects.filter(nivel_cinco=self, encabezadoas__fecha__range=(f1, f2), encabezadoas__anulado=False, encabezadoas__cerrado=False).aggregate(total=Sum('haber_b'))
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def debe_d_t_excel(self, f1, f2):
+		res = asiento.objects.filter(nivel_cinco=self, encabezadoas__fecha__range=(f1, f2), encabezadoas__anulado=False, encabezadoas__cerrado=False).aggregate(total=Sum('debe_d'))
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def haber_d_t_excel(self, f1, f2):
+		res = asiento.objects.filter(nivel_cinco=self, encabezadoas__fecha__range=(f1, f2), encabezadoas__anulado=False, encabezadoas__cerrado=False).aggregate(total=Sum('haber_d'))
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+
+
+
+
+
+	def debe_b_t(self, f1, f2):
+		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Sum('asiento__debe_b'))
+		if res['total'] == None:
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def haber_b_t(self, f1, f2):
-		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('asiento__haber_b'))
+		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Sum('asiento__haber_b'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def debe_d_t(self, f1, f2):
-		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('asiento__debe_d'))
+		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Sum('asiento__debe_d'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def haber_d_t(self, f1, f2):
-		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('asiento__haber_d'))
+		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Sum('asiento__haber_d'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def saldo_b_t_excel(self, f1, f2):
+		res = asiento.objects.filter(nivel_cinco=self, encabezadoas__fecha__range=(f1, f2), encabezadoas__anulado=False, encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_cinco__nivel_uno__id=1, then=Sum(F('debe_b') - F('haber_b'))), When(Q(nivel_cinco__nivel_uno__id=2) | Q(nivel_cinco__nivel_uno__id=3), then=Sum(F('haber_b') - F('debe_b')))))
+
+		if res['total'] == None:
+			return Decimal(0.0)
+		else:
+			return res['total']
+
+	def saldo_d_t_excel(self, f1, f2):
+		res = asiento.objects.filter(nivel_cinco=self, encabezadoas__fecha__range=(f1, f2), encabezadoas__anulado=False, encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_cinco__nivel_uno__id=1, then=Sum(F('debe_d') - F('haber_d'))), When(Q(nivel_cinco__nivel_uno__id=2) | Q(nivel_cinco__nivel_uno__id=3), then=Sum(F('haber_d') - F('debe_d')))))
+
+		if res['total'] == None:
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def saldo_b_t(self, f1, f2):
-		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('asiento__debe_b') - F('asiento__haber_b'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('asiento__haber_b') - F('asiento__debe_b')))))
+		res = nivel_cinco.objects.select_related('nivel_cuatro').filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('asiento__debe_b') - F('asiento__haber_b'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('asiento__haber_b') - F('asiento__debe_b')))))
 
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def saldo_d_t(self, f1, f2):
-		res = nivel_cinco.objects.filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('asiento__debe_d') - F('asiento__haber_d'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('asiento__haber_d') - F('asiento__debe_d')))))
+		res = nivel_cinco.objects.select_related('nivel_cuatro').filter(nivel_cuatro=self.nivel_cuatro, asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('asiento__debe_d') - F('asiento__haber_d'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('asiento__haber_d') - F('asiento__debe_d')))))
 
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
@@ -622,7 +901,7 @@ class asiento(models.Model):
 		max_digits=15,
 		decimal_places=2,
 		null=True,
-		blank=True
+		blank=True,
 		)
 	haber_b = models.DecimalField(
 		default=0,
@@ -636,7 +915,8 @@ class asiento(models.Model):
 		max_digits=15,
 		decimal_places=2,
 		null=True,
-		blank=True
+		blank=True,
+		db_index=True
 		)
 	haber_d = models.DecimalField(
 		default=0,
@@ -686,59 +966,59 @@ class asiento(models.Model):
 	def debe_b_t(self, f1, f2):
 		res = asiento.objects.filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('debe_b'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def haber_b_t(self, f1, f2):
 		res = asiento.objects.filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('haber_b'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def debe_d_t(self, f1, f2):
 		res = asiento.objects.filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('debe_d'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def haber_d_t(self, f1, f2):
 		res = asiento.objects.filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum('haber_d'))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def saldo_b_t_p(self, f1, f2):
-		res = asiento.objects.filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+		res = asiento.objects.select_related('nivel_cinco').values('debe_b', 'haber_b').filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('haber_b') - F('debe_b')))
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def saldo_d_t_p(self, f1, f2):
-		res = asiento.objects.filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('haber_d') - F('debe_d')))
+		res = asiento.objects.select_related('nivel_cinco').values('debe_d', 'haber_d').filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Sum(F('haber_d') - F('debe_d')))
 
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def saldo_b_t(self, f1, f2):
-		res = asiento.objects.filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=1, then=Sum(F('debe_b') - F('haber_b'))), When(Q(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=2) | Q(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=3), then=Sum(F('haber_b') - F('debe_b')))))
+		res = asiento.objects.select_related('nivel_cinco').values('debe_b', 'haber_b').filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=1, then=Sum(F('debe_b') - F('haber_b'))), When(Q(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=2) | Q(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=3), then=Sum(F('haber_b') - F('debe_b')))))
 
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
 	def saldo_d_t(self, f1, f2):
-		res = asiento.objects.filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=1, then=Sum(F('debe_d') - F('haber_d'))), When(Q(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=2) | Q(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=3), then=Sum(F('haber_d') - F('debe_d')))))
+		res = asiento.objects.select_related('nivel_cinco').values('debe_d', 'haber_d').filter(nivel_cinco=self.nivel_cinco, encabezadoas__fecha__range=(f1, f2)).aggregate(total=Case(When(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=1, then=Sum(F('debe_d') - F('haber_d'))), When(Q(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=2) | Q(nivel_cinco__nivel_cuatro__nivel_tres__nivel_dos__nivel_uno__id=3), then=Sum(F('haber_d') - F('debe_d')))))
 
 		if res['total'] == None:
-			return 0.0
+			return Decimal(0.0)
 		else:
 			return res['total']
 
@@ -1027,6 +1307,7 @@ class Factura_V(models.Model):
 
 class Cotizacion(models.Model):
 	fecha = models.DateField(
+		unique=True,
 		null=False,
 		blank=False
 		)
@@ -1035,6 +1316,7 @@ class Cotizacion(models.Model):
 		blank=False
 		)
 	ufv = models.DecimalField(
+		unique=True,
 		null=False,
 		blank=False,
 		default=0,

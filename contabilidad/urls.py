@@ -395,6 +395,38 @@ urlpatterns = [
         permission_required('auth.view_contabilidad')(login_required(ReporteCostoServicio.as_view())), 
         name='rep_costo_servicio'
     ),
+    url(r'^temp_balancegen_excel/$',
+        permission_required('auth.view_contabilidad')(login_required(RepBalanceGenExcelTemplate.as_view())), 
+        name='temp_balancegen_excel'
+    ),
+    url(r'^balancegen_excel/$',
+        permission_required('auth.view_contabilidad')(login_required(BalanceGenExcel.as_view())), 
+        name='balancegen_excel'
+    ),
+    url(r'^temp_estadoresult_excel/$',
+        permission_required('auth.view_contabilidad')(login_required(RepEstResultExcelTemplate.as_view())), 
+        name='temp_estadoresult_excel'
+    ),
+    url(r'^estadoresult_excel/$',
+        permission_required('auth.view_contabilidad')(login_required(EstadoResultExcel.as_view())), 
+        name='estadoresult_excel'
+    ),
+    url(r'^temp_evopatrim_excel/$',
+        permission_required('auth.view_contabilidad')(login_required(RepEvoPatrimExcelTemplate.as_view())), 
+        name='temp_evopatrim_excel'
+    ),
+    url(r'^evopatrim_excel/$',
+        permission_required('auth.view_contabilidad')(login_required(EvoPatrimExcel.as_view())), 
+        name='evopatrim_excel'
+    ),
+    url(r'^temp_costoserv_excel/$',
+        permission_required('auth.view_contabilidad')(login_required(RepCostoServicioTemplateExcel.as_view())), 
+        name='temp_costoserv_excel'
+    ),
+    url(r'^costoserv_excel/$',
+        permission_required('auth.view_contabilidad')(login_required(RepCostoServicioExcel.as_view())), 
+        name='costoserv_excel'
+    ),
     url(r'^rep_plan_cuenta/$',
         permission_required('auth.view_contabilidad')(login_required(RepPlanCuentas.as_view())), 
         name='rep_plan_cuenta'
@@ -439,5 +471,13 @@ urlpatterns = [
     url(r'^renum_comp/$',
         permission_required('auth.view_contabilidad')(login_required(renumerarComprobantes.as_view())), 
         name='renum_comp'
+    ),
+    url(r'^rep_libromay_excel/$',
+        permission_required('auth.view_contabilidad')(login_required(RepLibroMayExcel.as_view())), 
+        name='rep_libromay_excel'
+    ),
+    url(r'^rep_librodiario_excel/$',
+        permission_required('auth.view_contabilidad')(login_required(RepLibroDiarioExcel.as_view())), 
+        name='rep_librodiario_excel'
     ),
 ]

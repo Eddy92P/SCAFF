@@ -83,6 +83,136 @@ class Rubro(models.Model):
 	def nomb(self):
 		return self.nombre
 
+	def val_ini_excel(self, f, f1):
+		res = Alta_baja_activo.objects.filter(fecha_alta__range=(f, f1), tipo_bien__rubro=self).aggregate(total=Sum('valor_inic'))
+		return res['total']
+
+	def val_inic_tot_excel(self, fecha, fecha_ant, vinc):
+		res = 0
+		res2 = 0
+		if vinc == '1':
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=True, baja=False)
+		else:
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=False, baja=False)
+		for i in res1:
+			res = res + i.valor_inicial(fecha_ant)
+			for j in i.capitalizacion_set.filter(alta_activo__fecha_alta__lte=fecha, alta_activo__tipo_bien__rubro=self, fecha_cap__lte=fecha):
+				res2 = res2 + j.valor_inicial_cap(fecha_ant)
+		result = res + res2
+		return round(result, 2)
+
+	def valor_actual_tot_excel(self, fecha, fecha_ant, vinc):
+		res = 0
+		res2 = 0
+		if vinc == '1':
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=True, baja=False)
+		else:
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=False, baja=False)
+		for i in res1:
+			res = res + i.valor_actual(fecha, fecha_ant)
+			for j in i.capitalizacion_set.filter(alta_activo__fecha_alta__lte=fecha, alta_activo__tipo_bien__rubro=self, fecha_cap__lte=fecha):
+				res2 = res2 + j.valor_actual_cap(fecha, fecha_ant)
+		result = res + res2
+		return result
+
+	def actualizacion_tot_excel(self, fecha, fecha_ant, vinc):
+		res = 0
+		res2 = 0
+		if vinc == '1':
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=True, baja=False)
+		else:
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=False, baja=False)
+		for i in res1:
+			res = res + i.actualizacion(fecha, fecha_ant)
+			for j in i.capitalizacion_set.filter(alta_activo__fecha_alta__lte=fecha, alta_activo__tipo_bien__rubro=self, fecha_cap__lte=fecha):
+				res2 = res2 + j.actualizacion_cap(fecha, fecha_ant)
+		result = res + res2
+		return result
+
+	def deprec_gestion_tot_excel(self, fecha, fecha_ant, vinc):
+		res = 0
+		res2 = 0
+		if vinc == '1':
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=True, baja=False)
+		else:
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=False, baja=False)
+		for i in res1:
+			res = res + i.deprec_gestion(fecha, fecha_ant)
+			for j in i.capitalizacion_set.filter(alta_activo__fecha_alta__lte=fecha, alta_activo__tipo_bien__rubro=self, fecha_cap__lte=fecha):
+				res2 = res2 + j.deprec_gestion_cap(fecha, fecha_ant)
+		result = res + res2
+		return result
+
+	def deprec_acum_inicial_tot_excel(self, fecha, fecha_ant, vinc):
+		res = 0
+		res2 = 0
+		if vinc == '1':
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=True, baja=False)
+		else:
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=False, baja=False)
+		for i in res1:
+			res = res + i.deprec_acum_inicial(fecha, fecha_ant)
+			for j in i.capitalizacion_set.filter(alta_activo__fecha_alta__lte=fecha, alta_activo__tipo_bien__rubro=self, fecha_cap__lte=fecha):
+				res2 = res2 + j.deprec_acum_inicial_cap(fecha, fecha_ant)
+		result = res + res2
+		return round(result, 2)
+
+	def valor_act_deprec_acum_tot_excel(self, fecha, fecha_ant, vinc):
+		res = 0
+		res2 = 0
+		if vinc == '1':
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=True, baja=False)
+		else:
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=False, baja=False)
+		for i in res1:
+			res = res + i.valor_act_deprec_acum(fecha, fecha_ant)
+			for j in i.capitalizacion_set.filter(alta_activo__fecha_alta__lte=fecha, alta_activo__tipo_bien__rubro=self, fecha_cap__lte=fecha):
+				res2 = res2 + j.valor_act_deprec_acum_cap(fecha, fecha_ant)
+		result = res + res2
+		return result
+
+	def actualiz_deprec_acum_tot_excel(self, fecha, fecha_ant, vinc):
+		res = 0
+		res2 = 0
+		if vinc == '1':
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=True, baja=False)
+		else:
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=False, baja=False)
+		for i in res1:
+			res = res + i.actualiz_deprec_acum(fecha, fecha_ant)
+			for j in i.capitalizacion_set.filter(alta_activo__fecha_alta__lte=fecha, alta_activo__tipo_bien__rubro=self, fecha_cap__lte=fecha):
+				res2 = res2 + j.actualiz_deprec_acum_cap(fecha, fecha_ant)
+		result = res + res2
+		return result
+
+	def deprec_acum_tot_excel(self, fecha, fecha_ant, vinc):
+		res = 0
+		res2 = 0
+		if vinc == '1':
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=True, baja=False)
+		else:
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=False, baja=False)
+		for i in res1:
+			res = res + i.deprec_acum(fecha, fecha_ant)
+			for j in i.capitalizacion_set.filter(alta_activo__fecha_alta__lte=fecha, alta_activo__tipo_bien__rubro=self, fecha_cap__lte=fecha):
+				res2 = res2 + j.deprec_acum_cap(fecha, fecha_ant)
+		result = res + res2
+		return result
+
+	def saldo_activo_tot_excel(self, fecha, fecha_ant, vinc):
+		res = 0
+		res2 = 0
+		if vinc == '1':
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=True, baja=False)
+		else:
+			res1 = Alta_baja_activo.objects.filter(fecha_alta__lte=fecha, tipo_bien__rubro=self, vinculado=False, baja=False)
+		for i in res1:
+			res = res + i.saldo_activo(fecha, fecha_ant)
+			for j in i.capitalizacion_set.filter(alta_activo__fecha_alta__lte=fecha, alta_activo__tipo_bien__rubro=self, fecha_cap__lte=fecha):
+				res2 = res2 + j.saldo_activo_cap(fecha, fecha_ant)
+		result = res + res2
+		return result
+
 class Tipo_bien(models.Model):
 	rubro = models.ForeignKey(Rubro)
 	codigo = models.CharField(

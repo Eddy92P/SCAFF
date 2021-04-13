@@ -139,6 +139,10 @@
             <li><a href="{% url 'contabilidad:estado_resultados' %}">Estado de Resultados</a></li>
             <li><a href="{% url 'contabilidad:estado_ev' %}">Estado de Evolución del Patrimonio</a></li>
             <li><a href="{% url 'contabilidad:costo_servicio' %}">Estado de Costo de Servicio</a></li>
+            <li><a href="{% url 'contabilidad:temp_balancegen_excel' %}">Balance General (Excel)</a></li>
+            <li><a href="{% url 'contabilidad:temp_estadoresult_excel' %}">Estado de Resultados (Excel)</a></li>
+            <li><a href="{% url 'contabilidad:temp_evopatrim_excel' %}">Estado de Evolución del Patrimonio (Excel)</a></li>
+            <li><a href="{% url 'contabilidad:temp_costoserv_excel' %}">Estado de Costo de Servicio (Excel)</a></li>
             {% endif %}
           </ul>
         </li>
@@ -150,7 +154,7 @@
           <ul style="background-color: #302F2F;" class="dropdown-menu">
             {% if perms.almacenes.add_ingresoitem %}
             <li>
-              <a href="#">Proveedores, Clientes</a>
+              <a href="#">Proveedores</a>
               <ul>
                 <li><a href="{% url 'almacenes:listaproveedor' %}">Proveedores</a></li>  
               </ul>
@@ -197,7 +201,7 @@
               </ul>
             </li>
             <li>
-              <a href="#">Kardex</a>
+              <a href="#">Reportes Kardex</a>
               <ul>
                 <li><a href="{% url 'almacenes:listaitemt' %}">Físico Valorado</a></li>
                 <li><a href="{% url 'almacenes:res_kardex' %}">Resumen</a></li>
@@ -213,6 +217,31 @@
                 <li><a href="{% url 'almacenes:detalle_proveedores' %}">Proveedores</a></li>
               </ul>
             </li>
+            <li><a href="{% url 'almacenes:template_reporte_gral_excel' %}">Reporte General (Excel)</a></li>
+            <li>
+              <a href="#">Reportes Diarios (Excel)</a>
+              <ul>
+                <li><a href="{% url 'almacenes:template_reporte_diarioent_excel' %}">Reporte Entradas</a></li>
+                <li><a href="{% url 'almacenes:template_reporte_diariosal_excel' %}">Reporte Salidas</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#">Reportes Kardex (Excel)</a>
+              <ul>
+                <li style="left: 50px"><a href="{% url 'almacenes:template_reporte_kardexval_excel' %}">Físico Valorado</a></li>
+                <li style="left: 50px"><a href="{% url 'almacenes:template_reporte_reskardexval_excel' %}">Resumen Físico Valorado</a></li>
+              </ul>
+            </li>
+            <li><a href="{% url 'almacenes:template_reporte_resumen_entsal_excel' %}">Reporte Resumen de Entradas y Salidas (Excel)</a></li>
+            <li>
+              <a href="#">Detalles (Excel)</a>
+              <ul>
+                <li><a href="{% url 'almacenes:template_reporte_detalle_ent_excel' %}">Entradas</a></li>
+                <li><a href="{% url 'almacenes:template_reporte_detalle_sal_excel' %}">Salidas</a></li>
+                <li><a href="{% url 'almacenes:template_reporte_detalle_cliente_excel' %}">Clientes</a></li>
+                <li><a href="{% url 'almacenes:template_reporte_detalle_proov_excel' %}">Proovedores</a></li>
+              </ul>
+            </li>
             {% endif %}
           </ul>
         </li>
@@ -225,7 +254,7 @@
             <a href="#">Registro Activos Fijos</a>
               <ul>
                 <li><a href="{% url 'activos_f:listaubicacion' %}">Ubicación</a></li>
-		<li><a href="{% url 'almacenes:listacliente' %}">Clientes</a></li>
+		            <li><a href="{% url 'almacenes:listacliente' %}">Clientes</a></li>
                 <li><a href="{% url 'activos_f:listarubro' %}">Rubros</a></li>
                 <li><a href="{% url 'activos_f:listatipo_bien' %}">Tipos de Bien</a></li>
                 <li><a href="{% url 'almacenes:listaitemact' %}">Asignar Items</a></li>
@@ -250,6 +279,9 @@
             <li><a href="{% url 'activos_f:temp_espec_bien' %}">Reporte Específico/General de Bienes</a></li>
             <li><a href="{% url 'activos_f:temp_alta_baja' %}">Reporte Altas/Bajas de Activos</a></li>
             <li><a href="{% url 'activos_f:temp_inventario' %}">Reporte de Inventario</a></li>
+            <li><a href="{% url 'activos_f:temp_rep_especbien_excel' %}">Reporte Específico/General de Bienes (Excel)</a></li>
+            <li><a href="{% url 'activos_f:temp_rep_altabaja_excel' %}">Reporte Altas/Bajas de Activos (Excel)</a></li>
+            <li><a href="{% url 'activos_f:temp_rep_inventario_excel' %}">Reporte Inventario (Excel)</a></li>
           </ul>
         </li>
       {% endif %}

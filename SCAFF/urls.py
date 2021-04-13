@@ -24,6 +24,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.conf.urls.static import static
 
+import debug_toolbar
 urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^admin/', admin.site.urls),
@@ -34,4 +35,5 @@ urlpatterns = [
     #url(r'^chaining/', include('smart_selects.urls')),
     #url(r'^proyectos/', include('Proyectos.urls', namespace='proyectos')),
     url(r'^$', RedirectView.as_view(url=reverse_lazy('personal:main')), name='home'),
+    url('__debug__/', include(debug_toolbar.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

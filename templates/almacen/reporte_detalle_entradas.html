@@ -213,9 +213,6 @@
                         {% regroup res by subcategoria as items %}
                         {% for res1 in items %}
                             <tr>
-                                <td id="fuente3" colspan="9"><b>{{ res1.grouper.categoria.nombre|upper }}</b></td>
-                            </tr>
-                            <tr>
                                 <td id="fuente3" colspan="9"><b>{{ res1.grouper.nombre|upper }}</b></td>
                             </tr>
                             {% for i in res1.list %}     
@@ -238,7 +235,7 @@
                                 </tr>
                                 <tr>
                                     <td id="fuente3" colspan="8"><b>TOTAL.- {{ res1.grouper.categoria.nombre|upper }}</b></td>
-                                    <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% tot_cant_e res1.grouper f1 f2 %}</td>
+                                    <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% tot_cant_e res1.grouper.categoria f1 f2 %}</td>
                                     <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% imp_t res1.grouper.categoria f1 f2 %}</td>
                                     <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% imp_iva res1.grouper.categoria f1 f2 %}</td>
                                     <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% imp_t_iva res1.grouper.categoria f1 f2 %}</td>

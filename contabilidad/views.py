@@ -26,6 +26,7 @@ from django.core.urlresolvers import reverse_lazy
 from easy_pdf.views import PDFTemplateView
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
 class crearAsiento(CreateView):
 	model_pk = nivel_cinco
@@ -152,7 +153,7 @@ class crearAsiento1(crearAsiento):
 				aux4.append(i.sub_total)
 				aux4.append(0)
 			aux3 = zip(aux1, aux2, aux4)
-			total_salida_objects = aux.salida_item_set.all().count()
+			total_salida_objects = aux.salidaitem_set.all().count()
 			crearAsientoFormSetSal = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=total_salida_objects*2)
 			crear_asiento_form_set = crearAsientoFormSetSal(initial=[{'nivel_cinco': i, 'debe_b': k, 'haber_b': j} for i, j, k in aux3])
 		except Exception as e:
@@ -2292,9 +2293,9 @@ class updateCierreGestion(UpdateView):
 			form.save(commit=False)
 			if form.cleaned_data['cerrado'] == True:
 				year = self.model.objects.get(id=pk1).year
-				asientos = encabezadoas.objects.filter(fecha__year=year).exclude(Q(fecha__month=10) | Q(fecha__month=11) | Q(fecha__month=12)).update(cerrado=True)
-				ingresos = encingresoitem.objects.filter(fecha__year=year).exclude(Q(fecha__month=10) | Q(fecha__month=11) | Q(fecha__month=12)).update(cerrado=True)
-				salidas = encsalidaitem.objects.filter(fecha__year=year).exclude(Q(fecha__month=10) | Q(fecha__month=11) | Q(fecha__month=12)).update(cerrado=True)
+				asientos = encabezadoas.objects.filter(fecha__year=year).exclude(Q(fecha__month=10) & Q(fecha__month=11) & Q(fecha__month=12)).update(cerrado=True)
+				ingresos = encingresoitem.objects.filter(fecha__year=year).exclude(Q(fecha__month=10) & Q(fecha__month=11) & Q(fecha__month=12)).update(cerrado=True)
+				salidas = encsalidaitem.objects.filter(fecha__year=year).exclude(Q(fecha__month=10) & Q(fecha__month=11) & Q(fecha__month=12)).update(cerrado=True)
 			form.save()
 			return HttpResponseRedirect(reverse_lazy(self.success_url))
 		else:
@@ -2340,7 +2341,6 @@ class renumerarComprobantes(FormView):
 		else:
 			self.render_to_response(self.get_context_data(form=form))
 
-
 # Reportes
 class listaLibroMayor(CreateView, ListView):
 	model = asiento
@@ -2379,7 +2379,7 @@ class listaLibroMayor(CreateView, ListView):
 			b = 0
 			niv_cinco = nivel_cinco.objects.get(Q(codigo=campo2) | Q(descripcion=campo2))
 			if (niv_cinco.nivel_uno.id == 2) or (niv_cinco.nivel_uno.id == 4):
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.haber_b - i.debe_b
@@ -2391,7 +2391,7 @@ class listaLibroMayor(CreateView, ListView):
 					aux7 = aux7 + i.debe_d
 					aux8 = aux8 + i.haber_d
 
-				for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+				for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
 					aux = len(saldo)
 					if aux == 0:
 						saldo.append(aux2[b])
@@ -2402,7 +2402,7 @@ class listaLibroMayor(CreateView, ListView):
 						saldo_aux.append(saldo_aux[b-1] + aux3[b])
 						b += 1
 			else:
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.debe_b - i.haber_b
@@ -2413,7 +2413,7 @@ class listaLibroMayor(CreateView, ListView):
 					aux5 = aux5 + i.haber_b
 					aux7 = aux7 + i.debe_d
 					aux8 = aux8 + i.haber_d
-				for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+				for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
 					aux = len(saldo)
 					if aux == 0:
 						saldo.append(aux2[b])
@@ -2423,10 +2423,10 @@ class listaLibroMayor(CreateView, ListView):
 						saldo.append(saldo[b-1] + aux2[b])
 						saldo_aux.append(saldo_aux[b-1] + aux3[b])
 						b += 1
-			lista = zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'), saldo, saldo_aux)
+			lista = zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'), saldo, saldo_aux)
 			object_list = lista
 		else:
-			lista = zip(self.model.objects.all().exclude(encabezadoas__anulado=True).order_by('id'), " ", " ")
+			lista = zip(self.model.objects.all().exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('id'), " ", " ")
 			object_list = lista
 		return object_list
 
@@ -2468,7 +2468,7 @@ class libroMayorP(PDFTemplateView):
 		niv_cinco = nivel_cinco.objects.get(Q(codigo=campo3) | Q(descripcion=campo3))
 		if (niv_cinco.nivel_uno.id == 2) or (niv_cinco.nivel_uno.id == 4):
 			if campo4 == 'Bs':
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.haber_b - i.debe_b
@@ -2478,7 +2478,7 @@ class libroMayorP(PDFTemplateView):
 					aux4 = aux4 + i.debe_b
 					aux5 = aux5 + i.haber_b
 			elif campo4 == 'Dls':
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.haber_b - i.debe_b
@@ -2488,7 +2488,7 @@ class libroMayorP(PDFTemplateView):
 					aux7 = aux7 + i.debe_d
 					aux8 = aux8 + i.haber_d
 			elif campo4 == 'BsDl':
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.haber_b - i.debe_b
@@ -2499,7 +2499,7 @@ class libroMayorP(PDFTemplateView):
 					aux5 = aux5 + i.haber_b
 					aux7 = aux7 + i.debe_d
 					aux8 = aux8 + i.haber_d
-			for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+			for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
 				aux = len(saldo)
 				if aux == 0:
 					saldo.append(aux2[b])
@@ -2511,7 +2511,7 @@ class libroMayorP(PDFTemplateView):
 					b += 1
 		else:
 			if campo4 == 'Bs':
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.debe_b - i.haber_b
@@ -2521,7 +2521,7 @@ class libroMayorP(PDFTemplateView):
 					aux4 = aux4 + i.debe_b
 					aux5 = aux5 + i.haber_b
 			elif campo4 == 'Dls':
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.debe_b - i.haber_b
@@ -2531,7 +2531,7 @@ class libroMayorP(PDFTemplateView):
 					aux7 = aux7 + i.debe_d
 					aux8 = aux8 + i.haber_d
 			elif campo4 == 'BsDl':
-				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
 					aux = 0
 					aux1 = 0
 					aux = i.debe_b - i.haber_b
@@ -2542,7 +2542,7 @@ class libroMayorP(PDFTemplateView):
 					aux5 = aux5 + i.haber_b
 					aux7 = aux7 + i.debe_d
 					aux8 = aux8 + i.haber_d
-			for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'):
+			for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
 				aux = len(saldo)
 				if aux == 0:
 					saldo.append(aux2[b])
@@ -2560,7 +2560,7 @@ class libroMayorP(PDFTemplateView):
 		context.update({'campo2': fecha2})
 		context.update({'campo3': campo3})
 		context.update({'campo4': campo4})
-		lista = zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True).order_by('encabezadoas__fecha'), saldo, saldo_aux)
+		lista = zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'), saldo, saldo_aux)
 		context['asi'] = lista
 		return context
 
@@ -2578,7 +2578,7 @@ class balanceGen(PDFTemplateView):
 		context.update({'campo': fecha1})
 		context.update({'campo2': fecha2})
 		context.update({'campo3': campo3})
-		res = nivel_uno.objects.filter(Q(id__lte=3) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2))) & Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False)).distinct()
+		res = nivel_uno.objects.filter(Q(id__lte=3) & (Q(nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2))) & Q(nivel_cinco__asiento__encabezadoas__anulado=False,nivel_cinco__asiento__encabezadoas__cerrado=False)).order_by('id').distinct()
 		context['niv'] = res
 		context['f1'] = f1
 		context['f2'] = f2
@@ -2603,9 +2603,9 @@ class estadoResultado(PDFTemplateView):
 		context.update({'campo': fecha1})
 		context.update({'campo2': fecha2})
 		context.update({'campo3': campo3})
-		res = nivel_uno.objects.filter(Q(id__gte=4) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2))) & Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False)).distinct()
+		res = nivel_uno.objects.filter(Q(id__gte=4) & (Q(nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2))) & Q(nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False)).order_by('id').distinct()
 		context['niv'] = res
-		for i in nivel_uno.objects.filter(Q(id__gte=4) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2))) & Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False)).distinct():
+		for i in nivel_uno.objects.filter(Q(id__gte=4) & (Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2))) & Q(nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False)).distinct():
 			for j in i.nivel_dos_set.all():
 				for k in j.nivel_tres_set.all():
 					for l in k.nivel_cuatro_set.all():
@@ -2683,7 +2683,7 @@ class FacturasExcel(TemplateView):
 	def get(self, request, *args, **kwargs):
 		campo = request.GET.get('campo')
 		campo2 = request.GET.get('campo2')
-		res = Factura.objects.filter(Q(fecha_fac__month=campo) & Q(fecha_fac__year=campo2)).exclude(asiento__encabezadoas__anulado=True)
+		res = Factura.objects.filter(Q(fecha_fac__month=campo) & Q(fecha_fac__year=campo2)).exclude(asiento__encabezadoas__anulado=True, asiento__encabezadoas__cerrado=True)
 		wb = Workbook()
 		ws = wb.active
 	
@@ -2743,7 +2743,7 @@ class FacturasVExcel(TemplateView):
 	def get(self, request, *args, **kwargs):
 		campo = request.GET.get('campo')
 		campo2 = request.GET.get('campo2')
-		res = Factura_V.objects.filter(Q(fecha_fac__month=campo) & Q(fecha_fac__year=campo2)).exclude(asiento__encabezadoas__anulado=True)
+		res = Factura_V.objects.filter(Q(fecha_fac__month=campo) & Q(fecha_fac__year=campo2)).exclude(asiento__encabezadoas__anulado=True, asiento__encabezadoas__cerrado=True)
 		wb = Workbook()
 		ws = wb.active
 	
@@ -2802,7 +2802,7 @@ class RetencionExcel(TemplateView):
 		campo2 = request.GET.get('campo2')
 		f1 = datetime.datetime.strptime(campo, "%Y-%m-%d")
 		f2 = datetime.datetime.strptime(campo2, "%Y-%m-%d")
-		res = encabezadoas.objects.filter(Q(fecha__range=(f1,f2)) & Q(Q(asientos__opciones_p='R') | Q(asientos__opciones_p='A'))).exclude(anulado=True)
+		res = encabezadoas.objects.filter(Q(fecha__range=(f1,f2)) & Q(Q(asientos__opciones_p='R') | Q(asientos__opciones_p='A'))).exclude(anulado=True, cerrado=True)
 		wb = Workbook()
 		ws = wb.active
 	
@@ -2871,17 +2871,17 @@ class estadoEvolucionP(PDFTemplateView):
 		context['asi'] = asiento.objects.filter(encabezadoas__fecha__lte=f)
 		
 		if (f.month!=10) | (f.month!=11) | (f.month!=12):
-			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
 		else:
-			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
-			c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
 		
 		
 		if c1_a['total']:
@@ -2908,19 +2908,19 @@ class estadoEvolucionP(PDFTemplateView):
 		patrimonio_neto_a = aux + aux1 + aux2 + aux3 + aux4
 		
 		if (f.month!=10) | (f.month!=11) | (f.month!=12):
-			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
 		else:
-			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
-			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).exclude(encabezadoas__anulado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
 			
 		if c1['total']:
 			aux5 = c1['total']  #capital social
@@ -2985,7 +2985,7 @@ class libroDiario(PDFTemplateView):
 		f2 = datetime.datetime.strptime(campo1, "%Y-%m-%d")
 		fecha1 = f1.strftime("%d/%m/%Y")
 		fecha2 = f2.strftime("%d/%m/%Y")
-		res = asiento.objects.filter(encabezadoas__fecha__range=(f1, f2)).exclude(encabezadoas__anulado=True).order_by('encabezadoas__numero_comp')
+		res = asiento.objects.filter(encabezadoas__fecha__range=(f1, f2)).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__numero_comp')
 		context['lib'] = res
 		context['fecha1'] = fecha1
 		context['fecha2'] = fecha2
@@ -3012,9 +3012,9 @@ class ReporteCostoServicio(PDFTemplateView):
 		fecha1 = f1.strftime("%d/%m/%Y")
 		fecha2 = f2.strftime("%d/%m/%Y")
 
-		res = nivel_cinco.objects.filter(Q(nivel_cuatro__codigo='510101') | Q(nivel_cuatro__codigo='510102') | Q(nivel_cuatro__codigo='510103'), asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).distinct().order_by('codigo')
+		res = nivel_cinco.objects.filter(Q(nivel_cuatro__codigo='510101') | Q(nivel_cuatro__codigo='510102') | Q(nivel_cuatro__codigo='510103'), asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).distinct().order_by('codigo')
 
-		res1 = nivel_cinco.objects.filter(Q(nivel_cuatro__codigo='510101') | Q(nivel_cuatro__codigo='510102') | Q(nivel_cuatro__codigo='510103'), asiento__encabezadoas__fecha__range=(f1, f2), nivel_dos__nivel_tres__nivel_cuatro__nivel_cinco__asiento__encabezadoas__anulado=False).aggregate(total=Sum('asiento__debe_b'))
+		res1 = nivel_cinco.objects.filter(Q(nivel_cuatro__codigo='510101') | Q(nivel_cuatro__codigo='510102') | Q(nivel_cuatro__codigo='510103'), asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Sum('asiento__debe_b'))
 
 		context['res'] = res
 		context['total'] = res1['total']
@@ -3033,3 +3033,1402 @@ class RepPlanCuentas(PDFTemplateView):
 		context['res'] = res
 
 		return context
+
+class RepBalanceGenExcelTemplate(FormView):
+	form_class = repBalanceGenForm
+	template_name = 'contabilidad/temp_rep_balance_gen_excel.html'
+	def get_context_data(self, **kwargs):
+		context = super(RepBalanceGenExcelTemplate, self).get_context_data(**kwargs)
+		if 'form'in context:
+			context['form'] = self.form_class()
+		return context
+
+class BalanceGenExcel(TemplateView):
+	def get(self, request, *args, **kwargs):
+		campo = request.GET.get('campo')
+		campo1 = request.GET.get('campo1')
+		campo2 = request.GET.get('campo2')
+		f1 = datetime.datetime.strptime(campo, "%Y-%m-%d")
+		f2 = datetime.datetime.strptime(campo1, "%Y-%m-%d")
+		fecha1 = f1.strftime("%d/%m/%Y")
+		fecha2 = f2.strftime("%d/%m/%Y")
+		total_iteration = 1
+		res = nivel_uno.objects.filter(Q(id__lte=3) & (Q(nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2))) & Q(nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False)).order_by('id').distinct()
+		total_queries = nivel_uno.objects.filter(Q(id__lte=3) & (Q(nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2))) & Q(nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False)).distinct().count()
+		wb = Workbook()
+		ws = wb.active
+		
+		ws['A1'] = 'BALANCE GENERAL PERIODO DEL ' + str(fecha1) + ' al ' + str(fecha2)
+		ws['A2'] = 'Código'
+		ws['B2'] = 'Nombre Cuenta'
+		ws['C2'] = 'Bolivianos Bs.'
+		ws['D2'] = 'Dólares US$.'
+
+		ws['A1'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['A2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['B2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['C2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['D2'].alignment = Alignment(horizontal="center", vertical="center")
+
+		ws.merge_cells('A1:D1')
+
+		ws.column_dimensions['B'].width = 50
+		ws.column_dimensions['C'].width = 15
+		ws.column_dimensions['D'].width = 15
+
+		ws['A1'].font = Font(bold=True)
+		ws['A2'].font = Font(bold=True)
+		ws['B2'].font = Font(bold=True)
+		ws['C2'].font = Font(bold=True)
+		ws['D2'].font = Font(bold=True)
+
+		ws['A1'].fill = PatternFill(start_color='219FB5', end_color='219FB5', fill_type='solid')
+
+		cont = 3
+		
+		if campo2 == 'G':
+			for niv_uno in res:
+				if total_iteration < total_queries:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					for niv_dos in niv_uno.nivel_dos_related():
+						ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t(f1, f2)
+						ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t(f1, f2)
+					total_iteration += 1
+				else:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					for niv_dos in niv_uno.nivel_dos_related():
+						ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t(f1, f2)
+						ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t(f1, f2)
+					cont += 1
+					ws.cell(row = cont, column = 2).value = 'TOTAL PASIVO PATRIMONIO'
+					ws.cell(row = cont, column = 3).value = niv_uno.suma_patrimonio_pasivo_bs(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.suma_patrimonio_pasivo_dls(f1, f2)
+
+				cont+=1
+
+		if campo2 == 'R':
+			for niv_uno in res:
+				if total_iteration < total_queries:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t(f1, f2)
+							cont += 1
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
+								if nivel_tres.asiento_exists():
+									ws.cell(row = cont, column = 3).value = niv_tres.saldo_b_t(f1, f2)
+									ws.cell(row = cont, column = 4).value = niv_tres.saldo_d_t(f1, f2)
+					total_iteration += 1
+				else:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t(f1, f2)
+							cont += 1
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
+								ws.cell(row = cont, column = 3).value = niv_tres.saldo_b_t(f1, f2)
+								ws.cell(row = cont, column = 4).value = niv_tres.saldo_d_t(f1, f2)
+							cont += 1
+							ws.cell(row = cont, column = 2).value = 'TOTAL PASIVO PATRIMONIO'
+							ws.cell(row = cont, column = 3).value = niv_uno.suma_patrimonio_pasivo_bs(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_uno.suma_patrimonio_pasivo_dls(f1, f2)
+
+				cont+=1
+
+		if campo2 == 'T':
+			for niv_uno in res:
+				if total_iteration < total_queries:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					ws.cell(row = cont, column = 3).value = niv_uno.saldo_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.saldo_d_t_excel(f1, f2)
+					cont += 1
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t_excel(f1, f2)
+							cont += 1
+							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
+								if niv_tres.asiento_exists():
+									ws.cell(row = cont, column = 1).value = niv_tres.codigo
+									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
+									ws.cell(row = cont, column = 3).value = niv_tres.saldo_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 4).value = niv_tres.saldo_d_t_excel(f1, f2)
+									cont += 1
+
+					total_iteration += 1
+				else:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t(f1, f2)
+							cont += 1
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
+								if niv_tres.asiento_exists():
+									ws.cell(row = cont, column = 3).value = niv_tres.saldo_b_t(f1, f2)
+									ws.cell(row = cont, column = 4).value = niv_tres.saldo_d_t(f1, f2)
+									cont += 1
+									ws.cell(row = cont, column = 1).value = niv_tres.codigo
+									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
+									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
+										ws.cell(row = cont, column = 3).value = niv_cuatro.saldo_b_t(f1, f2)
+										ws.cell(row = cont, column = 4).value = niv_cuatro.saldo_d_t(f1, f2)
+									cont += 1
+									ws.cell(row = cont, column = 2).value = 'TOTAL PASIVO PATRIMONIO'
+									ws.cell(row = cont, column = 3).value = niv_uno.suma_patrimonio_pasivo_bs(f1, f2)
+									ws.cell(row = cont, column = 4).value = niv_uno.suma_patrimonio_pasivo_dls(f1, f2)
+
+		if campo2 == 'C':
+			for niv_uno in res:
+				if total_iteration < total_queries:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					ws.cell(row = cont, column = 3).value = niv_uno.saldo_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.saldo_d_t_excel(f1, f2)
+					cont += 1
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t_excel(f1, f2)
+							cont += 1
+							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
+								if niv_tres.asiento_exists():
+									ws.cell(row = cont, column = 1).value = niv_tres.codigo
+									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
+									ws.cell(row = cont, column = 3).value = niv_tres.saldo_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 4).value = niv_tres.saldo_d_t_excel(f1, f2)
+									cont += 1
+									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
+										if niv_cuatro.asiento_exists():
+											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
+											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
+											ws.cell(row = cont, column = 3).value = niv_cuatro.saldo_b_t_excel(f1, f2)
+											ws.cell(row = cont, column = 4).value = niv_cuatro.saldo_d_t_excel(f1, f2)
+											cont += 1
+
+					total_iteration += 1
+				else:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					ws.cell(row = cont, column = 3).value = niv_uno.saldo_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.saldo_d_t_excel(f1, f2)
+					cont += 1
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t_excel(f1, f2)
+							cont += 1
+							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
+								if niv_tres.asiento_exists():
+									ws.cell(row = cont, column = 1).value = niv_tres.codigo
+									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
+									ws.cell(row = cont, column = 3).value = niv_tres.saldo_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 4).value = niv_tres.saldo_d_t_excel(f1, f2)
+									cont += 1
+									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
+										if niv_cuatro.asiento_exists():
+											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
+											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
+											ws.cell(row = cont, column = 3).value = niv_cuatro.saldo_b_t_excel(f1, f2)
+											ws.cell(row = cont, column = 4).value = niv_cuatro.saldo_d_t_excel(f1, f2)
+											cont += 1
+										ws.cell(row = cont, column = 2).value = 'TOTAL PASIVO PATRIMONIO'
+										ws.cell(row = cont, column = 3).value = niv_uno.suma_patrimonio_pasivo_bs(f1, f2)
+										ws.cell(row = cont, column = 4).value = niv_uno.suma_patrimonio_pasivo_dls(f1, f2)
+
+
+		if campo2 == 'SC':
+			for niv_uno in res:
+				if total_iteration < total_queries:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					ws.cell(row = cont, column = 3).value = niv_uno.saldo_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.saldo_d_t_excel(f1, f2)
+					cont += 1
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t_excel(f1, f2)
+							cont += 1
+							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
+								if niv_tres.asiento_exists():
+									ws.cell(row = cont, column = 1).value = niv_tres.codigo
+									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
+									ws.cell(row = cont, column = 3).value = niv_tres.saldo_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 4).value = niv_tres.saldo_d_t_excel(f1, f2)
+									cont += 1
+									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
+										if niv_cuatro.asiento_exists():
+											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
+											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
+											ws.cell(row = cont, column = 3).value = niv_cuatro.saldo_b_t_excel(f1, f2)
+											ws.cell(row = cont, column = 4).value = niv_cuatro.saldo_d_t_excel(f1, f2)
+											cont += 1
+											for niv_cinco in niv_cuatro.nivel_cinco_set.all().distinct():
+												if niv_cinco.asiento_exists():
+													print(niv_cinco.saldo_d_t_excel(f1, f2))
+													ws.cell(row = cont, column = 1).value = niv_cinco.codigo
+													ws.cell(row = cont, column = 2).value = niv_cinco.descripcion
+													ws.cell(row = cont, column = 3).value = niv_cinco.saldo_b_t_excel(f1, f2)
+													ws.cell(row = cont, column = 4).value = niv_cinco.saldo_d_t_excel(f1, f2)
+													cont += 1
+
+					total_iteration += 1
+				else:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					ws.cell(row = cont, column = 3).value = niv_uno.saldo_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.saldo_d_t_excel(f1, f2)
+					cont += 1
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t_excel(f1, f2)
+							cont += 1
+							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
+								if niv_tres.asiento_exists():
+									ws.cell(row = cont, column = 1).value = niv_tres.codigo
+									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
+									ws.cell(row = cont, column = 3).value = niv_tres.saldo_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 4).value = niv_tres.saldo_d_t_excel(f1, f2)
+									cont += 1
+									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
+										if niv_cuatro.asiento_exists():
+											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
+											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
+											ws.cell(row = cont, column = 3).value = niv_cuatro.saldo_b_t_excel(f1, f2)
+											ws.cell(row = cont, column = 4).value = niv_cuatro.saldo_d_t_excel(f1, f2)
+											cont += 1
+											for niv_cinco in niv_cuatro.nivel_cinco_set.all().distinct():
+												if niv_cinco.asiento_exists():
+													ws.cell(row = cont, column = 1).value = niv_cinco.codigo
+													ws.cell(row = cont, column = 2).value = niv_cinco.descripcion
+													ws.cell(row = cont, column = 3).value = niv_cinco.saldo_b_t_excel(f1, f2)
+													ws.cell(row = cont, column = 4).value = niv_cinco.saldo_d_t_excel(f1, f2)
+													cont += 1
+												ws.cell(row = cont, column = 2).value = 'TOTAL PASIVO PATRIMONIO'
+												ws.cell(row = cont, column = 3).value = niv_uno.suma_patrimonio_pasivo_bs(f1, f2)
+												ws.cell(row = cont, column = 4).value = niv_uno.suma_patrimonio_pasivo_dls(f1, f2)
+				
+
+		nombre_archivo = "Balance General.xlsx"
+		response = HttpResponse(content_type = "application/ms-excel")
+		content = "attachment; filename = {0}".format(nombre_archivo)
+		response['Content-Disposition'] = content
+		response.content = save_virtual_workbook(wb)
+		return response
+
+
+class RepEstResultExcelTemplate(FormView):
+	form_class = repEstadoResultForm
+	template_name = 'contabilidad/temp_rep_estado_result_excel.html'
+	def get_context_data(self, **kwargs):
+		context = super(RepEstResultExcelTemplate, self).get_context_data(**kwargs)
+		if 'form'in context:
+			context['form'] = self.form_class()
+		return context
+
+class EstadoResultExcel(TemplateView):
+	def get(self, request, *args, **kwargs):
+		campo = request.GET.get('campo')
+		campo1 = request.GET.get('campo1')
+		campo2 = request.GET.get('campo2')
+		f1 = datetime.datetime.strptime(campo, "%Y-%m-%d")
+		f2 = datetime.datetime.strptime(campo1, "%Y-%m-%d")
+		fecha1 = f1.strftime("%d/%m/%Y")
+		fecha2 = f2.strftime("%d/%m/%Y")
+		total_iteration = 1
+		res = nivel_uno.objects.filter(Q(id__gte=4) & (Q(nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2))) & Q(nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False)).order_by('id').distinct()
+		total_queries = nivel_uno.objects.filter(Q(id__gte=4) & (Q(nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2))) & Q(nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False)).distinct().count()
+		wb = Workbook()
+		ws = wb.active
+	
+		ws['A1'] = 'ESTADO DE RESULTADOS PERIODO DEL ' + str(fecha1) + ' al ' + str(fecha2)
+		ws['A2'] = 'Código'
+		ws['B2'] = 'Nombre Cuenta'
+		ws['C2'] = 'Bolivianos Bs.'
+		ws['E2'] = 'Dólares US$.'
+		ws['C3'] = 'Debe'
+		ws['D3'] = 'Haber'
+		ws['E3'] = 'Debe'
+		ws['F3'] = 'Haber'
+
+		ws.merge_cells('C2:D2')
+		ws.merge_cells('E2:F2')
+
+		ws['A1'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['A2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['B2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['C2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['E2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['C3'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['D3'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['E3'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['F3'].alignment = Alignment(horizontal="center", vertical="center")
+
+		ws.merge_cells('A1:F1')
+
+		ws.column_dimensions['B'].width = 50
+		ws.column_dimensions['C'].width = 15
+		ws.column_dimensions['D'].width = 15
+		ws.column_dimensions['E'].width = 15
+		ws.column_dimensions['F'].width = 15
+
+		ws['A1'].font = Font(bold=True)
+		ws['A2'].font = Font(bold=True)
+		ws['B2'].font = Font(bold=True)
+		ws['C2'].font = Font(bold=True)
+		ws['E2'].font = Font(bold=True)
+
+		ws['A1'].fill = PatternFill(start_color='219FB5', end_color='219FB5', fill_type='solid')
+
+		cont = 4
+
+		if campo2 == 'G':
+			for niv_uno in res:
+				if total_iteration < total_queries:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					ws.cell(row = cont, column = 3).value = niv_uno.debe_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.haber_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.debe_d_t_excel(f1, f2)
+					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
+					total_iteration += 1
+				else:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					ws.cell(row = cont, column = 3).value = niv_uno.debe_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.haber_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.debe_d_t_excel(f1, f2)
+					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
+					cont += 1
+					ws.cell(row = cont, column = 2).value = 'TOTALES'
+					ws.cell(row = cont, column = 3).value = niv_uno.debe_b_ter(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.haber_b_ter(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.debe_d_ter(f1, f2)
+					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_ter(f1, f2)
+					cont += 1
+					ws.cell(row = cont, column = 2).value = 'UTILIDAD DEL PERIODO'
+					ws.cell(row = cont, column = 3).value = niv_uno.saldo_b_ter(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.saldo_d_ter(f1, f2)
+
+				cont += 1
+
+		if campo2 == 'R':
+			for niv_uno in res:
+				if total_iteration < total_queries:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					ws.cell(row = cont, column = 3).value = niv_uno.debe_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.haber_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.debe_d_t_excel(f1, f2)
+					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
+					cont += 1
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.haber_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 5).value = niv_dos.debe_d_t_excel(f1, f2)
+							ws.cell(row = cont, column = 6).value = niv_dos.haber_d_t_excel(f1, f2)
+							cont += 1
+					total_iteration += 1
+
+				else:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					ws.cell(row = cont, column = 3).value = niv_uno.debe_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.haber_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.debe_d_t_excel(f1, f2)
+					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
+					cont += 1
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.haber_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 5).value = niv_dos.debe_d_t_excel(f1, f2)
+							ws.cell(row = cont, column = 6).value = niv_dos.haber_d_t_excel(f1, f2)
+							cont += 1
+					ws.cell(row = cont, column = 2).value = 'TOTALES'
+					ws.cell(row = cont, column = 3).value = niv_uno.debe_b_ter(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.haber_b_ter(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.debe_d_ter(f1, f2)
+					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_ter(f1, f2)
+					cont += 1
+					ws.cell(row = cont, column = 2).value = 'UTILIDAD DEL PERIODO'
+					ws.cell(row = cont, column = 3).value = niv_uno.saldo_b_ter(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.saldo_d_ter(f1, f2)
+
+				cont += 1
+
+		if campo2 == 'T':
+			for niv_uno in res:
+				if total_iteration < total_queries:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					ws.cell(row = cont, column = 3).value = niv_uno.debe_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.haber_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.debe_d_t_excel(f1, f2)
+					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
+					cont += 1
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.haber_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 5).value = niv_dos.debe_d_t_excel(f1, f2)
+							ws.cell(row = cont, column = 6).value = niv_dos.haber_d_t_excel(f1, f2)
+							cont += 1
+							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
+								if niv_tres.asiento_exists():
+									ws.cell(row = cont, column = 1).value = niv_tres.codigo
+									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
+									ws.cell(row = cont, column = 3).value = niv_tres.debe_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 4).value = niv_tres.haber_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 5).value = niv_tres.debe_d_t_excel(f1, f2)
+									ws.cell(row = cont, column = 6).value = niv_tres.haber_d_t_excel(f1, f2)
+									cont += 1
+					total_iteration += 1
+
+				else:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					ws.cell(row = cont, column = 3).value = niv_uno.debe_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.haber_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.debe_d_t_excel(f1, f2)
+					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
+					cont += 1
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.haber_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 5).value = niv_dos.debe_d_t_excel(f1, f2)
+							ws.cell(row = cont, column = 6).value = niv_dos.haber_d_t_excel(f1, f2)
+							cont += 1
+							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
+								if niv_tres.asiento_exists():
+									ws.cell(row = cont, column = 1).value = niv_tres.codigo
+									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
+									ws.cell(row = cont, column = 3).value = niv_tres.debe_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 4).value = niv_tres.haber_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 5).value = niv_tres.debe_d_t_excel(f1, f2)
+									ws.cell(row = cont, column = 6).value = niv_tres.haber_d_t_excel(f1, f2)
+									cont += 1
+					ws.cell(row = cont, column = 2).value = 'TOTALES'
+					ws.cell(row = cont, column = 3).value = niv_uno.debe_b_ter(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.haber_b_ter(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.debe_d_ter(f1, f2)
+					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_ter(f1, f2)
+					cont += 1
+					ws.cell(row = cont, column = 2).value = 'UTILIDAD DEL PERIODO'
+					ws.cell(row = cont, column = 3).value = niv_uno.saldo_b_ter(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.saldo_d_ter(f1, f2)
+
+				cont += 1
+
+		if campo2 == 'C':
+			for niv_uno in res:
+				if total_iteration < total_queries:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					ws.cell(row = cont, column = 3).value = niv_uno.debe_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.haber_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.debe_d_t_excel(f1, f2)
+					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
+					cont += 1
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.haber_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 5).value = niv_dos.debe_d_t_excel(f1, f2)
+							ws.cell(row = cont, column = 6).value = niv_dos.haber_d_t_excel(f1, f2)
+							cont += 1
+							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
+								if niv_tres.asiento_exists():
+									ws.cell(row = cont, column = 1).value = niv_tres.codigo
+									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
+									ws.cell(row = cont, column = 3).value = niv_tres.debe_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 4).value = niv_tres.haber_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 5).value = niv_tres.debe_d_t_excel(f1, f2)
+									ws.cell(row = cont, column = 6).value = niv_tres.haber_d_t_excel(f1, f2)
+									cont += 1
+									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
+										if niv_cuatro.asiento_exists():
+											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
+											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
+											ws.cell(row = cont, column = 3).value = niv_cuatro.debe_b_t_excel(f1, f2)
+											ws.cell(row = cont, column = 4).value = niv_cuatro.haber_b_t_excel(f1, f2)
+											ws.cell(row = cont, column = 5).value = niv_cuatro.debe_d_t_excel(f1, f2)
+											ws.cell(row = cont, column = 6).value = niv_cuatro.haber_d_t_excel(f1, f2)
+											cont += 1
+					total_iteration += 1
+
+				else:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					ws.cell(row = cont, column = 3).value = niv_uno.debe_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.haber_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.debe_d_t_excel(f1, f2)
+					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
+					cont += 1
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.haber_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 5).value = niv_dos.debe_d_t_excel(f1, f2)
+							ws.cell(row = cont, column = 6).value = niv_dos.haber_d_t_excel(f1, f2)
+							cont += 1
+							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
+								if niv_tres.asiento_exists():
+									ws.cell(row = cont, column = 1).value = niv_tres.codigo
+									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
+									ws.cell(row = cont, column = 3).value = niv_tres.debe_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 4).value = niv_tres.haber_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 5).value = niv_tres.debe_d_t_excel(f1, f2)
+									ws.cell(row = cont, column = 6).value = niv_tres.haber_d_t_excel(f1, f2)
+									cont += 1
+									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
+										if niv_cuatro.asiento_exists():
+											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
+											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
+											ws.cell(row = cont, column = 3).value = niv_cuatro.debe_b_t_excel(f1, f2)
+											ws.cell(row = cont, column = 4).value = niv_cuatro.haber_b_t_excel(f1, f2)
+											ws.cell(row = cont, column = 5).value = niv_cuatro.debe_d_t_excel(f1, f2)
+											ws.cell(row = cont, column = 6).value = niv_cuatro.haber_d_t_excel(f1, f2)
+											cont += 1
+					ws.cell(row = cont, column = 2).value = 'TOTALES'
+					ws.cell(row = cont, column = 3).value = niv_uno.debe_b_ter(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.haber_b_ter(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.debe_d_ter(f1, f2)
+					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_ter(f1, f2)
+					cont += 1
+					ws.cell(row = cont, column = 2).value = 'UTILIDAD DEL PERIODO'
+					ws.cell(row = cont, column = 3).value = niv_uno.saldo_b_ter(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.saldo_d_ter(f1, f2)
+
+				cont += 1
+
+		if campo2 == 'SC':
+			for niv_uno in res:
+				if total_iteration < total_queries:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					ws.cell(row = cont, column = 3).value = niv_uno.debe_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.haber_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.debe_d_t_excel(f1, f2)
+					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
+					cont += 1
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.haber_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 5).value = niv_dos.debe_d_t_excel(f1, f2)
+							ws.cell(row = cont, column = 6).value = niv_dos.haber_d_t_excel(f1, f2)
+							cont += 1
+							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
+								if niv_tres.asiento_exists():
+									ws.cell(row = cont, column = 1).value = niv_tres.codigo
+									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
+									ws.cell(row = cont, column = 3).value = niv_tres.debe_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 4).value = niv_tres.haber_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 5).value = niv_tres.debe_d_t_excel(f1, f2)
+									ws.cell(row = cont, column = 6).value = niv_tres.haber_d_t_excel(f1, f2)
+									cont += 1
+									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
+										if niv_cuatro.asiento_exists():
+											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
+											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
+											ws.cell(row = cont, column = 3).value = niv_cuatro.debe_b_t_excel(f1, f2)
+											ws.cell(row = cont, column = 4).value = niv_cuatro.haber_b_t_excel(f1, f2)
+											ws.cell(row = cont, column = 5).value = niv_cuatro.debe_d_t_excel(f1, f2)
+											ws.cell(row = cont, column = 6).value = niv_cuatro.haber_d_t_excel(f1, f2)
+											cont += 1
+											for niv_cinco in niv_cuatro.nivel_cinco_set.all().distinct():
+												if niv_cinco.asiento_exists():
+													ws.cell(row = cont, column = 1).value = niv_cinco.codigo
+													ws.cell(row = cont, column = 2).value = niv_cinco.descripcion
+													ws.cell(row = cont, column = 3).value = niv_cinco.debe_b_t_excel(f1, f2)
+													ws.cell(row = cont, column = 4).value = niv_cinco.haber_b_t_excel(f1, f2)
+													ws.cell(row = cont, column = 5).value = niv_cinco.debe_d_t_excel(f1, f2)
+													ws.cell(row = cont, column = 6).value = niv_cinco.haber_d_t_excel(f1, f2)
+													cont += 1
+					total_iteration += 1
+
+				else:
+					ws.cell(row = cont, column = 1).value = niv_uno.id
+					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
+					ws.cell(row = cont, column = 3).value = niv_uno.debe_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.haber_b_t_excel(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.debe_d_t_excel(f1, f2)
+					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
+					cont += 1
+					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
+						if niv_dos.asiento_exists():
+							ws.cell(row = cont, column = 1).value = niv_dos.codigo
+							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
+							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 4).value = niv_dos.haber_b_t_excel(f1, f2)
+							ws.cell(row = cont, column = 5).value = niv_dos.debe_d_t_excel(f1, f2)
+							ws.cell(row = cont, column = 6).value = niv_dos.haber_d_t_excel(f1, f2)
+							cont += 1
+							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
+								if niv_tres.asiento_exists():
+									ws.cell(row = cont, column = 1).value = niv_tres.codigo
+									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
+									ws.cell(row = cont, column = 3).value = niv_tres.debe_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 4).value = niv_tres.haber_b_t_excel(f1, f2)
+									ws.cell(row = cont, column = 5).value = niv_tres.debe_d_t_excel(f1, f2)
+									ws.cell(row = cont, column = 6).value = niv_tres.haber_d_t_excel(f1, f2)
+									cont += 1
+									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
+										if niv_cuatro.asiento_exists():
+											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
+											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
+											ws.cell(row = cont, column = 3).value = niv_cuatro.debe_b_t_excel(f1, f2)
+											ws.cell(row = cont, column = 4).value = niv_cuatro.haber_b_t_excel(f1, f2)
+											ws.cell(row = cont, column = 5).value = niv_cuatro.debe_d_t_excel(f1, f2)
+											ws.cell(row = cont, column = 6).value = niv_cuatro.haber_d_t_excel(f1, f2)
+											cont += 1
+											for niv_cinco in niv_cuatro.nivel_cinco_set.all().distinct():
+												if niv_cinco.asiento_exists():
+													ws.cell(row = cont, column = 1).value = niv_cinco.codigo
+													ws.cell(row = cont, column = 2).value = niv_cinco.descripcion
+													ws.cell(row = cont, column = 3).value = niv_cinco.debe_b_t_excel(f1, f2)
+													ws.cell(row = cont, column = 4).value = niv_cinco.haber_b_t_excel(f1, f2)
+													ws.cell(row = cont, column = 5).value = niv_cinco.debe_d_t_excel(f1, f2)
+													ws.cell(row = cont, column = 6).value = niv_cinco.haber_d_t_excel(f1, f2)
+													cont += 1
+
+					ws.cell(row = cont, column = 2).value = 'TOTALES'
+					ws.cell(row = cont, column = 3).value = niv_uno.debe_b_ter(f1, f2)
+					ws.cell(row = cont, column = 4).value = niv_uno.haber_b_ter(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.debe_d_ter(f1, f2)
+					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_ter(f1, f2)
+					cont += 1
+					ws.cell(row = cont, column = 2).value = 'UTILIDAD DEL PERIODO'
+					ws.cell(row = cont, column = 3).value = niv_uno.saldo_b_ter(f1, f2)
+					ws.cell(row = cont, column = 5).value = niv_uno.saldo_d_ter(f1, f2)
+
+				cont += 1
+
+		nombre_archivo = "Estado de Resultados.xlsx"
+		response = HttpResponse(content_type = "application/ms-excel")
+		content = "attachment; filename = {0}".format(nombre_archivo)
+		response['Content-Disposition'] = content
+		response.content = save_virtual_workbook(wb)
+		return response
+
+class RepEvoPatrimExcelTemplate(FormView):
+	form_class = repEvoPatrimForm
+	template_name = 'contabilidad/temp_rep_evo_patrim_excel.html'
+	def get_context_data(self, **kwargs):
+		context = super(RepEvoPatrimExcelTemplate, self).get_context_data(**kwargs)
+		if 'form'in context:
+			context['form'] = self.form_class()
+		return context
+
+class EvoPatrimExcel(TemplateView):
+	def get(self, request, *args, **kwargs):
+		campo = self.request.GET.get('campo1')
+		f = datetime.datetime.strptime(campo, "%Y-%m-%d")
+		year_act = f.year
+		year = f.year - 1
+		res = 0
+		fecha = f.strftime("%d/%m/%Y")
+
+		wb = Workbook()
+		ws = wb.active
+		
+		ws['A1'] = 'ESTADO DE EVOLUCION DE PATRIMONIO PERIODO AL' + str(fecha)
+		ws['A2'] = 'Denominación'
+		ws['B2'] = 'Capital Social'
+		ws['C2'] = 'Ajuste de Capital'
+		ws['D2'] = 'Reserva Legal'
+		ws['E2'] = 'Ajuste de Reservas Patrimoniales'
+		ws['F2'] = 'Resultados Acumulados'
+		ws['G2'] = 'Patrimonio Neto'
+		ws['A3'] = 'Saldos al inicio de la Gestión'
+		ws['A4'] = 'Incremento de Capital'
+		ws['A5'] = 'Apropiación Fondo de Reserva Legal'
+		ws['A6'] = 'Ajuste de Capital'
+		ws['A7'] = 'Ajuste de Reservas Patrimoniales'
+		ws['A8'] = 'Actualización Resultado Acumulado'
+		ws['A9'] = 'Resultado del Ejercicio'
+		ws['A10'] = 'Saldos Finales'
+
+		ws['A1'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['A2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['B2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['C2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['D2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['E2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['F2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['G2'].alignment = Alignment(horizontal="center", vertical="center")
+
+		ws.merge_cells('A1:G1')
+
+		ws.column_dimensions['A'].width = 35
+		ws.column_dimensions['B'].width = 20
+		ws.column_dimensions['C'].width = 20
+		ws.column_dimensions['D'].width = 20
+		ws.column_dimensions['E'].width = 35
+		ws.column_dimensions['F'].width = 30
+		ws.column_dimensions['G'].width = 20
+
+		ws['A1'].font = Font(bold=True)
+		ws['A2'].font = Font(bold=True)
+		ws['B2'].font = Font(bold=True)
+		ws['C2'].font = Font(bold=True)
+		ws['D2'].font = Font(bold=True)
+		ws['E2'].font = Font(bold=True)
+		ws['F2'].font = Font(bold=True)
+		ws['G2'].font = Font(bold=True)
+
+		ws['A1'].fill = PatternFill(start_color='219FB5', end_color='219FB5', fill_type='solid')
+		
+		if (f.month!=10) | (f.month!=11) | (f.month!=12):
+			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+		else:
+			c1_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c2_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c3_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c4_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+			c5_a = asiento.objects.filter(Q(encabezadoas__fecha__lte=str(year_act)+"-09-30") & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('debe_b') - F('haber_b')))
+
+		if c1_a['total']:
+			aux = c1_a['total']
+			ws.cell(row = 3, column = 2).value = c1_a['total'] #capital social anterior gestión
+		else:
+			aux = 0
+			ws.cell(row = 3, column = 2).value = 0
+		if c2_a['total']:
+			aux1 = c2_a['total']
+			ws.cell(row = 3, column = 3).value = c2_a['total'] #ajuste de capital anterior gestión
+		else:
+			aux1 = 0
+			ws.cell(row = 3, column = 3).value = 0
+		if c3_a['total']:
+			aux2 = c3_a['total']
+			ws.cell(row = 3, column = 4).value = c3_a['total'] #reserva legal anterior gestión
+		else:
+			aux2 = 0
+			ws.cell(row = 3, column = 4).value = 0
+		if c4_a['total']:
+			aux3 = c4_a['total']
+			ws.cell(row = 3, column = 5).value = c4_a['total'] #ajuste reservas patrimoniales anterior gestión
+		else:
+			aux3 = 0
+			ws.cell(row = 3, column = 5).value = 0
+		if c5_a['total']:
+			aux4 = c5_a['total']
+			ws.cell(row = 3, column = 6).value = c5_a['total'] #resultados acumulados anterior gestión
+		else:
+			aux4 = 0
+			ws.cell(row = 3, column = 6).value = 0
+
+		patrimonio_neto_a = aux + aux1 + aux2 + aux3 + aux4
+
+		ws.cell(row = 3, column = 7).value = patrimonio_neto_a
+
+		if (f.month!=10) | (f.month!=11) | (f.month!=12):
+			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+		else:
+			c1 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c2 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3101030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c3 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c4 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3102030001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c5 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104010001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+			c6 = asiento.objects.filter(Q(encabezadoas__fecha__range=(str(year_act)+"-10-01", f)) & Q(nivel_cinco__codigo="3104020001")).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).aggregate(total=Sum(F('haber_b') - F('debe_b')))
+		
+		#capital social
+		if c1['total']:
+			aux5 = c1['total']
+			ws.cell(row = 4, column = 2).value = c1['total']
+			ws.cell(row = 4, column = 6).value = c1['total']
+		else:
+			aux5 = 0
+			ws.cell(row = 4, column = 2).value = 0
+			ws.cell(row = 4, column = 6).value = 0
+
+		#reserva legal
+		if c3['total']:
+			aux6 = c3['total']
+			ws.cell(row = 5, column = 4).value = c3['total']
+			ws.cell(row = 5, column = 6).value = c3['total']
+		else:
+			aux6 = 0
+			ws.cell(row = 5, column = 4).value = 0
+			ws.cell(row = 5, column = 6).value = 0
+
+		#ajuste de capital
+		if c2['total']:
+			aux7 = c2['total']
+			ws.cell(row = 6, column = 3).value = c2['total']
+			ws.cell(row = 6, column = 7).value = c2['total']
+		else:
+			aux7 = 0
+			ws.cell(row = 6, column = 3).value = 0
+			ws.cell(row = 6, column = 7).value = 0
+
+		#ajuste reservas patrimoniales
+		if c4['total']:
+			aux8 = c4['total']
+			ws.cell(row = 7, column = 5).value = c4['total']
+			ws.cell(row = 7, column = 7).value = c4['total']
+		else:
+			aux8 = 0
+			ws.cell(row = 7, column = 5).value = 0
+			ws.cell(row = 7, column = 7).value = 0
+
+		#resultados acumulados
+		if c5['total']:
+			aux9 = c5['total']
+			ws.cell(row = 8, column = 6).value = c5['total']
+			ws.cell(row = 8, column = 7).value = c5['total']
+		else:
+			aux9 = 0
+			ws.cell(row = 8, column = 6).value = 0
+			ws.cell(row = 8, column = 7).value = 0
+
+		#resultado del ejercicio
+		if c6['total']:
+			aux10 = c6['total']
+			ws.cell(row = 9, column = 6).value = c6['total']
+			ws.cell(row = 9, column = 7).value = c6['total']
+		else:
+			aux10 = 0
+			ws.cell(row = 9, column = 6).value = 0
+			ws.cell(row = 9, column = 7).value = 0
+
+		capital_social = aux + aux5
+		ajuste_capital = aux1 + aux6
+		reserva_legal = aux2 + aux7
+		ajuste_reserv = aux3 + aux8
+		resultados_acum = aux4 + aux5 + aux7 + aux9 + aux10
+		patrimonio_total = patrimonio_neto_a + aux6 + aux8 + aux9 + aux10
+
+		ws.cell(row = 10, column = 2).value = capital_social
+		ws.cell(row = 10, column = 3).value = ajuste_capital
+		ws.cell(row = 10, column = 4).value = reserva_legal
+		ws.cell(row = 10, column = 5).value = ajuste_reserv
+		ws.cell(row = 10, column = 6).value = resultados_acum
+		ws.cell(row = 10, column = 7).value = patrimonio_total
+
+		nombre_archivo = "Estado de Evolucion del Patrimonio.xlsx"
+		response = HttpResponse(content_type = "application/ms-excel")
+		content = "attachment; filename = {0}".format(nombre_archivo)
+		response['Content-Disposition'] = content
+		response.content = save_virtual_workbook(wb)
+		return response
+
+class RepCostoServicioTemplateExcel(FormView):
+	form_class = repCostoServicioForm
+	template_name = 'contabilidad/temp_costo_servicio_excel.html'
+	def get_context_data(self, **kwargs):
+		context = super(RepCostoServicioTemplateExcel, self).get_context_data(**kwargs)
+		if 'form'in context:
+			context['form'] = self.form_class()
+		return context
+
+class RepCostoServicioExcel(TemplateView):
+	def get(self, request, *args, **kwargs):
+		campo = request.GET.get('campo')
+		campo1 = request.GET.get('campo1')
+		f1 = datetime.datetime.strptime(campo, "%Y-%m-%d")
+		f2 = datetime.datetime.strptime(campo1, "%Y-%m-%d")
+		fecha1 = f1.strftime("%d/%m/%Y")
+		fecha2 = f2.strftime("%d/%m/%Y")
+		iteration = 1
+
+		wb = Workbook()
+		ws = wb.active
+		
+		ws['A1'] = 'ESTADO DE COSTO DE SERVICIO DEL ' + str(fecha1) + ' al ' + str(fecha2)
+		ws['A2'] = 'Cuenta'
+		ws['B2'] = 'Monto Bs.'
+
+		ws['A1'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['A2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['B2'].alignment = Alignment(horizontal="center", vertical="center")
+
+		ws.merge_cells('A1:B1')
+
+		ws.column_dimensions['A'].width = 50
+		ws.column_dimensions['B'].width = 20
+
+		ws['A1'].font = Font(bold=True)
+		ws['A2'].font = Font(bold=True)
+		ws['B2'].font = Font(bold=True)
+
+		ws['A1'].fill = PatternFill(start_color='219FB5', end_color='219FB5', fill_type='solid')
+
+		cont = 3
+
+		queries_count = nivel_cinco.objects.filter(Q(nivel_cuatro__codigo='510101') | Q(nivel_cuatro__codigo='510102') | Q(nivel_cuatro__codigo='510103'), asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).distinct().count()
+
+		res = nivel_cinco.objects.filter(Q(nivel_cuatro__codigo='510101') | Q(nivel_cuatro__codigo='510102') | Q(nivel_cuatro__codigo='510103'), asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).distinct().order_by('codigo')
+
+		res1 = nivel_cinco.objects.filter(Q(nivel_cuatro__codigo='510101') | Q(nivel_cuatro__codigo='510102') | Q(nivel_cuatro__codigo='510103'), asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Sum('asiento__debe_b'))
+
+		for niv_cinco in res:
+			if iteration < queries_count:
+				ws.cell(row = cont, column = 1).value = niv_cinco.nivel_cuatro.descripcion
+				cont += 1
+				ws.cell(row = cont, column = 1).value = niv_cinco.descripcion
+				ws.cell(row = cont, column = 2).value = niv_cinco.debe_b_t_excel(f1, f2)
+				cont += 1
+				ws.cell(row = cont, column = 1).value = 'TOTAL.- ' + niv_cinco.nivel_cuatro.descripcion
+				ws.cell(row = cont, column = 2).value = niv_cinco.nivel_cuatro.debe_b_t_excel(f1, f2)
+				cont += 1
+				iteration += 1
+
+			else:
+				ws.cell(row = cont, column = 1).value = niv_cinco.nivel_cuatro.descripcion
+				cont += 1
+				ws.cell(row = cont, column = 1).value = niv_cinco.descripcion
+				ws.cell(row = cont, column = 2).value = niv_cinco.debe_b_t_excel(f1, f2)
+				cont += 1
+				ws.cell(row = cont, column = 1).value = 'TOTAL.- ' + niv_cinco.nivel_cuatro.descripcion
+				ws.cell(row = cont, column = 2).value = niv_cinco.nivel_cuatro.debe_b_t_excel(f1, f2)
+				cont += 1
+				ws.cell(row = cont, column = 1).value = 'COSTO TOTAL SERVICIOS DE TOLL'
+				ws.cell(row = cont, column = 2).value = res1['total']
+
+		nombre_archivo = "Estado de Costo de Servicio.xlsx"
+		response = HttpResponse(content_type = "application/ms-excel")
+		content = "attachment; filename = {0}".format(nombre_archivo)
+		response['Content-Disposition'] = content
+		response.content = save_virtual_workbook(wb)
+		return response
+
+class RepLibroMayExcel(TemplateView):
+	def get(self, request, *args, **kwargs):
+		campo = self.request.GET.get('campo')
+		campo2 = self.request.GET.get('campo2')
+		campo3 = self.request.GET.get('campo3')
+		campo4 = self.request.GET.get('campo4')
+		f1 = datetime.datetime.strptime(campo, "%Y-%m-%d")
+		f2 = datetime.datetime.strptime(campo2, "%Y-%m-%d")
+		fecha1 = f1.strftime("%d/%m/%Y")
+		fecha2 = f2.strftime("%d/%m/%Y")
+		ini = campo3[0]
+		aux2 = []
+		aux3 = []
+		aux4 = 0
+		aux5 = 0
+		aux7 = 0
+		aux8 = 0
+		saldo = []
+		saldo_aux = []
+		b = 0
+		iteration = 1
+		cont = 5
+
+		wb = Workbook()
+		ws = wb.active
+
+		ws['A1'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['B2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['A3'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['B3'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['C3'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['D3'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['E3'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['H3'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['K3'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['E4'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['F4'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['G4'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['H4'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['I4'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['J4'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['K4'].alignment = Alignment(horizontal="center", vertical="center")
+
+
+		ws.column_dimensions['A'].width = 15
+		ws.column_dimensions['B'].width = 5
+		ws.column_dimensions['C'].width = 20
+		ws.column_dimensions['D'].width = 25
+		ws.column_dimensions['E'].width = 15
+		ws.column_dimensions['F'].width = 15
+		ws.column_dimensions['G'].width = 15
+		ws.column_dimensions['H'].width = 15
+		ws.column_dimensions['I'].width = 15
+		ws.column_dimensions['J'].width = 15
+		ws.column_dimensions['K'].width = 15
+
+		ws['A1'].font = Font(bold=True)
+		ws['A2'].font = Font(bold=True)
+		ws['A3'].font = Font(bold=True)
+		ws['B3'].font = Font(bold=True)
+		ws['C3'].font = Font(bold=True)
+		ws['D3'].font = Font(bold=True)
+		ws['E3'].font = Font(bold=True)
+		ws['F3'].font = Font(bold=True)
+		ws['G3'].font = Font(bold=True)
+		ws['H3'].font = Font(bold=True)
+		ws['I3'].font = Font(bold=True)
+		ws['J3'].font = Font(bold=True)
+		ws['K3'].font = Font(bold=True)
+
+		ws['A1'].fill = PatternFill(start_color='219FB5', end_color='219FB5', fill_type='solid')
+	
+		ws['A1'] = 'LIBRO MAYOR PERIODO DEL ' + str(fecha1) + ' al ' + str(fecha2)
+		cod = asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True)
+		for codi in cod:
+			ws['A2'] = 'CUENTA ' + str(codi.nivel_cinco.codigo) + ' ' + codi.nivel_cinco.descripcion
+			break
+		ws['A3'] = 'Fecha'
+		ws['B3'] = 'Tipo'
+		ws['C3'] = 'Nº de Comprobante'
+		ws['D3'] = 'Descripción'
+		if campo4 == 'Bs':
+			ws['E3'] = 'Bolivianos'
+			ws['E4'] = 'Debe'
+			ws['F4'] = 'Haber'
+			ws['G4'] = 'Saldo'
+			ws['H3'] = 'T/C'
+			ws.merge_cells('A2:H2')
+			ws.merge_cells('E3:G3')
+			ws.merge_cells('A1:H1')
+		elif campo4 == 'Dls':
+			ws['E3'] = 'Dólares'
+			ws['E4'] = 'Debe'
+			ws['F4'] = 'Haber'
+			ws['G4'] = 'Saldo'
+			ws['H3'] = 'T/C'
+			ws.merge_cells('A2:H2')
+			ws.merge_cells('E3:G3')
+			ws.merge_cells('A1:H1')
+		else:
+			ws['E3'] = 'Bolivianos'
+			ws['H3'] = 'Dólares'
+			ws['E4'] = 'Debe'
+			ws['F4'] = 'Haber'
+			ws['G4'] = 'Saldo'
+			ws['H4'] = 'Debe'
+			ws['I4'] = 'Haber'
+			ws['J4'] = 'Saldo'
+			ws['K3'] = 'T/C'
+			ws.merge_cells('A2:K2')
+			ws.merge_cells('E3:G3')
+			ws.merge_cells('H3:J3')
+			ws.merge_cells('A1:K1')
+
+		niv_cinco = nivel_cinco.objects.get(Q(codigo=campo3) | Q(descripcion=campo3))
+		if (niv_cinco.nivel_uno.id == 2) or (niv_cinco.nivel_uno.id == 4):
+			if campo4 == 'Bs':
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
+					aux = 0
+					aux1 = 0
+					aux = i.haber_b - i.debe_b
+					aux1 = i.haber_d - i.debe_d
+					aux2.append(aux)
+					aux3.append(aux1)
+					aux4 = aux4 + i.debe_b
+					aux5 = aux5 + i.haber_b
+			elif campo4 == 'Dls':
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
+					aux = 0
+					aux1 = 0
+					aux = i.haber_b - i.debe_b
+					aux1 = i.haber_d - i.debe_d
+					aux2.append(aux)
+					aux3.append(aux1)
+					aux7 = aux7 + i.debe_d
+					aux8 = aux8 + i.haber_d
+			elif campo4 == 'BsDl':
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
+					aux = 0
+					aux1 = 0
+					aux = i.haber_b - i.debe_b
+					aux1 = i.haber_d - i.debe_d
+					aux2.append(aux)
+					aux3.append(aux1)
+					aux4 = aux4 + i.debe_b
+					aux5 = aux5 + i.haber_b
+					aux7 = aux7 + i.debe_d
+					aux8 = aux8 + i.haber_d
+			for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
+				aux = len(saldo)
+				if aux == 0:
+					saldo.append(aux2[b])
+					saldo_aux.append(aux3[b])
+					b += 1
+				elif b <= aux:
+					saldo.append(saldo[b-1] + aux2[b])
+					saldo_aux.append(saldo_aux[b-1] + aux3[b])
+					b += 1
+		else:
+			if campo4 == 'Bs':
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
+					aux = 0
+					aux1 = 0
+					aux = i.debe_b - i.haber_b
+					aux1 = i.debe_d - i.haber_d
+					aux2.append(aux)
+					aux3.append(aux1)
+					aux4 = aux4 + i.debe_b
+					aux5 = aux5 + i.haber_b
+			elif campo4 == 'Dls':
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
+					aux = 0
+					aux1 = 0
+					aux = i.debe_b - i.haber_b
+					aux1 = i.debe_d - i.haber_d
+					aux2.append(aux)
+					aux3.append(aux1)
+					aux7 = aux7 + i.debe_d
+					aux8 = aux8 + i.haber_d
+			elif campo4 == 'BsDl':
+				for i in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
+					aux = 0
+					aux1 = 0
+					aux = i.debe_b - i.haber_b
+					aux1 = i.debe_d - i.haber_d
+					aux2.append(aux)
+					aux3.append(aux1)
+					aux4 = aux4 + i.debe_b
+					aux5 = aux5 + i.haber_b
+					aux7 = aux7 + i.debe_d
+					aux8 = aux8 + i.haber_d
+			for f in asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'):
+				aux = len(saldo)
+				if aux == 0:
+					saldo.append(aux2[b])
+					saldo_aux.append(aux3[b])
+					b += 1
+				elif b <= aux:
+					saldo.append(saldo[b-1] + aux2[b])
+					saldo_aux.append(saldo_aux[b-1] + aux3[b])
+					b += 1
+
+		lista = zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'), saldo, saldo_aux)
+		num_queries = len(lista)
+
+		for res, res1, res2 in lista:
+			if iteration < num_queries:
+				if campo4 == 'Bs':
+					ws.cell(row = cont, column = 1).value = res.encabezadoas.fecha_fi()
+					ws.cell(row = cont, column = 2).value = res.encabezadoas.tipo_trans
+					ws.cell(row = cont, column = 3).value = res.encabezadoas.numero_comp
+					ws.cell(row = cont, column = 4).value = res.refer
+					ws.cell(row = cont, column = 5).value = res.debe_b
+					ws.cell(row = cont, column = 6).value = res.haber_b
+					ws.cell(row = cont, column = 7).value = res1
+					ws.cell(row = cont, column = 8).value = res.encabezadoas.cotizacion
+					cont += 1
+				elif campo4 == 'Dls':
+					ws.cell(row = cont, column = 1).value = res.encabezadoas.fecha_fi()
+					ws.cell(row = cont, column = 2).value = res.encabezadoas.tipo_trans
+					ws.cell(row = cont, column = 3).value = res.encabezadoas.numero_comp
+					ws.cell(row = cont, column = 4).value = res.refer
+					ws.cell(row = cont, column = 5).value = res.debe_d
+					ws.cell(row = cont, column = 6).value = res.haber_d
+					ws.cell(row = cont, column = 7).value = res2
+					ws.cell(row = cont, column = 8).value = res.encabezadoas.cotizacion
+					cont += 1
+				else:
+					ws.cell(row = cont, column = 1).value = res.encabezadoas.fecha_fi()
+					ws.cell(row = cont, column = 2).value = res.encabezadoas.tipo_trans
+					ws.cell(row = cont, column = 3).value = res.encabezadoas.numero_comp
+					ws.cell(row = cont, column = 4).value = res.refer
+					ws.cell(row = cont, column = 5).value = res.debe_b
+					ws.cell(row = cont, column = 6).value = res.haber_b
+					ws.cell(row = cont, column = 7).value = res1
+					ws.cell(row = cont, column = 8).value = res.debe_d
+					ws.cell(row = cont, column = 9).value = res.haber_d
+					ws.cell(row = cont, column = 10).value = res2
+					ws.cell(row = cont, column = 11).value = res.encabezadoas.cotizacion
+					cont += 1
+				iteration += 1
+			else:
+				if campo4 == 'Bs':
+					ws.cell(row = cont, column = 1).value = res.encabezadoas.fecha_fi()
+					ws.cell(row = cont, column = 2).value = res.encabezadoas.tipo_trans
+					ws.cell(row = cont, column = 3).value = res.encabezadoas.numero_comp
+					ws.cell(row = cont, column = 4).value = res.refer
+					ws.cell(row = cont, column = 5).value = res.debe_b
+					ws.cell(row = cont, column = 6).value = res.haber_b
+					ws.cell(row = cont, column = 7).value = res1
+					ws.cell(row = cont, column = 8).value = res.encabezadoas.cotizacion
+					cont += 1
+				elif campo4 == 'Dls':
+					ws.cell(row = cont, column = 1).value = res.encabezadoas.fecha_fi()
+					ws.cell(row = cont, column = 2).value = res.encabezadoas.tipo_trans
+					ws.cell(row = cont, column = 3).value = res.encabezadoas.numero_comp
+					ws.cell(row = cont, column = 4).value = res.refer
+					ws.cell(row = cont, column = 5).value = res.debe_d
+					ws.cell(row = cont, column = 6).value = res.haber_d
+					ws.cell(row = cont, column = 7).value = res2
+					ws.cell(row = cont, column = 8).value = res.encabezadoas.cotizacion
+					cont += 1
+				else:
+					ws.cell(row = cont, column = 1).value = res.encabezadoas.fecha_fi()
+					ws.cell(row = cont, column = 2).value = res.encabezadoas.tipo_trans
+					ws.cell(row = cont, column = 3).value = res.encabezadoas.numero_comp
+					ws.cell(row = cont, column = 4).value = res.refer
+					ws.cell(row = cont, column = 5).value = res.debe_b
+					ws.cell(row = cont, column = 6).value = res.haber_b
+					ws.cell(row = cont, column = 7).value = res1
+					ws.cell(row = cont, column = 8).value = res.debe_d
+					ws.cell(row = cont, column = 9).value = res.haber_d
+					ws.cell(row = cont, column = 10).value = res2
+					ws.cell(row = cont, column = 11).value = res.encabezadoas.cotizacion
+					cont += 1
+				ws.cell(row = cont, column = 1).value = 'TOTAL ' + res.nivel_cinco.codigo + ' ' + res.nivel_cinco.descripcion
+				if campo4 == 'Bs':
+					ws.cell(row = cont, column = 5).value = aux4
+					ws.cell(row = cont, column = 6).value = aux5
+				elif campo4 == 'Dls':
+					ws.cell(row = cont, column = 5).value = aux7
+					ws.cell(row = cont, column = 6).value = aux8
+				else:
+					ws.cell(row = cont, column = 5).value = aux4
+					ws.cell(row = cont, column = 6).value = aux5
+
+					ws.cell(row = cont, column = 8).value = aux7
+					ws.cell(row = cont, column = 9).value = aux8
+
+		nombre_archivo = "Libro Mayor.xlsx"
+		response = HttpResponse(content_type = "application/ms-excel")
+		content = "attachment; filename = {0}".format(nombre_archivo)
+		response['Content-Disposition'] = content
+		response.content = save_virtual_workbook(wb)
+		return response
+
+class RepLibroDiarioExcel(TemplateView):
+	def get(self, request, *args, **kwargs):
+		campo = self.request.GET.get('campo')
+		campo1 = self.request.GET.get('campo1')
+		f1 = datetime.datetime.strptime(campo, "%Y-%m-%d")
+		f2 = datetime.datetime.strptime(campo1, "%Y-%m-%d")
+		fecha1 = f1.strftime("%d/%m/%Y")
+		fecha2 = f2.strftime("%d/%m/%Y")
+		res = encabezadoas.objects.filter(fecha__range=(f1, f2), anulado=False).order_by('numero_comp')
+
+		iteration = 1
+		cont = 3
+
+		wb = Workbook()
+		ws = wb.active
+		
+		ws['A1'] = 'LIBRO DIARO DEL ' + str(fecha1) + ' al ' + str(fecha2)
+		ws['A2'] = 'Nº de comprobante'
+		ws['B2'] = 'Tipo'
+		ws['C2'] = 'Fecha'
+		ws['D2'] = 'Código de cuenta'
+		ws['E2'] = 'Nombre de cuenta'
+		ws['F2'] = 'Debe Bs.'
+		ws['G2'] = 'Haber Bs.'
+		ws['H2'] = 'Debe $us.'
+		ws['I2'] = 'Haber $us.'
+		ws['J2'] = 'T/C'
+
+		ws['A1'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['A2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['B2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['C2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['D2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['E2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['F2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['G2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['H2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['I2'].alignment = Alignment(horizontal="center", vertical="center")
+		ws['J2'].alignment = Alignment(horizontal="center", vertical="center")
+
+
+		ws.column_dimensions['A'].width = 20
+		ws.column_dimensions['B'].width = 15
+		ws.column_dimensions['C'].width = 15
+		ws.column_dimensions['D'].width = 25
+		ws.column_dimensions['E'].width = 50
+		ws.column_dimensions['F'].width = 15
+		ws.column_dimensions['G'].width = 15
+		ws.column_dimensions['H'].width = 15
+		ws.column_dimensions['I'].width = 15
+		ws.column_dimensions['J'].width = 10
+
+		ws['A1'].font = Font(bold=True)
+		ws['A2'].font = Font(bold=True)
+		ws['B2'].font = Font(bold=True)
+		ws['C2'].font = Font(bold=True)
+		ws['D2'].font = Font(bold=True)
+		ws['E2'].font = Font(bold=True)
+		ws['F2'].font = Font(bold=True)
+		ws['G2'].font = Font(bold=True)
+		ws['H2'].font = Font(bold=True)
+		ws['I2'].font = Font(bold=True)
+		ws['J2'].font = Font(bold=True)
+
+		ws['A1'].fill = PatternFill(start_color='219FB5', end_color='219FB5', fill_type='solid')
+
+		ws.merge_cells('A1:J1')
+
+		for encabezado in res:
+			for asi in encabezado.asientos.filter(encabezadoas__fecha__range=(f1, f2), encabezadoas__anulado=False, encabezadoas__cerrado=False):
+				ws.cell(row = cont, column = 1).value = asi.encabezadoas.numero_comp
+				ws.cell(row = cont, column = 2).value = asi.encabezadoas.get_tipo_trans_display()
+				ws.cell(row = cont, column = 3).value = asi.encabezadoas.fecha_f()
+				ws.cell(row = cont, column = 4).value = asi.nivel_cinco.codigo
+				ws.cell(row = cont, column = 5).value = asi.nivel_cinco.descripcion
+				ws.cell(row = cont, column = 6).value = asi.debe_b
+				ws.cell(row = cont, column = 7).value = asi.haber_b
+				ws.cell(row = cont, column = 8).value = asi.debe_d
+				ws.cell(row = cont, column = 9).value = asi.haber_d
+				ws.cell(row = cont, column = 10).value = asi.encabezadoas.cotizacion
+				cont += 1
+			ws.cell(row = cont, column = 1).value = "GLOSA: " + encabezado.glosa
+			cont += 1
+
+		nombre_archivo = "Libro Diario.xlsx"
+		response = HttpResponse(content_type = "application/ms-excel")
+		content = "attachment; filename = {0}".format(nombre_archivo)
+		response['Content-Disposition'] = content
+		response.content = save_virtual_workbook(wb)
+		return response

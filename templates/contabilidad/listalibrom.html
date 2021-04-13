@@ -48,6 +48,24 @@
 								<button href="" type="submit" class="btn btn-warning">Libro Mayor PDF</button>
 	
 						</form>
+						<form action="{% url 'contabilidad:rep_libromay_excel' %}" accept-charset="utf-8" method="get">
+								
+								<label> Desde:
+								<input class="form-control" type="date" name="campo" placeholder="Ingrese una fecha"></label>
+								<label> Hasta:
+								<input class="form-control" type="date" name="campo2" placeholder="Ingrese una fecha"></label>
+								<label> Cuenta:
+								<input class="form-control" type="text" name="campo3" placeholder="Ingrese una cuenta"></label>
+								<label>Moneda:
+									<select class="form-control" name="campo4">
+										<option value="Bs">Bs.</option>
+										<option value="Dls">$us.</option>
+										<option value="BsDl">Bs./$us.</option>
+									</select>
+								</label>
+								<button href="" type="submit" class="btn btn-success">Libro Mayor Excel</button>
+	
+						</form>
 					</div>
 				</div>
 				

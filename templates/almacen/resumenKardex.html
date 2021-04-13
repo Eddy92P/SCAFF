@@ -12,7 +12,7 @@
         {% block layout_style %}
             <style type="text/css">
                 @page {
-                    size: {{ pagesize|default:"Letter" }};
+                    size: {{ pagesize|default:"landscape" }};
                     margin-left: 2.2cm;
                     margin-right: 0.5cm;
                     margin-top: 1cm;
@@ -202,6 +202,14 @@
             </div>  
         
             </div>
+
+<div id="page-footer">
+    {%block page_foot%}
+            
+        Página <pdf:pagenumber />
+           
+    {%endblock%}
+</div>
         
 </body>
 </html>

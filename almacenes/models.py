@@ -81,6 +81,27 @@ class proveedor(models.Model):
 	class Meta:
 		verbose_name_plural = _('proveedores')
 
+	def cantidad_proveedor_e_excel(self, f1, f2):
+		res = ingresoitem.objects.filter(encingresoitem__fecha__range=(f1, f2), encingresoitem__proveedor=self, encingresoitem__cerrado=False).aggregate(total=Sum('cantidad'))
+		if res['total'] == None:
+			return 0
+		else:
+			return res['total']
+
+	def costo_unit_proveedor_e_excel(self, f1, f2):
+		res = ingresoitem.objects.filter(encingresoitem__fecha__range=(f1, f2), encingresoitem__proveedor=self, encingresoitem__cerrado=False).aggregate(total=Sum('costo_unit'))
+		if res['total'] == None:
+			return 0
+		else:
+			return res['total']
+
+	def importe_proveedor_e_excel(self, f1, f2):
+		res = ingresoitem.objects.filter(encingresoitem__fecha__range=(f1, f2), encingresoitem__proveedor=self, encingresoitem__cerrado=False).aggregate(total=Sum('sub_total'))
+		if res['total'] == None:
+			return 0
+		else:
+			return res['total']
+
 class cliente(models.Model):
 	ubicacion_gen = models.ForeignKey('activos_f.Ubicacion_gen')
 	num_cuenta = models.ForeignKey('contabilidad.nivel_cinco')
@@ -118,6 +139,27 @@ class cliente(models.Model):
 	class Meta:
 		verbose_name_plural = _('clientes')
 
+	def cantidad_cliente_s_excel(self, f1, f2):
+		res = salidaitem.objects.filter(encsalidaitem__fecha__range=(f1, f2), encsalidaitem__cliente=self, encsalidaitem__cerrado=False).aggregate(total=Sum('cantidad'))
+		if res['total'] == None:
+			return 0
+		else:
+			return res['total']
+
+	def costo_unit_cliente_s_excel(self, f1, f2):
+		res = salidaitem.objects.filter(encsalidaitem__fecha__range=(f1, f2), encsalidaitem__cliente=self, encsalidaitem__cerrado=False).aggregate(total=Sum('costo_unit'))
+		if res['total'] == None:
+			return 0
+		else:
+			return res['total']
+
+	def importe_cliente_s_excel(self, f1, f2):
+		res = salidaitem.objects.filter(encsalidaitem__fecha__range=(f1, f2), encsalidaitem__cliente=self, encsalidaitem__cerrado=False).aggregate(total=Sum('sub_total'))
+		if res['total'] == None:
+			return 0
+		else:
+			return res['total']
+
 class tipo_entrada(models.Model):
 	nombre = models.CharField(
 		max_length=50,
@@ -134,6 +176,18 @@ class tipo_entrada(models.Model):
 	def __unicode__(self):
 		return self.nombre
 
+	def tipo_ent_importe_excel(self, f1, f2):
+		res = ingresoitem.objects.filter(encingresoitem__tipo_entrada=self, encingresoitem__fecha__range=(f1, f2), encingresoitem__cerrado=False).aggregate(total=Sum('costo_total'))
+		return res['total']
+
+	def tipo_ent_costo_excel(self, f1, f2):
+		res = ingresoitem.objects.filter(encingresoitem__tipo_entrada=self, encingresoitem__fecha__range=(f1, f2), encingresoitem__cerrado=False).aggregate(total=Sum('sub_total'))
+		return res['total']
+
+	def tipo_ent_iva_excel(self, f1, f2):
+		res = self.tipo_ent_importe_excel(f1, f2) - self.tipo_ent_costo_excel(f1, f2)
+		return res
+
 class tipo_salida(models.Model):
 	nombre = models.CharField(
 		max_length=50,
@@ -149,6 +203,10 @@ class tipo_salida(models.Model):
 		)
 	def __unicode__(self):
 		return self.nombre
+
+	def tipo_sal_importe_excel(self, f1, f2):
+		res = salidaitem.objects.filter(encsalidaitem__tipo_salida=self, encsalidaitem__fecha__range=(f1, f2), encsalidaitem__cerrado=False).aggregate(total=Sum('sub_total'))
+		return res['total']
 
 class unidad(models.Model):
 	simbolo = models.CharField(
@@ -295,72 +353,72 @@ class categoria(models.Model):
 		)
 
 	def total_cant_e(self, f1, f2):
-		res = item.objects.filter(categoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('ingresoitem__cantidad'))
+		res = item.objects.filter(categoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2), ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__cantidad'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def total_cant_s(self, f1, f2):
-		res = item.objects.filter(categoria=self, salidaitem__encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('salidaitem__cantidad'))
+		res = item.objects.filter(categoria=self, salidaitem__encsalidaitem__fecha__range=(f1, f2), salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__cantidad'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
-	def categoria_a_ent(self, f1):
-		res = item.objects.filter(categoria=self, ingresoitem__encingresoitem__fecha__lt=f1).aggregate(total=Sum('ingresoitem__sub_total'))
+	def categoria_a_ent(self, f1, res):
+		res = res.filter(categoria=self, ingresoitem__encingresoitem__fecha__lt=f1, ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
-	def categoria_a_sal(self, f1):
-		res = item.objects.filter(categoria=self, salidaitem__encsalidaitem__fecha__lt=f1).aggregate(total=Sum('salidaitem__sub_total'))
+	def categoria_a_sal(self, f1, res):
+		res = res.filter(categoria=self, salidaitem__encsalidaitem__fecha__lt=f1, salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
-	def categoria_a_t(self, f1):
-		res = self.categoria_a_ent(f1) - self.categoria_a_sal(f1)
+	def categoria_a_t(self, f1, res):
+		res = self.categoria_a_ent(f1, res) - self.categoria_a_sal(f1, res)
 		return res
 
-	def total_categ_e(self, f1, f2):
-		res = item.objects.filter(categoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('ingresoitem__sub_total'))
+	def total_categ_e(self, f1, f2, res):
+		res = res.filter(categoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2), ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
-	def total_categ_s(self, f1, f2):
-		res = item.objects.filter(categoria=self, salidaitem__encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('salidaitem__sub_total'))
+	def total_categ_s(self, f1, f2, res):
+		res = res.filter(categoria=self, salidaitem__encsalidaitem__fecha__range=(f1, f2), salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
-	def categoria_t(self, f1, f2):
-		res = self.categoria_a_t(f1) + self.total_categ_e(f1, f2) - self.total_categ_s(f1, f2)
+	def categoria_t(self, f1, f2, res):
+		res = self.categoria_a_t(f1, res) + self.total_categ_e(f1, f2, res) - self.total_categ_s(f1, f2, res)
 		return res
 
 	#Reporte detalle de entradas
 	def importe_total_s(self, f1, f2):
-		res = item.objects.filter(categoria=self, salidaitem__encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('salidaitem__sub_total'))
+		res = item.objects.filter(categoria=self, salidaitem__encsalidaitem__fecha__range=(f1, f2), salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def importe_total(self, f1, f2):
-		res = item.objects.filter(categoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('ingresoitem__costo_total'))
+		res = item.objects.filter(categoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2), ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__costo_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def importe_total_iva(self, f1, f2):
-		res = item.objects.filter(categoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('ingresoitem__sub_total'))
+		res = item.objects.filter(categoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2), ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
@@ -403,72 +461,72 @@ class subcategoria(models.Model):
 
 
 	def total_cant_e(self, f1, f2):
-		res = item.objects.filter(subcategoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('ingresoitem__cantidad'))
+		res = item.objects.filter(subcategoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2), ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__cantidad'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def total_cant_s(self, f1, f2):
-		res = item.objects.filter(subcategoria=self, salidaitem__encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('salidaitem__cantidad'))
+		res = item.objects.filter(subcategoria=self, salidaitem__encsalidaitem__fecha__range=(f1, f2), salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__cantidad'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
-	def subcategoria_a_ent(self, f1):
-		res = item.objects.filter(subcategoria=self, ingresoitem__encingresoitem__fecha__lt=f1).aggregate(total=Sum('ingresoitem__sub_total'))
+	def subcategoria_a_ent(self, f1, res):
+		res = res.filter(subcategoria=self, ingresoitem__encingresoitem__fecha__lt=f1, ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
-	def subcategoria_a_sal(self, f1):
-		res = item.objects.filter(subcategoria=self, salidaitem__encsalidaitem__fecha__lt=f1).aggregate(total=Sum('salidaitem__sub_total'))
+	def subcategoria_a_sal(self, f1, res):
+		res = res.filter(subcategoria=self, salidaitem__encsalidaitem__fecha__lt=f1, salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
-	def subcategoria_a_t(self, f1):
-		res = self.subcategoria_a_ent(f1) - self.subcategoria_a_sal(f1)
+	def subcategoria_a_t(self, f1, res):
+		res = self.subcategoria_a_ent(f1, res) - self.subcategoria_a_sal(f1, res)
 		return res
 
 	def total_sub_e(self, f1, f2):
-		res = item.objects.filter(subcategoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('ingresoitem__sub_total'))
+		res = item.objects.filter(subcategoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2), ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def total_sub_s(self, f1, f2):
-		res = item.objects.filter(subcategoria=self, salidaitem__encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('salidaitem__sub_total'))
+		res = item.objects.filter(subcategoria=self, salidaitem__encsalidaitem__fecha__range=(f1, f2), salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
-	def subcategoria_t(self, f1, f2):
-		res = self.subcategoria_a_t(f1) + self.total_sub_e(f1, f2) - self.total_sub_s(f1, f2)
+	def subcategoria_t(self, f1, f2, res):
+		res = self.subcategoria_a_t(f1, res) + self.total_sub_e(f1, f2) - self.total_sub_s(f1, f2)
 		return res
 
 	#Reporte detalle de entradas
 	def importe_total_s(self, f1, f2):
-		res = item.objects.filter(subcategoria=self, salidaitem__encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('salidaitem__sub_total'))
+		res = item.objects.filter(subcategoria=self, salidaitem__encsalidaitem__fecha__range=(f1, f2), salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def importe_total(self, f1, f2):
-		res = item.objects.filter(subcategoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('ingresoitem__costo_total'))
+		res = item.objects.filter(subcategoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2), ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__costo_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def importe_total_iva(self, f1, f2):
-		res = item.objects.filter(subcategoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('ingresoitem__sub_total'))
+		res = item.objects.filter(subcategoria=self, ingresoitem__encingresoitem__fecha__range=(f1, f2), ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
@@ -487,7 +545,7 @@ class item(models.Model):
 	unidad = models.ForeignKey(unidad)
 	codigo = models.CharField(
 		max_length=15,
-		unique=False,
+		unique=True,
 		null=False,
 		blank=False,
 		validators=[
@@ -525,28 +583,28 @@ class item(models.Model):
 
 	#Cálculo de saldos anteriores
 	def cant_ea(self, f1):
-		res = item.objects.filter(id=self.id, ingresoitem__encingresoitem__fecha__lt=f1).aggregate(total=Sum('ingresoitem__cantidad'))
+		res = item.objects.filter(id=self.id, ingresoitem__encingresoitem__fecha__lt=f1, ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__cantidad'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def cant_sa(self, f1):
-		res = item.objects.filter(id=self.id, salidaitem__encsalidaitem__fecha__lt=f1).aggregate(total=Sum('salidaitem__cantidad'))
+		res = item.objects.filter(id=self.id, salidaitem__encsalidaitem__fecha__lt=f1, salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__cantidad'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def subt_ea(self, f1):
-		res = item.objects.filter(id=self.id, ingresoitem__encingresoitem__fecha__lt=f1).aggregate(total=Sum('ingresoitem__sub_total'))
+		res = item.objects.filter(id=self.id, ingresoitem__encingresoitem__fecha__lt=f1, ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def subt_sa(self, f1):
-		res = item.objects.filter(id=self.id, salidaitem__encsalidaitem__fecha__lt=f1).aggregate(total=Sum('salidaitem__sub_total'))
+		res = item.objects.filter(id=self.id, salidaitem__encsalidaitem__fecha__lt=f1, salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
@@ -563,14 +621,14 @@ class item(models.Model):
 	#Saldos anteriores de almacenes, categorias, sub_categorias
 	
 	def categoria_a_ent(self, f1):
-		res = item.objects.filter(categoria=self.categoria, ingresoitem__encingresoitem__fecha__lt=f1).aggregate(total=Sum('ingresoitem__sub_total'))
+		res = item.objects.filter(categoria=self.categoria, ingresoitem__encingresoitem__fecha__lt=f1, ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def categoria_a_sal(self, f1):
-		res = item.objects.filter(categoria=self.categoria, salidaitem__encsalidaitem__fecha__lt=f1).aggregate(total=Sum('salidaitem__sub_total'))
+		res = item.objects.filter(categoria=self.categoria, salidaitem__encsalidaitem__fecha__lt=f1, salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
@@ -581,14 +639,14 @@ class item(models.Model):
 		return res
 
 	def subcategoria_a_ent(self, f1):
-		res = item.objects.filter(subcategoria=self.subcategoria, ingresoitem__encingresoitem__fecha__lt=f1).aggregate(total=Sum('ingresoitem__sub_total'))
+		res = item.objects.filter(subcategoria=self.subcategoria, ingresoitem__encingresoitem__fecha__lt=f1, ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def subcategoria_a_sal(self, f1):
-		res = item.objects.filter(subcategoria=self.subcategoria, salidaitem__encsalidaitem__fecha__lt=f1).aggregate(total=Sum('salidaitem__sub_total'))
+		res = item.objects.filter(subcategoria=self.subcategoria, salidaitem__encsalidaitem__fecha__lt=f1, salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
@@ -600,35 +658,35 @@ class item(models.Model):
 
 	#Cálculo de cantidades, sub_totales y saldos actuales
 	def total_costo_u_s(self, f1, f2):
-		res = item.objects.filter(id=self.id, salidaitem__encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('salidaitem__costo_unit'))
+		res = item.objects.filter(id=self.id, salidaitem__encsalidaitem__fecha__range=(f1, f2), ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('salidaitem__costo_unit'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def total_cant_e(self, f1, f2):
-		res = item.objects.filter(id=self.id, ingresoitem__encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('ingresoitem__cantidad'))
+		res = item.objects.filter(id=self.id, ingresoitem__encingresoitem__fecha__range=(f1, f2), ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__cantidad'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def total_cant_s(self, f1, f2):
-		res = item.objects.filter(id=self.id, salidaitem__encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('salidaitem__cantidad'))
+		res = item.objects.filter(id=self.id, salidaitem__encsalidaitem__fecha__range=(f1, f2), salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__cantidad'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def total_subt_e(self, f1, f2):
-		res = item.objects.filter(id=self.id, ingresoitem__encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('ingresoitem__sub_total'))
+		res = item.objects.filter(id=self.id, ingresoitem__encingresoitem__fecha__range=(f1, f2), ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def total_subt_s(self, f1, f2):
-		res = item.objects.filter(id=self.id, salidaitem__encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('salidaitem__sub_total'))
+		res = item.objects.filter(id=self.id, salidaitem__encsalidaitem__fecha__range=(f1, f2), salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
@@ -643,14 +701,14 @@ class item(models.Model):
 		return res
 
 	def total_sub_e(self, f1, f2):
-		res = item.objects.filter(subcategoria=self.subcategoria, ingresoitem__encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('ingresoitem__sub_total'))
+		res = item.objects.filter(subcategoria=self.subcategoria, ingresoitem__encingresoitem__fecha__range=(f1, f2), ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 	
 	def total_categ_e(self, f1, f2):
-		res = item.objects.filter(categoria=self.categoria, ingresoitem__encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('ingresoitem__sub_total'))
+		res = item.objects.filter(categoria=self.categoria, ingresoitem__encingresoitem__fecha__range=(f1, f2), ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
@@ -659,14 +717,14 @@ class item(models.Model):
 
 
 	def total_sub_s(self, f1, f2):
-		res = item.objects.filter(subcategoria=self.subcategoria, salidaitem__encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('salidaitem__sub_total'))
+		res = item.objects.filter(subcategoria=self.subcategoria, salidaitem__encsalidaitem__fecha__range=(f1, f2), salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 	
 	def total_categ_s(self, f1, f2):
-		res = item.objects.filter(categoria=self.categoria, salidaitem__encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('salidaitem__sub_total'))
+		res = item.objects.filter(categoria=self.categoria, salidaitem__encsalidaitem__fecha__range=(f1, f2), salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
@@ -681,21 +739,21 @@ class item(models.Model):
 		return res
 
 	def importe_total_s(self, f1, f2):
-		res = item.objects.filter(id=self.id, salidaitem__encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('salidaitem__sub_total'))
+		res = item.objects.filter(id=self.id, salidaitem__encsalidaitem__fecha__range=(f1, f2), salidaitem__encsalidaitem__cerrado=False).aggregate(total=Sum('salidaitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def importe_total_e(self, f1, f2):
-		res = item.objects.filter(id=self.id, ingresoitem__encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('ingresoitem__costo_total'))
+		res = item.objects.filter(id=self.id, ingresoitem__encingresoitem__fecha__range=(f1, f2), ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__costo_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def importe_total_iva(self, f1, f2):
-		res = item.objects.filter(id=self.id, ingresoitem__encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('ingresoitem__sub_total'))
+		res = item.objects.filter(id=self.id, ingresoitem__encingresoitem__fecha__range=(f1, f2), ingresoitem__encingresoitem__cerrado=False).aggregate(total=Sum('ingresoitem__sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
@@ -706,52 +764,52 @@ class item(models.Model):
 		return res
 
 	#Totales
-	def ingreso_t_a(self, f1):
-		res = ingresoitem.objects.filter(encingresoitem__fecha__lt=f1).aggregate(total=Sum('sub_total'))
+	def ingreso_t_a(self, f1, res):
+		res = ingresoitem.objects.filter(item__in=res, encingresoitem__fecha__lt=f1, encingresoitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
-	def salida_t_a(self, f1):
-		res = salidaitem.objects.filter(encsalidaitem__fecha__lt=f1).aggregate(total=Sum('sub_total'))
+	def salida_t_a(self, f1, res):
+		res = salidaitem.objects.filter(item__in=res, encsalidaitem__fecha__lt=f1, encsalidaitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
-	def subtotal_t_a(self, f1):
-		res = self.ingreso_t_a(f1) - self.salida_t_a(f1)
+	def subtotal_t_a(self, f1, res):
+		res = self.ingreso_t_a(f1, res) - self.salida_t_a(f1, res)
 		return res
 
-	def ingreso_t(self, f1, f2):
-		res = ingresoitem.objects.filter(encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('sub_total'))
+	def ingreso_t(self, f1, f2, res):
+		res = ingresoitem.objects.filter(item__in=res, encingresoitem__fecha__range=(f1, f2), encingresoitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
-	def salida_t(self, f1, f2):
-		res = salidaitem.objects.filter(encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('sub_total'))
+	def salida_t(self, f1, f2, res):
+		res = salidaitem.objects.filter(item__in=res, encsalidaitem__fecha__range=(f1, f2), encsalidaitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
-	def saldo_t(self, f1, f2):
-		res = self.subtotal_t_a(f1) + self.ingreso_t(f1, f2) - self.salida_t(f1, f2)
+	def saldo_t(self, f1, f2, res):
+		res = self.subtotal_t_a(f1, res) + self.ingreso_t(f1, f2, res) - self.salida_t(f1, f2, res)
 		return res
 
 	#Totales solo una categoría
 	def ingresocat_t_a(self, f1, c):
-		res = ingresoitem.objects.filter(encingresoitem__fecha__lt=f1, item__subcategoria=c).aggregate(total=Sum('sub_total'))
+		res = ingresoitem.objects.filter(encingresoitem__fecha__lt=f1, item__subcategoria=c,encingresoitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def salidacat_t_a(self, f1, c):
-		res = salidaitem.objects.filter(encsalidaitem__fecha__lt=f1, item__categoria=c).aggregate(total=Sum('sub_total'))
+		res = salidaitem.objects.filter(encsalidaitem__fecha__lt=f1, item__categoria=c, encsalidaitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
@@ -762,14 +820,14 @@ class item(models.Model):
 		return res
 
 	def ingresocat_t(self, f1, f2, c):
-		res = ingresoitem.objects.filter(encingresoitem__fecha__range=(f1, f2), item__categoria=c).aggregate(total=Sum('sub_total'))
+		res = ingresoitem.objects.filter(encingresoitem__fecha__range=(f1, f2), item__categoria=c, encingresoitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def salidacat_t(self, f1, f2, c):
-		res = salidaitem.objects.filter(encsalidaitem__fecha__range=(f1, f2), item__categoria=c).aggregate(total=Sum('sub_total'))
+		res = salidaitem.objects.filter(encsalidaitem__fecha__range=(f1, f2), item__categoria=c, encingresoitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
@@ -820,6 +878,7 @@ class encingresoitem(models.Model):
 		max_length=50,
 		null=False,
 		blank=False,
+		unique=True,
 		validators=[
 			RegexValidator(
 				regex=r'^[0-9]',
@@ -876,6 +935,12 @@ class encingresoitem(models.Model):
 
 	def fecha_f(self):
 		return self.fecha.strftime("%d/%m/%y")
+
+	def categoria_enc(self):
+		return categoria.objects.filter(item__ingresoitem__encingresoitem=self)
+
+	def subcategoria_enc(self):
+		return subcategoria.objects.filter(item__ingresoitem__encingresoitem=self)
 
 class ingresoitem(models.Model):
 	encingresoitem = models.ForeignKey(encingresoitem)
@@ -940,24 +1005,24 @@ class ingresoitem(models.Model):
 	def encabezado(self):
 		return self.encingresoitem
 
-	def total(self, f1, f2):
-		res = ingresoitem.objects.filter(item__subcategoria=self.item.subcategoria, encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('sub_total'))
+	def total(self, f1):
+		res = ingresoitem.objects.only('sub_total').filter(item__subcategoria=self.item.subcategoria, encingresoitem__fecha=f1, encingresoitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		return res['total']
 	
-	def total1(self, f1, f2):
-		res = ingresoitem.objects.filter(item__categoria=self.item.categoria, encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('sub_total'))
+	def total1(self, f1):
+		res = ingresoitem.objects.only('sub_total').filter(item__categoria=self.item.categoria, encingresoitem__fecha=f1, encingresoitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		return res['total']
 	
-	def total2(self):
+	"""def total2(self):
 		res = ingresoitem.objects.filter(item__almacen=self.item.almacen, encingresoitem__fecha=self.encingresoitem.fecha).aggregate(total=Sum('sub_total'))
-		return res['total']
+		return res['total']"""
 
 	def tipo_ent_importe(self, f1, f2):
-		res = ingresoitem.objects.filter(encingresoitem__tipo_entrada=self.encingresoitem.tipo_entrada, encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('costo_total'))
+		res = ingresoitem.objects.filter(encingresoitem__tipo_entrada=self.encingresoitem.tipo_entrada, encingresoitem__fecha__range=(f1, f2), encingresoitem__cerrado=False).aggregate(total=Sum('costo_total'))
 		return res['total']
 
 	def tipo_ent_costo(self, f1, f2):
-		res = ingresoitem.objects.filter(encingresoitem__tipo_entrada=self.encingresoitem.tipo_entrada, encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('sub_total'))
+		res = ingresoitem.objects.filter(encingresoitem__tipo_entrada=self.encingresoitem.tipo_entrada, encingresoitem__fecha__range=(f1, f2), encingresoitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		return res['total']
 
 	def tipo_ent_iva(self, f1, f2):
@@ -966,21 +1031,21 @@ class ingresoitem(models.Model):
 
 	#Reporte resumen entradas por Proveedor
 	def cantidad_proveedor_e(self, f1, f2):
-		res = ingresoitem.objects.filter(encingresoitem__fecha__range=(f1, f2), encingresoitem__proveedor=self.encingresoitem.proveedor).aggregate(total=Sum('cantidad'))
+		res = ingresoitem.objects.filter(encingresoitem__fecha__range=(f1, f2), encingresoitem__proveedor=self.encingresoitem.proveedor, encingresoitem__cerrado=False).aggregate(total=Sum('cantidad'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def costo_unit_proveedor_e(self, f1, f2):
-		res = ingresoitem.objects.filter(encingresoitem__fecha__range=(f1, f2), encingresoitem__proveedor=self.encingresoitem.proveedor).aggregate(total=Sum('costo_unit'))
+		res = ingresoitem.objects.filter(encingresoitem__fecha__range=(f1, f2), encingresoitem__proveedor=self.encingresoitem.proveedor, encingresoitem__cerrado=False).aggregate(total=Sum('costo_unit'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def importe_proveedor_e(self, f1, f2):
-		res = ingresoitem.objects.filter(encingresoitem__fecha__range=(f1, f2), encingresoitem__proveedor=self.encingresoitem.proveedor).aggregate(total=Sum('sub_total'))
+		res = ingresoitem.objects.filter(encingresoitem__fecha__range=(f1, f2), encingresoitem__proveedor=self.encingresoitem.proveedor, encingresoitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
@@ -1002,6 +1067,7 @@ class encsalidaitem(models.Model):
 		max_length=50,
 		null=False,
 		blank=False,
+		unique=True,
 		validators=[
 			RegexValidator(
 				regex=r'^[0-9]',
@@ -1053,11 +1119,11 @@ class encsalidaitem(models.Model):
 		return self.fecha.strftime("%d/%m/%y")
 
 	def importe(self, f1, f2):
-		res = salidaitem.objects.filter(encsalidaitem=self, encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('sub_total'))
+		res = salidaitem.objects.filter(encsalidaitem=self, encsalidaitem__fecha__range=(f1, f2), encsalidaitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		return res['total']
 
 	def cantidad_t(self, f1, f2):
-		res = salidaitem.objects.filter(encsalidaitem=self, encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('cantidad'))
+		res = salidaitem.objects.filter(encsalidaitem=self, encsalidaitem__fecha__range=(f1, f2), encsalidaitem__cerrado=False).aggregate(total=Sum('cantidad'))
 		return res['total']
 
 class salidaitem(models.Model):
@@ -1103,680 +1169,40 @@ class salidaitem(models.Model):
 	def encabezado(self):
 		return self.encsalidaitem
 
-	def total(self, f1, f2):
-		res = salidaitem.objects.filter(item__subcategoria=self.item.subcategoria, encsalidaitem__fecha=(f1, f2)).aggregate(total=Sum('sub_total'))
+	def total(self, f1):
+		res = salidaitem.objects.filter(item__subcategoria=self.item.subcategoria, encsalidaitem__fecha=f1, encsalidaitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		return res['total']
 	
-	def total1(self, f1, f2):
-		res = salidaitem.objects.filter(item__categoria=self.item.categoria, encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('sub_total'))
+	def total1(self, f1):
+		res = salidaitem.objects.filter(item__categoria=self.item.categoria, encsalidaitem__fecha=f1, encsalidaitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		return res['total']
 	
 	def total2(self):
-		res = salidaitem.objects.filter(item__almacen=self.item.almacen, encsalidaitem__fecha=self.encsalidaitem.fecha).aggregate(total=Sum('sub_total'))
+		res = salidaitem.objects.filter(item__almacen=self.item.almacen, encsalidaitem__fecha=self.encsalidaitem.fecha, encsalidaitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		return res['total']
 
 	def tipo_sal_importe(self, f1, f2):
-		res = salidaitem.objects.filter(encsalidaitem__tipo_salida=self.encsalidaitem.tipo_salida, encsalidaitem__fecha__range=(f1, f2)).aggregate(total=Sum('sub_total'))
+		res = salidaitem.objects.filter(encsalidaitem__tipo_salida=self.encsalidaitem.tipo_salida, encsalidaitem__fecha__range=(f1, f2), encsalidaitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		return res['total']
 
 	#Reporte resumen salidas por Cliente
 	def cantidad_cliente_s(self, f1, f2):
-		res = salidaitem.objects.filter(encsalidaitem__fecha__range=(f1, f2), encsalidaitem__cliente=self.encsalidaitem.cliente).aggregate(total=Sum('cantidad'))
+		res = salidaitem.objects.filter(encsalidaitem__fecha__range=(f1, f2), encsalidaitem__cliente=self.encsalidaitem.cliente, encsalidaitem__cerrado=False).aggregate(total=Sum('cantidad'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def costo_unit_cliente_s(self, f1, f2):
-		res = salidaitem.objects.filter(encsalidaitem__fecha__range=(f1, f2), encsalidaitem__cliente=self.encsalidaitem.cliente).aggregate(total=Sum('costo_unit'))
+		res = salidaitem.objects.filter(encsalidaitem__fecha__range=(f1, f2), encsalidaitem__cliente=self.encsalidaitem.cliente, encsalidaitem__cerrado=False).aggregate(total=Sum('costo_unit'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
 
 	def importe_cliente_s(self, f1, f2):
-		res = salidaitem.objects.filter(encsalidaitem__fecha__range=(f1, f2), encsalidaitem__cliente=self.encsalidaitem.cliente).aggregate(total=Sum('sub_total'))
+		res = salidaitem.objects.filter(encsalidaitem__fecha__range=(f1, f2), encsalidaitem__cliente=self.encsalidaitem.cliente, encsalidaitem__cerrado=False).aggregate(total=Sum('sub_total'))
 		if res['total'] == None:
 			return 0
 		else:
 			return res['total']
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""def total_alm_e(self, f1, f2):
-	res = item.objects.filter(almacen=self.almacen, ingresoitem__encingresoitem__fecha__range=(f1, f2)).aggregate(total=Sum('ingresoitem__sub_total'))
-	if res['total'] == None:
-		return 0
-	else:
-		return res['total']"""
-"""def almacen_a_ent(self, f1):
-		res = item.objects.filter(almacen=self.almacen, ingresoitem__encingresoitem__fecha__lt=f1).aggregate(total=Sum('ingresoitem__sub_total'))
-		if res['total'] == None:
-			return 0
-		else:
-			return res['total']
-
-	def almcen_a_sal(self, f1):
-		res = item.objects.filter(almacen=self.almacen, salidaitem__encsalidaitem__fecha__lt=f1).aggregate(total=Sum('salidaitem__sub_total'))
-		if res['total'] == None:
-			return 0
-		else:
-			return res['total']
-
-	def almacen_a_t(self, f1):
-		res = self.almacen_a_ent(f1) - self.almcen_a_sal(f1)
-		return res"""
-
-
-"""
-		
-class material(models.Model):
-	decripcion = models.CharField(
-		max_length=100,
-		blank=False,
-		null=False,
-		unique=True
-	)
-	unidad = models.CharField(
-		max_length=10,
-		blank=False,
-		null=False
-	)
-	observaciones = models.TextField(
-		null=True,
-		blank=True,
-	)
-	def clean(self):
-		aux = re.sub(' +',' ',self.decripcion)
-		self.decripcion = aux.capitalize()
-	def __str__(self):
-		return self.decripcion
-
-class materialAlmacen(models.Model):
-	almacen = models.ForeignKey(almacen)
-	material = models.ForeignKey(material)
-	cantidad = models.PositiveIntegerField(
-		blank=False,
-		null=False,
-		default=0
-	)
-	def __str__(self):
-		return self.material.decripcion
-	class Meta:
-		unique_together = (('almacen', 'material'),)
-
-class ingresoMaterial(models.Model):
-	almacen = models.ForeignKey(almacen)
-	material = models.ForeignKey(material)
-	proveedor = models.ForeignKey(proveedor)
-	item = models.ForeignKey('seguimiento.item')
-	no_factura = models.CharField(
-		max_length=50,
-		null=False,
-		blank=False,
-		validators=[
-			RegexValidator(
-				regex=r'^[0-9]{1,20}$', 
-				message='El numero de factura tiene de 1 a 20 cifras', 
-				code='Numero Invalido'
-			)
-		]
-	)
-	no_autorizacion = models.CharField(
-		max_length=50,
-		null=False,
-		blank=False,
-		validators=[
-			RegexValidator(
-				regex=r'^[0-9]{5,20}$', 
-				message='El numero de autorizacion tiene de 5 a 20 cifras', 
-				code='Numero Invalido'
-			)
-		]
-	)
-	fecha =models.DateField(
-		null=False,
-		blank=False,
-		auto_now=True
-	)
-	costo_total = models.PositiveIntegerField(
-		null=False,
-		blank=False,
-		validators=[MinValueValidator(1,"El valor no puede ser cero")]
-	)
-	cantidad = models.PositiveIntegerField(
-		blank=False,
-		null=False,
-		default=0,
-		validators=[MinValueValidator(1,"El valor no puede ser cero")]
-	)
-	def totalItem(self):
-		res = ingresoMaterial.objects.filter(item=self.item).aggregate(total=Sum('costo_total'))
-		return res['total']
-	def total(self):
-		item = apps.get_model('seguimiento', 'item')
-		res = ingresoMaterial.objects.filter(item__in=item.objects.filter(proyecto=self.item.proyecto)).aggregate(total=Sum('costo_total'))
-		return res['total']
-	def unitario(self):
-		return round(self.costo_total/self.cantidad,3)
-		
-class salidaMaterial(models.Model):
-	almacen = models.ForeignKey(almacen)
-	material = models.ForeignKey(material)
-	confirmado = models.BooleanField(
-		blank=False,
-		null=False,
-		default=False
-	)
-	item = models.ForeignKey('seguimiento.item')
-	fecha =models.DateField(
-		null=False,
-		blank=False,
-		auto_now=True
-	)
-	cantidad = models.PositiveIntegerField(
-		blank=False,
-		null=False,
-		default=0,
-		validators=[MinValueValidator(1,"El valor no puede ser cero")]
-	)
-
-#insumos
-class insumos(models.Model):
-	decripcion = models.CharField(
-		max_length=100,
-		blank=False,
-		null=False,
-		unique=True
-	)
-	unidad = models.CharField(
-		max_length=10,
-		blank=False,
-		null=False
-	)
-	observaciones = models.TextField(
-		null=True,
-		blank=True,
-	)
-	def clean(self):
-		aux = re.sub(' +',' ',self.decripcion)
-		self.decripcion = aux.capitalize()
-	def __str__(self):
-		return self.decripcion
-class insumosAlmacen(models.Model):
-	almacen = models.ForeignKey(almacen)
-	insumos = models.ForeignKey(insumos)
-	cantidad = models.PositiveIntegerField(
-		blank=False,
-		null=False,
-		default=0
-	)
-	class Meta:
-		unique_together = (('almacen', 'insumos'),)
-class ingresoInsumos(models.Model):
-	almacen = models.ForeignKey(almacen)
-	insumos = models.ForeignKey(insumos)
-	proveedor = models.ForeignKey(proveedor)
-	item = models.ForeignKey('seguimiento.item')
-	no_factura = models.CharField(
-		max_length=50,
-		null=False,
-		blank=False,
-		validators=[
-			RegexValidator(
-				regex=r'^[0-9]{1,20}$', 
-				message='El numero de factura tiene de 1 a 20 cifras', 
-				code='Numero Invalido'
-			)
-		]
-	)
-	no_autorizacion = models.CharField(
-		max_length=50,
-		null=False,
-		blank=False,
-		validators=[
-			RegexValidator(
-				regex=r'^[0-9]{5,20}$', 
-				message='El numero de autorizacion tiene de 5 a 20 cifras', 
-				code='Numero Invalido'
-			)
-		]
-	)
-	fecha =models.DateField(
-		null=False,
-		blank=False,
-		auto_now=True
-	)
-	costo_total = models.PositiveIntegerField(
-		null=False,
-		blank=False,
-		validators=[MinValueValidator(1,"El valor no puede ser cero")]
-	)
-	cantidad = models.PositiveIntegerField(
-		blank=False,
-		null=False,
-		default=0,
-		validators=[MinValueValidator(1,"El valor no puede ser cero")]
-	)
-	def totalItem(self):
-		res = ingresoInsumos.objects.filter(item=self.item).aggregate(total=Sum('costo_total'))
-		return res['total']
-	def total(self):
-		item = apps.get_model('seguimiento', 'item')
-		res = ingresoInsumos.objects.filter(item__in=item.objects.filter(proyecto=self.item.proyecto)).aggregate(total=Sum('costo_total'))
-		return res['total']
-	def unitario(self):
-		return round(self.costo_total/self.cantidad,3)
-		
-class salidaInsumos(models.Model):
-	almacen = models.ForeignKey(almacen)
-	insumos = models.ForeignKey(insumos)
-	item = models.ForeignKey('seguimiento.item')
-	confirmado = models.BooleanField(
-		blank=False,
-		null=False,
-		default=False
-	)
-	fecha =models.DateField(
-		null=False,
-		blank=False,
-		auto_now=True
-	)
-	cantidad = models.PositiveIntegerField(
-		blank=False,
-		null=False,
-		default=0,
-		validators=[MinValueValidator(1,"El valor no puede ser cero")]
-	)
-
-#herraminetas
-class herramientas(models.Model):
-	decripcion = models.CharField(
-		max_length=100,
-		blank=False,
-		null=False,
-		unique=True
-	)
-	tipo = models.CharField(
-		max_length=30,
-		blank=False,
-		null=False
-	)
-	observaciones = models.TextField(
-		null=True,
-		blank=True,
-	)
-	def clean(self):
-		aux = re.sub(' +',' ',self.decripcion)
-		self.decripcion = aux.capitalize()
-	def __str__(self):
-		return self.decripcion
-
-class herramientasAlmacen(models.Model):
-	almacen = models.ForeignKey(almacen)
-	herramientas = models.ForeignKey(herramientas)
-	cantidad = models.PositiveIntegerField(
-		blank=False,
-		null=False,
-		default=0
-	)
-	def stock(self):
-		return ingresoHerramientas.objects.filter(almacen=self.almacen,herramientas=self.herramientas).aggregate(total=Sum('cantidad'))['total']
-	class Meta:
-		unique_together = (('almacen', 'herramientas'),)
-
-class ingresoHerramientas(models.Model):
-	almacen = models.ForeignKey(almacen)
-	herramientas = models.ForeignKey(herramientas)
-	proveedor = models.ForeignKey(proveedor)
-	no_factura = models.CharField(
-		max_length=50,
-		null=False,
-		blank=False,
-		validators=[
-			RegexValidator(
-				regex=r'^[0-9]{1,20}$', 
-				message='El numero de factura tiene de 5 a 20 cifras', 
-				code='Numero Invalido'
-			)
-		]
-	)
-	cantidad = models.PositiveIntegerField(
-		blank=False,
-		null=False,
-		default=0,
-		validators=[MinValueValidator(1,"El valor no puede ser cero")]
-	)
-	fecha =models.DateField(
-		null=False,
-		blank=False,
-		auto_now=True
-	)
-	costo_total = models.PositiveIntegerField(
-		null=False,
-		blank=False,
-		validators=[MinValueValidator(1,"El valor no puede ser cero")]
-	)
-
-
-class salidaHerramientas(models.Model):
-	almacen = models.ForeignKey(almacen)
-	herramientas = models.ForeignKey(herramientas)
-	item = models.ForeignKey('seguimiento.item')
-	debuelto = models.BooleanField(
-		blank=False,
-		null=False,
-		default=False
-	)
-	fecha =models.DateField(
-		null=False,
-		blank=False,
-		auto_now=True
-	)
-	cantidad = models.PositiveIntegerField(
-		blank=False,
-		null=False,
-		default=0,
-		validators=[MinValueValidator(1,"El valor no puede ser cero")]
-	)
-#maquinaria/equipo
-class maquinaria_equipo(models.Model):
-	decripcion = models.CharField(
-		max_length=100,
-		blank=False,
-		null=False,
-		unique=True
-	)
-	tipo = models.CharField(
-		max_length=30,
-		blank=False,
-		null=False
-	)
-	observaciones = models.TextField(
-		null=True,
-		blank=True,
-	)
-	def clean(self):
-		aux = re.sub(' +',' ',self.decripcion)
-		self.decripcion = aux.capitalize()
-	def __str__(self):
-		return self.decripcion
-
-class maquinaria_equipoAlmacen(models.Model):
-	almacen = models.ForeignKey(almacen)
-	maquinaria_equipo = models.ForeignKey(maquinaria_equipo)
-	cantidad = models.PositiveIntegerField(
-		blank=False,
-		null=False,
-		default=0
-	)
-	def stock(self):
-		return ingresoMaquinaria_equipo.objects.filter(almacen=self.almacen,maquinaria_equipo=self.maquinaria_equipo).aggregate(total=Sum('cantidad'))['total']
-	class Meta:
-		unique_together = (('almacen', 'maquinaria_equipo'),)
-
-class ingresoMaquinaria_equipo(models.Model):
-	almacen = models.ForeignKey(almacen)
-	maquinaria_equipo = models.ForeignKey(maquinaria_equipo)
-	proveedor = models.ForeignKey(proveedor)
-	cantidad = models.PositiveIntegerField(
-		blank=False,
-		null=False,
-		default=0,
-		validators=[MinValueValidator(1,"El valor no puede ser cero")]
-	)
-	fecha =models.DateField(
-		null=False,
-		blank=False,
-		auto_now=True
-	)
-	costo_total = models.PositiveIntegerField(
-		null=False,
-		blank=False,
-		validators=[MinValueValidator(1,"El valor no puede ser cero")]
-	)
-
-
-class salidaMaquinaria_equipo(models.Model):
-	almacen = models.ForeignKey(almacen)
-	maquinaria_equipo = models.ForeignKey(maquinaria_equipo)
-	item = models.ForeignKey('seguimiento.item')
-	debuelto = models.BooleanField(
-		blank=False,
-		null=False,
-		default=False
-	)
-	fecha =models.DateField(
-		null=False,
-		blank=False,
-		auto_now=True
-	)
-	cantidad = models.PositiveIntegerField(
-		blank=False,
-		null=False,
-		default=0,
-		validators=[MinValueValidator(1,"El valor no puede ser cero")]
-	)
-
-class tipoActivo(models.Model):
-	tipo = models.CharField(
-		max_length=60,
-		blank=False,
-		null=False,
-		unique=True
-	)
-	anios_vida_util = models.PositiveIntegerField(
-		blank=False,
-		null=False
-	)
-	observaciones = models.TextField(
-		blank=True,
-		null=True
-	)
-	
-	def clean(self):
-		aux = re.sub(' +',' ',self.tipo)
-		self.tipo = aux.capitalize()
-	def __str__(self):
-		return self.tipo
-
-class activo(models.Model):
-	tipoActivo = models.ForeignKey(tipoActivo)
-	descripcion = models.CharField(
-		max_length=100,
-		blank=False,
-		null=False
-	)
-	marca = models.CharField(
-		max_length=60,
-		blank=False,
-		null=False
-	)
-	modelo = models.CharField(
-		max_length=60,
-		blank=False,
-		null=False
-	)
-	fecha_ingreso = models.DateField(
-		blank=False,
-		null=False
-	)
-	costo_total = models.FloatField(
-		blank=False,
-		null=False
-	)
-	def depreciasion(self):
-		import datetime
-		datenow = datetime.datetime.now()
-
-		act = datenow.year - self.fecha_ingreso.year
-		dep = self.costo_total / self.tipoActivo.anios_vida_util
-
-		tdep = dep*act
-		res= self.costo_total-tdep
-
-		return res
-	def __str__(self):
-		return self.descripcion	"""

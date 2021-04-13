@@ -69,6 +69,16 @@
                                 <button href="" type="submit" class="btn btn-primary">LIBRO DIARIO PDF</button>
     
                         </form>
+                        <form action="{% url 'contabilidad:rep_librodiario_excel' %}" accept-charset="utf-8" method="get">
+                                
+                                
+                                <label> Desde:
+                                <input class="form-control" type="date" name="campo" placeholder="Ingrese una fecha"></label>
+                                <label> Hasta:
+                                <input class="form-control" type="date" name="campo1" placeholder="Ingrese una fecha"></label>
+                                <button href="" type="submit" class="btn btn-success">LIBRO DIARIO EXCEL</button>
+    
+                        </form>
                     </div>
                 </div>
                 

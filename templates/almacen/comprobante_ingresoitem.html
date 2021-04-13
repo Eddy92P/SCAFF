@@ -143,12 +143,14 @@
                         <tr>
                             <th style="background-color: #219FB5;" rowspan="2" colspan="2">CODIGO</th>
                             <th style="background-color: #219FB5;" rowspan="2" colspan="4">ARTICULO</th>
-                            <th style="background-color: #219FB5;" colspan="3">CANTIDAD</th>
-                            <th style="background-color: #219FB5;" rowspan="2" colspan="5">OBSERVACIONES</th>
+                            <th style="background-color: #219FB5;" colspan="2">CANTIDAD</th>
+                            <th style="background-color: #219FB5;" colspan="4">COSTO U.</th>
                         </tr>
                         <tr>   
-                            <th style="background-color: #219FB5;" colspan="2">ENTREGADO</th>
+                            <th style="background-color: #219FB5;" colspan="1">ENTR.</th>
                             <th style="background-color: #219FB5;" colspan="1">UNID.</th>
+                            <th style="background-color: #219FB5;" colspan="2">C/FACT.</th>
+                            <th style="background-color: #219FB5;" colspan="2">S/FACT.</th>
                         </tr>
                     </thead>
                     {% for i in res.ingresoitem_set.all %}
@@ -156,9 +158,10 @@
                         <tr>
                             <td colspan="2" id="fuente2">{{ i.item.codigo}}</td>
                             <td colspan="4" id="fuente2">{{ i.item.nombre }}</td>
-                            <td colspan="2" id="fuente">{{ i.cantidad }}</td>
+                            <td colspan="1" id="fuente">{{ i.cantidad }}</td>
                             <td colspan="1" id="fuente2">{{ i.item.unidad.simbolo }}</td>
-                            <td colspan="5" id="fuente2">{{ i.observaciones }}</td>
+                            <td colspan="2" id="fuente">{{ i.precio_unit }}</td>
+                            <td colspan="2" id="fuente">{{ i.costo_unit }}</td>
                         </tr>
                     </tbody>
                     {% endfor %}

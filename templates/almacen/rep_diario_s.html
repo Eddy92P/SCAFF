@@ -163,20 +163,20 @@
                                     <td colspan="2" id="fuente">{{ i.costo_unit }}</td>
                                     <td colspan="3" id="fuente">{{ i.sub_total }}</td>
                                 </tr>
-                                {% endfor %}
-                                {% for m in res3.list %}
+                                {% if forloop.last %}
                                     {% ifchanged res3.grouper %}
                                         <tr>
                                             <td colspan="21" id="fuente2"><b>TOTAL.- {{ res3.grouper|upper }}</b></td>
-                                            <td colspan="3" id="fuente">{% total_cat_sal m f1 f2 %}</td>
+                                            <td colspan="3" id="fuente">{% total_cat_sal i i.encsalidaitem.fecha %}</td>
                                         </tr>
                                     {% endifchanged %}
                                     {% ifchanged res3.grouper.categoria %}
                                         <tr>
                                             <td colspan="21" id="fuente2"><b>TOTAL.- {{ res3.grouper.categoria|upper }}</b></td>
-                                            <td colspan="3" id="fuente">{% total_cat_sal m f1 f2 %}</td>
+                                            <td colspan="3" id="fuente">{% total_cat_sal i i.encsalidaitem.fecha %}</td>
                                         </tr>
                                     {% endifchanged %}
+                                {% endif %}
                                 {% endfor %}
                             {% endfor %}
                     {% endfor %}

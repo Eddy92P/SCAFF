@@ -1,0 +1,26 @@
+{% extends "base/baseform_rep.html" %}	
+
+	<h2 style="text-align: center;">
+		{% block tituloform %}
+			Reporte Detalle de Entradas (Excel)
+		{% endblock tituloform %}
+	</h2>
+	
+	{% block urlEnviar %}
+	    {% url 'almacenes:reporte_detalle_ent_excel' %}
+	{% endblock urlEnviar %}
+
+	{% block formulario %}
+
+	
+		{% load bootstrap3 %}
+		{% bootstrap_form form %}
+
+		{% buttons %}
+	        <button type="submit" class="btn btn-primary center-block">
+	            {% bootstrap_icon "glyphicon glyphicon-ok" %} Generar
+	        </button>
+	    {% endbuttons %}
+		
+	
+	{% endblock formulario %}

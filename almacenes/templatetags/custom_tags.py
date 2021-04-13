@@ -24,8 +24,8 @@ def cat_a_t(item, f1):
 	return item.categoria_a_t(f1)
 
 @register.simple_tag
-def subc_a_t(item, f1):
-	return item.subcategoria_a_t(f1)
+def subc_a_t(item, f1, res):
+	return item.subcategoria_a_t(f1, res)
 
 @register.simple_tag
 def alm_t(item, f1, f2):
@@ -36,8 +36,8 @@ def cat_t(item, f1, f2):
 	return item.categoria_t(f1, f2)
 
 @register.simple_tag
-def subc_t(item, f1, f2):
-	return item.subcategoria_t(f1, f2)
+def subc_t(item, f1, f2, res):
+	return item.subcategoria_t(f1, f2, res)
 
 #Saldos almacenes, categorias, subcategorias de sus respectivos modelos
 @register.simple_tag
@@ -49,32 +49,32 @@ def alm_a_t(almacen, f1):
 	return almacen.almacen_a_t(f1)
 
 @register.simple_tag
-def cat_a_t(categoria, f1):
-	return categoria.categoria_a_t(f1)
+def cat_a_t(categoria, f1, res):
+	return categoria.categoria_a_t(f1, res)
 
 @register.simple_tag
-def subc_a_t(subcategoria, f1):
-	return subcategoria.subcategoria_a_t(f1)
+def subc_a_t(subcategoria, f1, res):
+	return subcategoria.subcategoria_a_t(f1, res)
 
 @register.simple_tag
 def alm_t(almacen, f1, f2):
 	return almacen.almacen_t(f1, f2)
 
 @register.simple_tag
-def cat_t(categoria, f1, f2):
-	return categoria.categoria_t(f1, f2)
+def cat_t(categoria, f1, f2, res):
+	return categoria.categoria_t(f1, f2, res)
 
 @register.simple_tag
-def subc_t(subcategoria, f1, f2):
-	return subcategoria.subcategoria_t(f1, f2)
+def subc_t(subcategoria, f1, f2, res):
+	return subcategoria.subcategoria_t(f1, f2, res)
 
 @register.simple_tag
 def tot_sub_e(subcategoria, f1, f2):	
 	return subcategoria.total_sub_e(f1, f2)
 
 @register.simple_tag
-def tot_categ_e(categoria, f1, f2):	
-	return categoria.total_categ_e(f1, f2)
+def tot_categ_e(categoria, f1, f2, res):	
+	return categoria.total_categ_e(f1, f2, res)
 
 @register.simple_tag
 def tot_alm_e(almacen, f1, f2):	
@@ -85,8 +85,8 @@ def tot_sub_s(subcategoria, f1, f2):
 	return subcategoria.total_sub_s(f1, f2)
 
 @register.simple_tag
-def tot_categ_s(categoria, f1, f2):	
-	return categoria.total_categ_s(f1, f2)
+def tot_categ_s(categoria, f1, f2, res):	
+	return categoria.total_categ_s(f1, f2, res)
 
 @register.simple_tag
 def tot_alm_s(almacen, f1, f2):	
@@ -149,8 +149,8 @@ def tot_sub_e(item, f1, f2):
 	return item.total_sub_e(f1, f2)
 
 @register.simple_tag
-def tot_categ_e(item, f1, f2):	
-	return item.total_categ_e(f1, f2)
+def tot_categ_e(item, f1, f2, res):	
+	return item.total_categ_e(f1, f2, res)
 
 @register.simple_tag
 def tot_alm_e(item, f1, f2):	
@@ -161,28 +161,28 @@ def tot_sub_s(item, f1, f2):
 	return item.total_sub_s(f1, f2)
 
 @register.simple_tag
-def tot_categ_s(item, f1, f2):	
-	return item.total_categ_s(f1, f2)
+def tot_categ_s(item, f1, f2, res):	
+	return item.total_categ_s(f1, f2, res)
 
 @register.simple_tag
 def tot_alm_s(item, f1, f2):	
 	return item.total_alm_s(f1, f2)
 
 @register.simple_tag
-def subt_t_a(item, f1):	
-	return item.subtotal_t_a(f1)
+def subt_t_a(item, f1, res):	
+	return item.subtotal_t_a(f1, res)
 
 @register.simple_tag
-def ing_t(item, f1, f2):	
-	return item.ingreso_t(f1, f2)
+def ing_t(item, f1, f2, res):	
+	return item.ingreso_t(f1, f2, res)
 
 @register.simple_tag
-def sal_t(item, f1, f2):	
-	return item.salida_t(f1, f2)
+def sal_t(item, f1, f2, res):	
+	return item.salida_t(f1, f2, res)
 
 @register.simple_tag
-def sald_t(item, f1, f2):	
-	return item.saldo_t(f1, f2)
+def sald_t(item, f1, f2, res):	
+	return item.saldo_t(f1, f2, res)
 
 @register.simple_tag
 def subtc_t_a(item, f1, c):	
@@ -312,18 +312,18 @@ def imp_p_e(ingresoitem, f1, f2):
 	return ingresoitem.importe_proveedor_e(f1, f2)
 
 @register.simple_tag
-def total_cat_ing(ingresoitem, f1, f2):
-	return ingresoitem.total1(f1, f2)
+def total_cat_ing(ingresoitem, f1):
+	return ingresoitem.total1(f1)
 
 @register.simple_tag
-def total_subcat_ing(ingresoitem, f1, f2):
-	return ingresoitem.total(f1, f2)
+def total_subcat_ing(ingresoitem, f1):
+	return ingresoitem.total(f1)
 
 @register.simple_tag
-def total_cat_sal(salidaitem, f1, f2):
-	return salidaitem.total1(f1, f2)
+def total_cat_sal(salidaitem, f1):
+	return salidaitem.total1(f1)
 
 @register.simple_tag
-def total_subcat_sal(salidaitem, f1, f2):
-	return salidaitem.total(f1, f2)
+def total_subcat_sal(salidaitem, f1):
+	return salidaitem.total(f1)
 
