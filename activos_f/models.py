@@ -29,9 +29,9 @@ def validate_file_extension(value):
 
 def validate_image(image):
 	file_size = image.file.size
-	limit_kb = 200
+	limit_kb = 5000
 	if file_size > limit_kb*1024:
-		raise ValidationError(u"El tamaño máximo permitido es de 200 KB")
+		raise ValidationError(u"El tamaño máximo permitido es de 5 MB")
 
 class Rubro(models.Model):
 	num_cuenta = models.OneToOneField('contabilidad.nivel_cinco')
@@ -400,6 +400,7 @@ class Alta_baja_activo(models.Model):
 	img_activo = models.ImageField(
 		upload_to='activos_fijos/', 
 		validators=[validate_file_extension, validate_image],
+		help_text='<li>El tamaño máximo permitido es de 5MB.</li><li>Los formatos permitidos son .jpg, .jpeg y .gif</li>',
 		null=True,
 		blank=True
 	)

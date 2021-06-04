@@ -57,7 +57,7 @@
 							      	<td>{{ obj.fecha_f }}</td>
 							      	<td>{{ obj.valor_inic }}</td>
 							      	{% if perms.contabilidad.add_asiento %}
-							      		<td><input type="checkbox" name="envia" value="{{ obj.id }}"></td>
+							      		<td class="text-center"><input type="checkbox" name="envia" value="{{ obj.id }}"></td>
 							      	{% endif %}
 							     
 							{% else %}
@@ -67,7 +67,7 @@
 							      	<td>{{ obj.fecha_f }}</td>
 							      	<td>{{ obj.valor_inic }}</td>
 							      	{% if perms.contabilidad.add_asiento %}
-							      		<td><input type="checkbox" name="envia" value="{{ obj.id }}"></td>
+							      		<td class="text-center"><input type="checkbox" name="envia" value="{{ obj.id }}"></td>
 							      	{% endif %}
 							     
 				  			{% endif %}

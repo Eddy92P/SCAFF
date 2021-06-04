@@ -135,7 +135,7 @@
                             <th style="background-color: #219FB5;" colspan="3">Código</th>
                             <th style="background-color: #219FB5;" colspan="4">Descripción</th>
                             <th style="background-color: #219FB5;" colspan="2">Cant</th>
-                            <th style="background-color: #219FB5;" colspan="1">Unid</th>
+                            <th style="background-color: #219FB5;" colspan="2">Unid</th>
                             <th style="background-color: #219FB5;" colspan="2">Costo U (Bs.)</th>
                             <th style="background-color: #219FB5;" colspan="3">Importe (Bs.)</th>
                         </tr>
@@ -156,20 +156,20 @@
                                     <td colspan="3" id="fuente2">{{ i.item.codigo }}</td>
                                     <td colspan="4" id="fuente2">{{ i.item.nombre }}</td>
                                     <td colspan="2" id="fuente">{{ i.cantidad }}</td>
-                                    <td colspan="1" id="fuente2">{{ i.item.unidad.simbolo }}</td>
+                                    <td colspan="2" id="fuente2" style="text-align: center;">{{ i.item.unidad.simbolo }}</td>
                                     <td colspan="2" id="fuente">{{ i.costo_unit }}</td>
                                     <td colspan="3" id="fuente">{{ i.sub_total }}</td>
                                 </tr>
                                 {% if forloop.last %}
                                     {% ifchanged res3.grouper %}
                                         <tr>
-                                            <td colspan="21" id="fuente2"><b>TOTAL.- {{ res3.grouper|upper }}</b></td>
+                                            <td colspan="22" id="fuente2"><b>TOTAL.- {{ res3.grouper|upper }}</b></td>
                                             <td colspan="3" id="fuente">{% total_subcat_ing i i.encingresoitem.fecha %}</td>
                                         </tr>
                                     {% endifchanged %}
                                     {% ifchanged res3.grouper.categoria %}
                                         <tr>
-                                            <td colspan="21" id="fuente2"><b>TOTAL.- {{ res3.grouper.categoria|upper }}</b></td>
+                                            <td colspan="22" id="fuente2"><b>TOTAL.- {{ res3.grouper.categoria|upper }}</b></td>
                                             <td colspan="3" id="fuente">{% total_cat_ing i i.encingresoitem.fecha %}</td>
                                         </tr>
                                     {% endifchanged %}

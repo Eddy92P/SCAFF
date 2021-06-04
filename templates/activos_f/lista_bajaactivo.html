@@ -15,15 +15,7 @@
 						
 						<h2 style="text-align: center;">
 							Listado de Bajas
-						</h2>
-						<form role="form" class="form-inline" action="" method="get" accept-charset="utf-8">
-								{% load bootstrap3 %}
-
-								{% if perms.activos_f.add_alta_baja_activo %}
-								<a class="btn btn-primary" type="submit"  href="{% url 'activos_f:nueva_altaactivo' %}">Registrar Alta</a>
-						    	{% endif %}
-						</form>
-						
+						</h2>	
 					</div>
 				</div>
 				
@@ -38,7 +30,6 @@
 				      	<th style="color: #FFFFFF"><i>Vida util</i></th>
 				      	<th style="color: #FFFFFF"><i>Vida util restante</i></th>
 				      	<th style="color: #FFFFFF"><i>Imagen activo</i></th>
-				      	<th style="color: #FFFFFF"><i>Opciones</i></th>
 				    </tr>
 				  	</thead>
 				 	 <tbody>
@@ -78,16 +69,7 @@
 							      	{% endif %}
 							     
 				  			{% endif %}
-				  					<td>
-				  						<div class="btn-group">
-				  							{% if perms.activos_f.change_alta_baja_activo %}
-                                        		<a href="{% url 'activos_f:update_altaactivo' obj.id %}" type="button" class="btn btn-primary" title="editar">
-                                            	<span class="glyphicon glyphicon-edit" aria-hidden="true">
-                                        		</a>
-                                        	{% endif %}
-											
-										</div>
-				  					</td>
+				  					
 					  			</tr>
 
 				  		{% endfor %}

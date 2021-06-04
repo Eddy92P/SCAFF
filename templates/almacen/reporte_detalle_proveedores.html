@@ -142,7 +142,7 @@
                             <th style="background-color: #219FB5;" colspan="2">Fecha</th>
                             <th style="background-color: #219FB5;" colspan="2">Factura o Recibo</th>
                             <th style="background-color: #219FB5;" colspan="8">Producto</th>
-                            <th style="background-color: #219FB5;" colspan="1">Unid</th>
+                            <th style="background-color: #219FB5;" colspan="2">Unid</th>
                             <th style="background-color: #219FB5;" colspan="3">Cantidad</th>
                             <th style="background-color: #219FB5;" colspan="3">Costo Unit</th>
                             <th style="background-color: #219FB5;" colspan="3">Importe</th>
@@ -158,7 +158,7 @@
                                     <td colspan="2" id="fuente4">{{ i.encingresoitem.fecha_f }}</td>
                                     <td colspan="2" id="fuente">{{ i.encingresoitem.factura }}</td>
                                     <td colspan="8" id="fuente2">{{ i.item.codigo }} {{ i.item.nombre }}</td>
-                                    <td colspan="1" id="fuente">{{ i.item.unidad.simbolo }}</td>
+                                    <td colspan="2" id="fuente" style="text-align: center">{{ i.item.unidad.simbolo }}</td>
                                     <td colspan="3" id="fuente">{{ i.cantidad }}</td>
                                     <td colspan="3" id="fuente">{{ i.costo_unit }}</td>
                                     <td colspan="3" id="fuente">{{ i.sub_total }}</td>
@@ -167,7 +167,7 @@
                                 {% for j in res1.grouper.encingresoitem_set.all|slice:":1" %}
                                     {% for k in j.ingresoitem_set.all|slice:":1" %}
                                     <tr>
-                                        <td id="fuente3" colspan="14"><b>TOTAL.- {{ k.encingresoitem.proveedor.nombre|upper }}</b></td>
+                                        <td id="fuente3" colspan="15"><b>TOTAL.- {{ k.encingresoitem.proveedor.nombre|upper }}</b></td>
                                         <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% cant_p_e k f1 f2 %}</td>
                                         <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% costo_u_p_e k f1 f2 %}</td>
                                         <td id="fuente" style="border-style: none; border-left: 1px solid black;" colspan="3">{% imp_p_e k f1 f2 %}</td>
@@ -176,7 +176,7 @@
                                 {% endfor %}
                             {% if forloop.last %}
                                 <tr>
-                                    <th style="text-align: left;" colspan="14">TOTALES</th>
+                                    <th style="text-align: left;" colspan="15">TOTALES</th>
                                     <td colspan="3" id="fuente">{{ total_cant }}</td>
                                     <td colspan="3" id="fuente">{{ total_costo_u }}</td>
                                     <td colspan="3" id="fuente">{{ total }}</td>

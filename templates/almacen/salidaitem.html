@@ -59,8 +59,7 @@
         <div class="card-header bg-light">
             <i><h4 style="text-decoration-line: underline;"><b>Consideraciones a tomar en cuenta para llenar el Ingreso</b></h4></i>
             <p style="color: red;">* No se deben ingresar items sin antes haber llenado todos los datos del encabezado.</p>
-            <p>* En caso de que por alguna razón no cuadren los totales, intente presionar cualquier tecla.</p>
-            <p>* Se pueden eliminar registros de la base de datos mediante el botón <b>"quitar fila"</b> y para actualizar los <b>TOTALES</b> debe volver a ingresar al formulario y presionar cualquier tecla.</p>
+            <p>* Se pueden eliminar registros de la base de datos mediante el botón <b>"quitar fila".</b>
         </div>                        
         <div class="panel panel-default">
                 <div class="panel-body">
@@ -157,7 +156,7 @@
                                 {{ crear_personal_form_set.management_form }}
                                 {% for crear_personal_form in crear_personal_form_set %}
                                     {{ crear_personal_form.id }}
-                                    <td class="col-lg-2">
+                                    <td class="col-lg-3">
                                         {% if forloop.counter == 2 %}
                                             <label>Autorizado</label>
                                         {% else %}
@@ -186,7 +185,7 @@
                         {% for crear_salida_form in crear_salida_form_set %}
                             <tr class="formset_row">
                                 {{ crear_salida_form.id }}
-                                <td>
+                                <td class="col-lg-5">
                                     <label>Item</label>
                                         {% if crear_salida_form.item.errors %}
                                             {% for error in crear_salida_form.item.errors %}

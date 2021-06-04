@@ -20,7 +20,7 @@
       }
       
       .nav li a {
-        background-color:#302F2F;
+        background-color:#3B3939;
         color:#FFF;
         text-decoration:none;
         padding:13px 15px;
@@ -29,7 +29,7 @@
       
       .nav li a:hover {
         background-color:#FFF;
-        color:#302F2F
+        color:#3B3939
       }
       
       .nav li ul {
@@ -52,7 +52,7 @@
       
 </style>
 
-<nav class="navbar navbar-dark" style="background-color: #302F2F;">
+<nav class="navbar navbar-dark" style="background-color: #3B3939; border-style: ridge; border-color: white;">
   <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -61,7 +61,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" style="color: white;" href="/">MINDES S.R.L.</a>
+      <a class="navbar-brand" style="color: #F1F1F1;" href="/">MINDES S.R.L.</a>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
@@ -70,7 +70,7 @@
       {% if perms.auth.view_personal %}
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Personal<span class="caret"></span></a>
-          <ul style="background-color: #302F2F;" class="dropdown-menu">
+          <ul style="background-color: #3B3939;" class="dropdown-menu">
             {% if perms.usuarios.add_kardex %}
             <li><a href="{% url 'personal:nuevousuario' %}">Nuevo usuario</a></li>
             {% endif %}
@@ -82,14 +82,13 @@
       {% if perms.auth.view_contabilidad %}
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contabilidad <span class="caret"></span></a>
-          <ul style="background-color: #302F2F;" class="dropdown-menu">
+          <ul style="background-color: #3B3939;" class="dropdown-menu">
             {% if perms.contabilidad.add_cotizacion %}
             <li><a href="{% url 'contabilidad:cotizacion_tcupload' %}">Importar Tipo de Cambio/UFVs</a></li>
             <li><a href="{% url 'contabilidad:listacotizacion_tc' %}">Tipo de Cambio/UFVs</a></li>
             {% endif %}
             {% if perms.contabilidad.add_asiento %}
             <li><a href="{% url 'contabilidad:nuevoasiento' %}">Nuevo Asiento</a></li>
-            <li><a href="{% url 'contabilidad:retencion' %}">Retenciones</a></li>
             {% endif %}
             <li>
               <a href="#">Libros</a>
@@ -120,9 +119,9 @@
           <a href="#">Listados</a>
           <ul>
             {% if perms.contabilidad.add_asiento %}
-            <li><a href="{% url 'contabilidad:listaasiento' %}">Asientos</a></li>
-            <li><a href="{% url 'contabilidad:listaasientoanulado' %}">Asientos (anulados)</a></li>
-            <li><a href="{% url 'contabilidad:listabancarizacion' %}">Bancarización</a></li>
+            <li style="left: 13px"><a href="{% url 'contabilidad:listaasiento' %}">Asientos</a></li>
+            <li style="left: 13px"><a href="{% url 'contabilidad:listaasientoanulado' %}">Asientos (anulados)</a></li>
+            <li style="left: 13px"><a href="{% url 'contabilidad:listabancarizacion' %}">Bancarización</a></li>
             {% endif %}
           </ul>
           </li>
@@ -133,7 +132,7 @@
         </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Estados Financieros<span class="caret"></span></a>
-          <ul style="background-color: #302F2F;" class="dropdown-menu">
+          <ul style="background-color: #3B3939;" class="dropdown-menu">
             {% if perms.contabilidad.add_asiento %}
             <li><a href="{% url 'contabilidad:cuentas_balance' %}">Balance General</a></li>
             <li><a href="{% url 'contabilidad:estado_resultados' %}">Estado de Resultados</a></li>
@@ -151,14 +150,9 @@
       {% if perms.auth.view_almacenes %}
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Almacenes<span class="caret"></span></a>
-          <ul style="background-color: #302F2F;" class="dropdown-menu">
+          <ul style="background-color: #3B3939;" class="dropdown-menu">
             {% if perms.almacenes.add_ingresoitem %}
-            <li>
-              <a href="#">Proveedores</a>
-              <ul>
-                <li><a href="{% url 'almacenes:listaproveedor' %}">Proveedores</a></li>  
-              </ul>
-            </li>
+            <li><a href="{% url 'almacenes:listaproveedor' %}">Proveedores</a></li>  
             <li><a href="{% url 'almacenes:listaunidad' %}">Unidades</a></li>
             <li>
               <a href="#">Tipos de Movimiento</a>
@@ -183,14 +177,11 @@
                 <li><a href="{% url 'almacenes:listasalida' %}">Salida Item</a></li>
               </ul>
             </li>
-            {% if perms.contabilidad.change_ingresoitem %}
-            <li><a href="{% url 'almacenes:act_inventario' %}">Actualización de inventario</a></li>
-            {% endif %}
           </ul>
         </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Reportes Almacenes<span class="caret"></span></a>
-          <ul style="background-color: #302F2F;" class="dropdown-menu">
+          <ul style="background-color: #3B3939;" class="dropdown-menu">
             {% if perms.almacenes.add_ingresoitem %}
             <li><a href="{% url 'almacenes:rep_kardex_temp' %}">Reporte General</a></li>
             <li>
@@ -249,7 +240,7 @@
       {% if perms.auth.view_activos_f%}
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Activos Fijos<span class="caret"></span></a>
-          <ul style="background-color: #302F2F;" class="dropdown-menu">
+          <ul style="background-color: #3B3939;" class="dropdown-menu">
           <li>
             <a href="#">Registro Activos Fijos</a>
               <ul>
@@ -257,17 +248,17 @@
 		            <li><a href="{% url 'almacenes:listacliente' %}">Clientes</a></li>
                 <li><a href="{% url 'activos_f:listarubro' %}">Rubros</a></li>
                 <li><a href="{% url 'activos_f:listatipo_bien' %}">Tipos de Bien</a></li>
-                <li><a href="{% url 'almacenes:listaitemact' %}">Asignar Items</a></li>
                 <li><a href="{% url 'activos_f:lista_altaactivo' %}">Dar de Alta</a></li>
                 <li><a href="{% url 'activos_f:lista_capitalizacion' %}">Capitalizaciones</a></li>
+                <li><a href="{% url 'almacenes:listaitemact' %}">Asignar Items</a></li>
               </ul>
           </li>
           <li>
             <a href="#">Listados</a>
               <ul>
-              <li><a href="{% url 'activos_f:lista_bajaactivo' %}">Listado de Bajas</a></li>
-              <li><a href="{% url 'almacenes:listasalidaf' %}">Items (A capitalizar)</a></li>
-              <li><a href="{% url 'almacenes:listaitemactivo' %}">Salidas (Alta Activo Fijo)</a></li>
+              <li style="left: 40px"><a href="{% url 'activos_f:lista_bajaactivo' %}">Listado de Bajas</a></li>
+              <li style="left: 40px"><a href="{% url 'almacenes:listasalidaf' %}">Items (A capitalizar)</a></li>
+              <li style="left: 40px"><a href="{% url 'almacenes:listaitemactivo' %}">Salidas (Alta Activo Fijo)</a></li>
                 
             </ul>
           </li>
@@ -275,7 +266,7 @@
         </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Reportes Activos Fijos<span class="caret"></span></a>
-          <ul style="background-color: #302F2F;" class="dropdown-menu">
+          <ul style="background-color: #3B3939;" class="dropdown-menu">
             <li><a href="{% url 'activos_f:temp_espec_bien' %}">Reporte Específico/General de Bienes</a></li>
             <li><a href="{% url 'activos_f:temp_alta_baja' %}">Reporte Altas/Bajas de Activos</a></li>
             <li><a href="{% url 'activos_f:temp_inventario' %}">Reporte de Inventario</a></li>
@@ -288,7 +279,7 @@
       {% if request.user.is_staff %}
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Otros<span class="caret"></span></a>
-          <ul style="background-color: #302F2F;" class="dropdown-menu">
+          <ul style="background-color: #3B3939;" class="dropdown-menu">
             <li><a href="{% url 'contabilidad:nuevagestion' %}">Registrar gestiones</a></li>
             <li><a href="{% url 'contabilidad:listagestion' %}">Listado de gestiones</a></li>
           </ul>
@@ -303,7 +294,7 @@
             <span class="glyphicon glyphicon-cog"></span> 
             <span class="caret"></span>
           </a>
-          <ul style="background-color: #302F2F;" class="dropdown-menu" role="menu">
+          <ul style="background-color: #3B3939;" class="dropdown-menu" role="menu">
             <li><a href="{% url 'personal:reset_password' %}">Cambiar Contraseña</a></li>
             <li><a href="{% url 'personal:updateusuariofronuser' %}">Actualizar información</a></li>
            

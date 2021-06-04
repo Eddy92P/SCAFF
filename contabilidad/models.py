@@ -34,8 +34,8 @@ class nivel_uno(models.Model):
 		res = nivel_dos.objects.select_related('nivel_uno').filter(nivel_uno__id=self.id)
 		return res
 
-	def asiento_exists(self):
-		return asiento.objects.filter(nivel_cinco__nivel_uno__id=self.id).exists()
+	def asiento_exists(self, f1, f2):
+		return asiento.objects.filter(nivel_cinco__nivel_uno=self, encabezadoas__fecha__range=(f1, f2)).exists()
 
 	#Totales para balance general
 	def debe_b_t(self, f1, f2):
@@ -297,8 +297,8 @@ class nivel_dos(models.Model):
 		res = nivel_tres.objects.select_related('nivel_dos').filter(nivel_dos__id=self.id)
 		return res
 
-	def asiento_exists(self):
-		return asiento.objects.filter(nivel_cinco__nivel_dos__id=self.id).exists()
+	def asiento_exists(self, f1, f2):
+		return asiento.objects.filter(nivel_cinco__nivel_dos=self, encabezadoas__fecha__range=(f1, f2)).exists()
 
 	# Saldos estado de resultados
 	def debe_b_t_excel(self, f1, f2):
@@ -429,8 +429,8 @@ class nivel_tres(models.Model):
 		res = nivel_cuatro.objects.select_related('nivel_tres').filter(nivel_tres__id=self.id)
 		return res
 
-	def asiento_exists(self):
-		return asiento.objects.filter(nivel_cinco__nivel_tres__id=self.id).exists()
+	def asiento_exists(self, f1, f2):
+		return asiento.objects.filter(nivel_cinco__nivel_tres=self, encabezadoas__fecha__range=(f1, f2)).exists()
 
 	# Saldos estado de resultados
 	def debe_b_t_excel(self, f1, f2):
@@ -563,8 +563,8 @@ class nivel_cuatro(models.Model):
 		res = nivel_cinco.objects.select_related('nivel_cuatro').filter(nivel_cuatro__id=self.id)
 		return res
 
-	def asiento_exists(self):
-		return asiento.objects.filter(nivel_cinco__nivel_cuatro__id=self.id).exists()
+	def asiento_exists(self, f1, f2):
+		return asiento.objects.filter(nivel_cinco__nivel_cuatro=self, encabezadoas__fecha__range=(f1, f2)).exists()
 
 	# Saldos estado de resultados
 	def debe_b_t_excel(self, f1, f2):
@@ -644,7 +644,7 @@ class nivel_cuatro(models.Model):
 			return res['total']
 
 	def saldo_b_t(self, f1, f2):
-		res = nivel_cuatro.objects.select_related('nivel_tres').filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_b') - F('nivel_cinco__asiento__haber_b'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_b') - F('nivel_cinco__asiento__debe_b')))))
+		res = nivel_cuatro.objects.select_related('nivel_tres').filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_b') - F('nivel_cinco__asiento__haber_b'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_b') - F('nivel_cinco__asiento__debe_b')))))
 
 		if res['total'] == None:
 			return Decimal(0.0)
@@ -652,7 +652,7 @@ class nivel_cuatro(models.Model):
 			return res['total']
 
 	def saldo_d_t(self, f1, f2):
-		res = nivel_cuatro.objects.select_related('nivel_tres').filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), asiento__encabezadoas__anulado=False, asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_d') - F('nivel_cinco__asiento__haber_d'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_d') - F('nivel_cinco__asiento__debe_d')))))
+		res = nivel_cuatro.objects.select_related('nivel_tres').filter(nivel_tres=self.nivel_tres, nivel_cinco__asiento__encabezadoas__fecha__range=(f1, f2), nivel_cinco__asiento__encabezadoas__anulado=False, nivel_cinco__asiento__encabezadoas__cerrado=False).aggregate(total=Case(When(nivel_uno__id=1, then=Sum(F('nivel_cinco__asiento__debe_d') - F('nivel_cinco__asiento__haber_d'))), When(Q(nivel_uno__id=2) | Q(nivel_uno__id=3), then=Sum(F('nivel_cinco__asiento__haber_d') - F('nivel_cinco__asiento__debe_d')))))
 
 		if res['total'] == None:
 			return Decimal(0.0)
@@ -703,8 +703,8 @@ class nivel_cinco(models.Model):
 		res = asiento.objects.select_related('nivel_cinco').filter(nivel_cinco__id=self.id)
 		return res
 
-	def asiento_exists(self):
-		return asiento.objects.filter(nivel_cinco__id=self.id).exists()
+	def asiento_exists(self, f1, f2):
+		return asiento.objects.filter(nivel_cinco=self, encabezadoas__fecha__range=(f1, f2)).exists()
 
 	# Saldos estado de resultados
 	def debe_b_t_excel(self, f1, f2):
@@ -937,12 +937,12 @@ class asiento(models.Model):
 	opciones_p = models.CharField(
 		max_length=1,
 		blank=True,
-		choices=(('R','Retenido'),('A','Asumido'),('F','Factura'),('D','Descuento'))
+		choices=(('F','Factura'),('D','Descuento'))
 		) 
 	opciones_s = models.CharField(
 		max_length=4,
 		blank=True,
-		choices=(('C','IU Compras'),('S','IU Servicio'),('RC','RC-IVA'),('A','Alquileres'),('Comp','Compras'),('B','Boletos'),('I','Importaciones'),('G','Gasolina'),('V','Ventas'),('SC','Sin Derecho a Crédito Fiscal'))
+		choices=(('Comp','Compras'),('B','Boletos'),('I','Importaciones'),('G','Gasolina'),('V','Ventas'),('SC','Sin Derecho a Crédito Fiscal'))
 		)
 	auxiliar = models.PositiveIntegerField(
 		null=True,
@@ -1313,7 +1313,8 @@ class Cotizacion(models.Model):
 		)
 	tipo_c = models.FloatField(
 		null=False,
-		blank=False
+		blank=False,
+		help_text='Debe tener un máximo de 2 decimales'
 		)
 	ufv = models.DecimalField(
 		unique=True,
@@ -1321,7 +1322,8 @@ class Cotizacion(models.Model):
 		blank=False,
 		default=0,
 		max_digits=6,
-		decimal_places=5
+		decimal_places=5,
+		help_text='Debe tener un máximo de 5 decimales'
 		)
 
 	def fecha_f(self):

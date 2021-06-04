@@ -200,7 +200,8 @@
                         {% endifchanged %}
                     </tr>
                         {% for i in res.nivel_dos_set.all %}
-                            {% if i.asiento_exists %}
+                            {% niv_dos_asiento_exists i f1 f2 as dos_asiento_exists %}
+                            {% if dos_asiento_exists %}
                             {% ifchanged i.descripcion %}
                             <tr>
                                 <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -261,7 +262,8 @@
                         {% endifchanged %}
                     </tr>
                         {% for i in res.nivel_dos_set.all %}
-                            {% if i.asiento_exists %}
+                            {% niv_dos_asiento_exists i f1 f2 as dos_asiento_exists %}
+                            {% if dos_asiento_exists %}
                             {% ifchanged i.descripcion %}
                                 <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
                                     <b>{{ i.codigo }}</b>
@@ -278,7 +280,8 @@
                             {% endifchanged %}
                             {% endif %}
                                 {% for j in i.nivel_tres_set.all %}
-                                {% if j.asiento_exists %}
+                                {% niv_tres_asiento_exists j f1 f2 as tres_asiento_exists %}
+                                {% if tres_asiento_exists %}
                                 {% ifchanged j.descripcion %}
                                 <tr>
                                     <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -341,7 +344,8 @@
                         {% endifchanged %}
                     </tr>
                         {% for i in res.nivel_dos_set.all %}
-                            {% if i.asiento_exists %}
+                            {% niv_dos_asiento_exists i f1 f2 as dos_asiento_exists %}
+                            {% if dos_asiento_exists %}
                             {% ifchanged i.descripcion %}
                             <tr>
                                 <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -360,7 +364,8 @@
                             {% endifchanged %}
                             {% endif %}
                             {% for j in i.nivel_tres_set.all %}
-                                {% if j.asiento_exists %}
+                                {% niv_tres_asiento_exists j f1 f2 as tres_asiento_exists %}
+                                {% if tres_asiento_exists %}
                                 {% ifchanged j.descripcion %}
                                 <tr>
                                     <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -379,7 +384,8 @@
                                 {% endifchanged %}
                                 {% endif %}
                                     {% for k in j.nivel_cuatro_set.all %}
-                                        {% if k.asiento_exists %}
+                                        {% niv_cuatro_asiento_exists k f1 f2 as cuatro_asiento_exists %}
+                                        {% if cuatro_asiento_exists %}
                                         {% ifchanged k.descripcion %}
                                         <tr>
                                             <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -443,7 +449,8 @@
                         {% endifchanged %}
                     </tr>
                         {% for i in res.nivel_dos_set.all %}
-                            {% if i.asiento_exists %}
+                            {% niv_dos_asiento_exists i f1 f2 as dos_asiento_exists %}
+                            {% if dos_asiento_exists %}
                             {% ifchanged i.descripcion %}
                             <tr>
                                 <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -462,7 +469,8 @@
                             {% endifchanged %}
                             {% endif %}
                                 {% for j in i.nivel_tres_set.all %}
-                                {% if j.asiento_exists %}
+                                {% niv_tres_asiento_exists j f1 f2 as tres_asiento_exists %}
+                                {% if tres_asiento_exists %}
                                 {% ifchanged j.descripcion %}
                                 <tr>
                                     <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -481,7 +489,8 @@
                                 {% endifchanged %}
                                 {% endif %}
                                     {% for k in j.nivel_cuatro_set.all %}
-                                    {% if k.asiento_exists %}
+                                    {% niv_cuatro_asiento_exists k f1 f2 as cuatro_asiento_exists %}
+                                    {% if cuatro_asiento_exists %}
                                     {% ifchanged k.descripcion %}
                                     <tr>
                                         <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">
@@ -500,7 +509,8 @@
                                     {% endifchanged %}
                                     {% endif %}
                                         {% for l in k.nivel_cinco_set.all %}
-                                        {% if l.asiento_exists %}
+                                        {% niv_cinco_asiento_exists l f1 f2 as cinco_asiento_exists %}
+                                        {% if cinco_asiento_exists %}
                                         {% ifchanged l.descripcion %}
                                         <tr>
                                             <td id="fuente" style="text-align: left; border-left: 1px solid black; border-right: 1px solid black;" colspan="2">

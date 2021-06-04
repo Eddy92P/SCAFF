@@ -111,9 +111,12 @@ class reporteEspecBienForm(forms.Form):
 	campo = forms.CharField(label="Fecha de Actualización/Depreciación", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
 	campo2 = forms.ChoiceField(label="Vinculado al proceso de producción", help_text="", choices=CHOICES)
 	try:
-		rubro = Rubro.objects.all().order_by('id').values_list('id', 'nombre')
-		lista = list(rubro)
-		lista.append(tuple(('T', 'Todo')))
+		def __init__(self, *args, **kwargs):
+			super(reporteEspecBienForm, self).__init__(*args, **kwargs)
+			rubro = Rubro.objects.all().order_by('id').values_list('id', 'nombre')
+			lista = list(rubro)
+			lista.append(tuple(('T', 'Todo')))
+			self.fields['campo1'].choices = lista
 		campo1 = forms.ChoiceField(label="Rubro", help_text="", choices=lista)
 	except Exception as e:
 		campo1 = forms.ChoiceField(label="Rubro", help_text="")
@@ -124,9 +127,12 @@ class reporteAltaBajaForm(forms.Form):
 	campo1 = forms.CharField(label="Hasta", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
 	campo3 = forms.ChoiceField(label="Alta/Baja", help_text="", choices=CHOICES)
 	try:
-		rubro = Rubro.objects.all().order_by('id').values_list('id', 'nombre')
-		lista = list(rubro)
-		lista.append(tuple(('T', 'Todo')))
+		def __init__(self, *args, **kwargs):
+			super(reporteAltaBajaForm, self).__init__(*args, **kwargs)
+			rubro = Rubro.objects.all().order_by('id').values_list('id', 'nombre')
+			lista = list(rubro)
+			lista.append(tuple(('T', 'Todo')))
+			self.fields['campo2'].choices = lista
 		campo2 = forms.ChoiceField(label="Rubro", help_text="", choices=lista)
 	except Exception as e:
 		campo2 = forms.ChoiceField(label="Rubro", help_text="")

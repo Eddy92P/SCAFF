@@ -154,13 +154,10 @@ class crearAltaActivo(CreateView):
 			persona = crear_personal_form_set.save(commit=False)
 			form1.save()
 			crear_personal_form_set.save()
-			try:
-				pk1 = self.kwargs['pk']
-				act = salidaitem.objects.get(id=pk1)
-				act.encsalidaitem.estado_act = True
-				act.save()
-			except Exception as e:
-				pass
+			pk1 = self.kwargs['pk']
+			act = salidaitem.objects.get(id=pk1)
+			act.encsalidaitem.estado_act = True
+			act.encsalidaitem.save()
 			return  HttpResponseRedirect(reverse_lazy(self.success_url))
 		else:
 			return self.render_to_response(self.get_context_data(form=form, crear_personal_form_set = crear_personal_form_set))
@@ -1118,7 +1115,7 @@ class ReporteAltaBajaExcel(TemplateView):
 							ws.cell(row = cont, column = 1).value = activo.codigo
 							ws.cell(row = cont, column = 2).value = activo.tipo_bien.tipo
 							if activo.img_activo:
-								ws.cell(row = cont, column = 3).value = activo.img_activo.url
+								ws.cell(row = cont, column = 3).value = activo.img_activo
 							else:
 								ws.cell(row = cont, column = 3).value = "Sin Imagen"
 							ws.cell(row = cont, column = 4).value = activo.fecha_alt()

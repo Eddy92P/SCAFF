@@ -52,10 +52,10 @@ class crearAsiento(CreateView):
 				ingreso = encingresoitem.objects.get(id=i)
 				for j in ingreso.ingresoitem_set.all():
 					aux4.append(j.item.categoria.num_cuenta)
-					aux5.append(j.sub_total)
+					aux5.append(j.costo_total)
 					aux1.append(j.item.categoria.num_cuenta)
 					aux1.append(0)
-					aux2.append(j.sub_total)
+					aux2.append(j.costo_total)
 					aux2.append(0)
 			aux3 = zip(aux1, aux2)
 			aux6 = zip(aux4, aux5)
@@ -353,17 +353,11 @@ class crearAsiento3(CreateView):
 			aux2 = []
 			for i in selec:
 				capital = Capitalizacion.objects.get(id=i)
-				if capital.alta_activo.vinculado == True:
-					aux1.append(capital.item.categoria.num_cuenta)
-					aux1.append(capital.item.categoria.num_cuenta)
-					aux2.append(capital.deprec_gestion_cap_tot(fecha, f5, '1'))
-					aux2.append(capital.deprec_acum_cap_tot(fecha, f5, '1'))
-				else:
-					aux1.append(capital.item.categoria.num_cuenta)
-					aux1.append(capital.item.categoria.num_cuenta)
-					aux2.append(capital.deprec_gestion_cap_tot(fecha, f5, '1'))
-					aux2.append(capital.deprec_acum_cap_tot(fecha, f5, '1'))
-			aux3 = zip(aux1, aux2)
+				aux1.append(capital.item.categoria.num_cuenta)
+				aux1.append(capital.item.categoria.num_cuenta)
+				aux2.append(capital.deprec_gestion_cap(fecha, f5))
+				aux2.append(capital.deprec_acum_cap(fecha, f5))
+				aux3 = zip(aux1, aux2)
 			crear_asiento_form_set = crearAsientoFormSet(initial=[{'nivel_cinco': i, 'debe_b': j} for i, j in aux3])
 		except Exception as e:
 			crear_asiento_form_set = crearAsientoFormSet()
@@ -503,7 +497,7 @@ class listaAsiento(CreateView, ListView):
 class listaAsientoAnulado(listaAsiento):
 	model = encabezadoas
 	form_class = searchForm
-	template_name = 'contabilidad/listaasiento.html'
+	template_name = 'contabilidad/listaasientoanulado.html'
 
 	def get_queryset(self):
 		object_list = self.model.objects.filter(anulado=True)
@@ -1332,9 +1326,7 @@ class crearFactura(CreateView):
 			pk1 = self.kwargs['pk']
 			monto = form.cleaned_data['importe_fac']
 			form = form.save(commit=False)
-			factura = asiento.objects.get(id=pk1)
-			factura.estado = True
-			factura.save()
+			form.estado = True
 			form.asiento = self.model_pk.objects.get(id=pk1)
 			form.save()
 			dat = self.model_pk.objects.get(id=pk1).encabezadoas
@@ -1437,9 +1429,7 @@ class crearFacturaV(CreateView):
 			pk1 = self.kwargs['pk']
 			monto = form.cleaned_data['importe_fac']
 			form = form.save(commit=False)
-			factura = asiento.objects.get(id=pk1)
-			factura.estado = True
-			factura.save()
+			form.estado = True
 			form.asiento = self.model_pk.objects.get(id=pk1)
 			form.save()
 			dat = self.model_pk.objects.get(id=pk1).encabezadoas
@@ -1539,9 +1529,7 @@ class crearFacturaBol(CreateView):
 			pk1 = self.kwargs['pk']
 			monto = form.cleaned_data['importe_fac']
 			form = form.save(commit=False)
-			factura = asiento.objects.get(id=pk1)
-			factura.estado = True
-			factura.save()
+			form.estado = True
 			form.asiento = self.model_pk.objects.get(id=pk1)
 			form.save()
 			dat = self.model_pk.objects.get(id=pk1).encabezadoas
@@ -1645,9 +1633,7 @@ class crearFacturaImp(CreateView):
 			pk1 = self.kwargs['pk']
 			monto = form.cleaned_data['importe_fac']
 			form = form.save(commit=False)
-			factura = asiento.objects.get(id=pk1)
-			factura.estado = True
-			factura.save()
+			form.estado = True
 			form.asiento = self.model_pk.objects.get(id=pk1)
 			form.save()
 			dat = self.model_pk.objects.get(id=pk1).encabezadoas
@@ -2195,6 +2181,7 @@ class crearBancarizacion(CreateView):
 			pk1 = self.kwargs['pk']
 			form = form.save(commit=False)
 			form.factura = self.model_pk.objects.get(id=pk1)
+			form.estado = True
 			form.save()
 			dat = self.model_pk.objects.get(id=pk1).asiento.encabezadoas
 			return HttpResponseRedirect(reverse_lazy(self.success_url, kwargs={'pk': dat.pk}))
@@ -3114,14 +3101,14 @@ class BalanceGenExcel(TemplateView):
 					ws.cell(row = cont, column = 1).value = niv_uno.id
 					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t(f1, f2)
 							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t(f1, f2)
 							cont += 1
 							ws.cell(row = cont, column = 1).value = niv_dos.codigo
 							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
 							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
-								if nivel_tres.asiento_exists():
+								if niv_tres.asiento_exists(f1, f2):
 									ws.cell(row = cont, column = 3).value = niv_tres.saldo_b_t(f1, f2)
 									ws.cell(row = cont, column = 4).value = niv_tres.saldo_d_t(f1, f2)
 					total_iteration += 1
@@ -3129,7 +3116,7 @@ class BalanceGenExcel(TemplateView):
 					ws.cell(row = cont, column = 1).value = niv_uno.id
 					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t(f1, f2)
 							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t(f1, f2)
 							cont += 1
@@ -3154,14 +3141,14 @@ class BalanceGenExcel(TemplateView):
 					ws.cell(row = cont, column = 4).value = niv_uno.saldo_d_t_excel(f1, f2)
 					cont += 1
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 1).value = niv_dos.codigo
 							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
 							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t_excel(f1, f2)
 							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t_excel(f1, f2)
 							cont += 1
 							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
-								if niv_tres.asiento_exists():
+								if niv_tres.asiento_exists(f1, f2):
 									ws.cell(row = cont, column = 1).value = niv_tres.codigo
 									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
 									ws.cell(row = cont, column = 3).value = niv_tres.saldo_b_t_excel(f1, f2)
@@ -3173,14 +3160,14 @@ class BalanceGenExcel(TemplateView):
 					ws.cell(row = cont, column = 1).value = niv_uno.id
 					ws.cell(row = cont, column = 2).value = niv_uno.descripcion
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t(f1, f2)
 							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t(f1, f2)
 							cont += 1
 							ws.cell(row = cont, column = 1).value = niv_dos.codigo
 							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
 							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
-								if niv_tres.asiento_exists():
+								if niv_tres.asiento_exists(f1, f2):
 									ws.cell(row = cont, column = 3).value = niv_tres.saldo_b_t(f1, f2)
 									ws.cell(row = cont, column = 4).value = niv_tres.saldo_d_t(f1, f2)
 									cont += 1
@@ -3203,21 +3190,21 @@ class BalanceGenExcel(TemplateView):
 					ws.cell(row = cont, column = 4).value = niv_uno.saldo_d_t_excel(f1, f2)
 					cont += 1
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 1).value = niv_dos.codigo
 							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
 							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t_excel(f1, f2)
 							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t_excel(f1, f2)
 							cont += 1
 							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
-								if niv_tres.asiento_exists():
+								if niv_tres.asiento_exists(f1, f2):
 									ws.cell(row = cont, column = 1).value = niv_tres.codigo
 									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
 									ws.cell(row = cont, column = 3).value = niv_tres.saldo_b_t_excel(f1, f2)
 									ws.cell(row = cont, column = 4).value = niv_tres.saldo_d_t_excel(f1, f2)
 									cont += 1
 									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
-										if niv_cuatro.asiento_exists():
+										if niv_cuatro.asiento_exists(f1, f2):
 											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
 											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
 											ws.cell(row = cont, column = 3).value = niv_cuatro.saldo_b_t_excel(f1, f2)
@@ -3232,21 +3219,21 @@ class BalanceGenExcel(TemplateView):
 					ws.cell(row = cont, column = 4).value = niv_uno.saldo_d_t_excel(f1, f2)
 					cont += 1
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 1).value = niv_dos.codigo
 							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
 							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t_excel(f1, f2)
 							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t_excel(f1, f2)
 							cont += 1
 							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
-								if niv_tres.asiento_exists():
+								if niv_tres.asiento_exists(f1, f2):
 									ws.cell(row = cont, column = 1).value = niv_tres.codigo
 									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
 									ws.cell(row = cont, column = 3).value = niv_tres.saldo_b_t_excel(f1, f2)
 									ws.cell(row = cont, column = 4).value = niv_tres.saldo_d_t_excel(f1, f2)
 									cont += 1
 									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
-										if niv_cuatro.asiento_exists():
+										if niv_cuatro.asiento_exists(f1, f2):
 											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
 											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
 											ws.cell(row = cont, column = 3).value = niv_cuatro.saldo_b_t_excel(f1, f2)
@@ -3266,29 +3253,28 @@ class BalanceGenExcel(TemplateView):
 					ws.cell(row = cont, column = 4).value = niv_uno.saldo_d_t_excel(f1, f2)
 					cont += 1
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 1).value = niv_dos.codigo
 							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
 							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t_excel(f1, f2)
 							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t_excel(f1, f2)
 							cont += 1
 							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
-								if niv_tres.asiento_exists():
+								if niv_tres.asiento_exists(f1, f2):
 									ws.cell(row = cont, column = 1).value = niv_tres.codigo
 									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
 									ws.cell(row = cont, column = 3).value = niv_tres.saldo_b_t_excel(f1, f2)
 									ws.cell(row = cont, column = 4).value = niv_tres.saldo_d_t_excel(f1, f2)
 									cont += 1
 									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
-										if niv_cuatro.asiento_exists():
+										if niv_cuatro.asiento_exists(f1, f2):
 											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
 											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
 											ws.cell(row = cont, column = 3).value = niv_cuatro.saldo_b_t_excel(f1, f2)
 											ws.cell(row = cont, column = 4).value = niv_cuatro.saldo_d_t_excel(f1, f2)
 											cont += 1
 											for niv_cinco in niv_cuatro.nivel_cinco_set.all().distinct():
-												if niv_cinco.asiento_exists():
-													print(niv_cinco.saldo_d_t_excel(f1, f2))
+												if niv_cinco.asiento_exists(f1, f2):
 													ws.cell(row = cont, column = 1).value = niv_cinco.codigo
 													ws.cell(row = cont, column = 2).value = niv_cinco.descripcion
 													ws.cell(row = cont, column = 3).value = niv_cinco.saldo_b_t_excel(f1, f2)
@@ -3303,28 +3289,28 @@ class BalanceGenExcel(TemplateView):
 					ws.cell(row = cont, column = 4).value = niv_uno.saldo_d_t_excel(f1, f2)
 					cont += 1
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 1).value = niv_dos.codigo
 							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
 							ws.cell(row = cont, column = 3).value = niv_dos.saldo_b_t_excel(f1, f2)
 							ws.cell(row = cont, column = 4).value = niv_dos.saldo_d_t_excel(f1, f2)
 							cont += 1
 							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
-								if niv_tres.asiento_exists():
+								if niv_tres.asiento_exists(f1, f2):
 									ws.cell(row = cont, column = 1).value = niv_tres.codigo
 									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
 									ws.cell(row = cont, column = 3).value = niv_tres.saldo_b_t_excel(f1, f2)
 									ws.cell(row = cont, column = 4).value = niv_tres.saldo_d_t_excel(f1, f2)
 									cont += 1
 									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
-										if niv_cuatro.asiento_exists():
+										if niv_cuatro.asiento_exists(f1, f2):
 											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
 											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
 											ws.cell(row = cont, column = 3).value = niv_cuatro.saldo_b_t_excel(f1, f2)
 											ws.cell(row = cont, column = 4).value = niv_cuatro.saldo_d_t_excel(f1, f2)
 											cont += 1
 											for niv_cinco in niv_cuatro.nivel_cinco_set.all().distinct():
-												if niv_cinco.asiento_exists():
+												if niv_cinco.asiento_exists(f1, f2):
 													ws.cell(row = cont, column = 1).value = niv_cinco.codigo
 													ws.cell(row = cont, column = 2).value = niv_cinco.descripcion
 													ws.cell(row = cont, column = 3).value = niv_cinco.saldo_b_t_excel(f1, f2)
@@ -3449,7 +3435,7 @@ class EstadoResultExcel(TemplateView):
 					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
 					cont += 1
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 1).value = niv_dos.codigo
 							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
 							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
@@ -3468,7 +3454,7 @@ class EstadoResultExcel(TemplateView):
 					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
 					cont += 1
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 1).value = niv_dos.codigo
 							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
 							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
@@ -3499,7 +3485,7 @@ class EstadoResultExcel(TemplateView):
 					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
 					cont += 1
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 1).value = niv_dos.codigo
 							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
 							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
@@ -3508,7 +3494,7 @@ class EstadoResultExcel(TemplateView):
 							ws.cell(row = cont, column = 6).value = niv_dos.haber_d_t_excel(f1, f2)
 							cont += 1
 							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
-								if niv_tres.asiento_exists():
+								if niv_tres.asiento_exists(f1, f2):
 									ws.cell(row = cont, column = 1).value = niv_tres.codigo
 									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
 									ws.cell(row = cont, column = 3).value = niv_tres.debe_b_t_excel(f1, f2)
@@ -3527,7 +3513,7 @@ class EstadoResultExcel(TemplateView):
 					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
 					cont += 1
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 1).value = niv_dos.codigo
 							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
 							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
@@ -3536,7 +3522,7 @@ class EstadoResultExcel(TemplateView):
 							ws.cell(row = cont, column = 6).value = niv_dos.haber_d_t_excel(f1, f2)
 							cont += 1
 							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
-								if niv_tres.asiento_exists():
+								if niv_tres.asiento_exists(f1, f2):
 									ws.cell(row = cont, column = 1).value = niv_tres.codigo
 									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
 									ws.cell(row = cont, column = 3).value = niv_tres.debe_b_t_excel(f1, f2)
@@ -3567,7 +3553,7 @@ class EstadoResultExcel(TemplateView):
 					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
 					cont += 1
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 1).value = niv_dos.codigo
 							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
 							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
@@ -3576,7 +3562,7 @@ class EstadoResultExcel(TemplateView):
 							ws.cell(row = cont, column = 6).value = niv_dos.haber_d_t_excel(f1, f2)
 							cont += 1
 							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
-								if niv_tres.asiento_exists():
+								if niv_tres.asiento_exists(f1, f2):
 									ws.cell(row = cont, column = 1).value = niv_tres.codigo
 									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
 									ws.cell(row = cont, column = 3).value = niv_tres.debe_b_t_excel(f1, f2)
@@ -3585,7 +3571,7 @@ class EstadoResultExcel(TemplateView):
 									ws.cell(row = cont, column = 6).value = niv_tres.haber_d_t_excel(f1, f2)
 									cont += 1
 									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
-										if niv_cuatro.asiento_exists():
+										if niv_cuatro.asiento_exists(f1, f2):
 											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
 											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
 											ws.cell(row = cont, column = 3).value = niv_cuatro.debe_b_t_excel(f1, f2)
@@ -3604,7 +3590,7 @@ class EstadoResultExcel(TemplateView):
 					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
 					cont += 1
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 1).value = niv_dos.codigo
 							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
 							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
@@ -3613,7 +3599,7 @@ class EstadoResultExcel(TemplateView):
 							ws.cell(row = cont, column = 6).value = niv_dos.haber_d_t_excel(f1, f2)
 							cont += 1
 							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
-								if niv_tres.asiento_exists():
+								if niv_tres.asiento_exists(f1, f2):
 									ws.cell(row = cont, column = 1).value = niv_tres.codigo
 									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
 									ws.cell(row = cont, column = 3).value = niv_tres.debe_b_t_excel(f1, f2)
@@ -3622,7 +3608,7 @@ class EstadoResultExcel(TemplateView):
 									ws.cell(row = cont, column = 6).value = niv_tres.haber_d_t_excel(f1, f2)
 									cont += 1
 									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
-										if niv_cuatro.asiento_exists():
+										if niv_cuatro.asiento_exists(f1, f2):
 											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
 											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
 											ws.cell(row = cont, column = 3).value = niv_cuatro.debe_b_t_excel(f1, f2)
@@ -3653,7 +3639,7 @@ class EstadoResultExcel(TemplateView):
 					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
 					cont += 1
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 1).value = niv_dos.codigo
 							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
 							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
@@ -3662,7 +3648,7 @@ class EstadoResultExcel(TemplateView):
 							ws.cell(row = cont, column = 6).value = niv_dos.haber_d_t_excel(f1, f2)
 							cont += 1
 							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
-								if niv_tres.asiento_exists():
+								if niv_tres.asiento_exists(f1, f2):
 									ws.cell(row = cont, column = 1).value = niv_tres.codigo
 									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
 									ws.cell(row = cont, column = 3).value = niv_tres.debe_b_t_excel(f1, f2)
@@ -3671,7 +3657,7 @@ class EstadoResultExcel(TemplateView):
 									ws.cell(row = cont, column = 6).value = niv_tres.haber_d_t_excel(f1, f2)
 									cont += 1
 									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
-										if niv_cuatro.asiento_exists():
+										if niv_cuatro.asiento_exists(f1, f2):
 											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
 											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
 											ws.cell(row = cont, column = 3).value = niv_cuatro.debe_b_t_excel(f1, f2)
@@ -3680,7 +3666,7 @@ class EstadoResultExcel(TemplateView):
 											ws.cell(row = cont, column = 6).value = niv_cuatro.haber_d_t_excel(f1, f2)
 											cont += 1
 											for niv_cinco in niv_cuatro.nivel_cinco_set.all().distinct():
-												if niv_cinco.asiento_exists():
+												if niv_cinco.asiento_exists(f1, f2):
 													ws.cell(row = cont, column = 1).value = niv_cinco.codigo
 													ws.cell(row = cont, column = 2).value = niv_cinco.descripcion
 													ws.cell(row = cont, column = 3).value = niv_cinco.debe_b_t_excel(f1, f2)
@@ -3699,7 +3685,7 @@ class EstadoResultExcel(TemplateView):
 					ws.cell(row = cont, column = 6).value = niv_uno.haber_d_t_excel(f1, f2)
 					cont += 1
 					for niv_dos in niv_uno.nivel_dos_set.all().distinct():
-						if niv_dos.asiento_exists():
+						if niv_dos.asiento_exists(f1, f2):
 							ws.cell(row = cont, column = 1).value = niv_dos.codigo
 							ws.cell(row = cont, column = 2).value = niv_dos.descripcion
 							ws.cell(row = cont, column = 3).value = niv_dos.debe_b_t_excel(f1, f2)
@@ -3708,7 +3694,7 @@ class EstadoResultExcel(TemplateView):
 							ws.cell(row = cont, column = 6).value = niv_dos.haber_d_t_excel(f1, f2)
 							cont += 1
 							for niv_tres in niv_dos.nivel_tres_set.all().distinct():
-								if niv_tres.asiento_exists():
+								if niv_tres.asiento_exists(f1, f2):
 									ws.cell(row = cont, column = 1).value = niv_tres.codigo
 									ws.cell(row = cont, column = 2).value = niv_tres.descripcion
 									ws.cell(row = cont, column = 3).value = niv_tres.debe_b_t_excel(f1, f2)
@@ -3717,7 +3703,7 @@ class EstadoResultExcel(TemplateView):
 									ws.cell(row = cont, column = 6).value = niv_tres.haber_d_t_excel(f1, f2)
 									cont += 1
 									for niv_cuatro in niv_tres.nivel_cuatro_set.all().distinct():
-										if niv_cuatro.asiento_exists():
+										if niv_cuatro.asiento_exists(f1, f2):
 											ws.cell(row = cont, column = 1).value = niv_cuatro.codigo
 											ws.cell(row = cont, column = 2).value = niv_cuatro.descripcion
 											ws.cell(row = cont, column = 3).value = niv_cuatro.debe_b_t_excel(f1, f2)
@@ -3726,7 +3712,7 @@ class EstadoResultExcel(TemplateView):
 											ws.cell(row = cont, column = 6).value = niv_cuatro.haber_d_t_excel(f1, f2)
 											cont += 1
 											for niv_cinco in niv_cuatro.nivel_cinco_set.all().distinct():
-												if niv_cinco.asiento_exists():
+												if niv_cinco.asiento_exists(f1, f2):
 													ws.cell(row = cont, column = 1).value = niv_cinco.codigo
 													ws.cell(row = cont, column = 2).value = niv_cinco.descripcion
 													ws.cell(row = cont, column = 3).value = niv_cinco.debe_b_t_excel(f1, f2)

@@ -23,7 +23,7 @@ class crearKardexUsuarioForm(ModelForm):
 			'cargo':forms.TextInput(attrs={'class':'form-control'})
 		}
 		labels = {
-			'ci : C.I.'
+			'ci' : 'C.I.'
 		}
 
 CHOICES = (('1','ID'),('2','Nombre'),)

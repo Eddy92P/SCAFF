@@ -20,6 +20,7 @@ class kardex(models.Model):
 		null=False,
 		blank=False,
 		unique=True,
+		help_text='El CI solo debe contener un maximo de 7 digitos y opcionalmente 2 letras mas',
 		validators=[
 			RegexValidator(
 				regex=r'[0-9]{7}[a-zA-Z]{0,2}',
@@ -32,6 +33,7 @@ class kardex(models.Model):
 		null=False,
 		blank=False,
 		unique=True,
+		help_text='El telefono celular solo debe contener un maximo de 8 digitos',
 		validators=[
 			RegexValidator(
 				regex=r'^[0-9]{8}$',
@@ -42,6 +44,7 @@ class kardex(models.Model):
 	telefono_fijo = models.PositiveIntegerField(
 		null=False,
 		blank=False,
+		help_text='El telefono celular solo debe contener un maximo de 7 digitos',
 		validators=[
 			RegexValidator(
 				regex=r'^[0-9]{7}',
@@ -130,6 +133,7 @@ class personal(models.Model):
 		max_length=9,
 		null=False,
 		blank=False,
+		help_text='El CI solo debe contener un maximo de 7 digitos y opcionalmente 2 letras mas',
 		validators=[
 			RegexValidator(
 				regex=r'^[0-9]{6,8}$',
@@ -153,17 +157,19 @@ class personal(models.Model):
 	telefono = models.CharField(
 		max_length=10,
 		null=False, 
-		blank=False, 
+		blank=False,
+		help_text='El teléfono solo debe contener un maximo de 8 digitos', 
 		validators=[
 			RegexValidator(
 				regex=r'^[0-9]{7,8}$', 
-				message='El teléfono tiene un máximo de 8 dígitos, además de contener sólo números', 
+				message='El teléfono tiene un máximo de 8 dígitos', 
 				code='Numero Invalido'
 			)
 		]
 	)
 	email = models.EmailField(
-		blank=True
+		blank=True,
+		help_text='Por ej. mindes@gmail.com'
 	)
 	direccion = models.CharField(
 		max_length=50,

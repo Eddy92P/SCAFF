@@ -20,7 +20,7 @@
                                 {% load bootstrap3 %}
 
                             {% if perms.contabilidad.add_factura_v %}
-                            <a class="btn btn-warning" type="submit"  href="{% url 'contabilidad:nuevafactura_v' pk1 %}">Crear Factura</a>
+                            <a class="btn btn-primary" type="submit"  href="{% url 'contabilidad:nuevafactura_v' pk1 %}">Crear Factura</a>
                             {% endif %}
                                 
                         </form>

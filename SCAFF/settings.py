@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'dal',
     'dal_select2',
     'import_export',
-    'debug_toolbar',
     'memoize',
 ]
 
@@ -60,7 +59,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 INTERNAL_IPS = [

@@ -312,3 +312,25 @@ def debe_d_ci_excel(nivel_cinco, f1, f2):
 @register.simple_tag
 def haber_d_ci_excel(nivel_cinco, f1, f2):	
 	return nivel_cinco.haber_d_t_excel(f1, f2)
+
+
+# Asiento exists
+@register.simple_tag
+def niv_uno_asiento_exists(nivel_uno, f1, f2):	
+	return nivel_uno.asiento_exists(f1, f2)
+
+@register.simple_tag
+def niv_dos_asiento_exists(nivel_dos, f1, f2):	
+	return nivel_dos.asiento_exists(f1, f2)
+
+@register.simple_tag
+def niv_tres_asiento_exists(nivel_tres, f1, f2):	
+	return nivel_tres.asiento_exists(f1, f2)
+
+@register.simple_tag
+def niv_cuatro_asiento_exists(nivel_cuatro, f1, f2):	
+	return nivel_cuatro.asiento_exists(f1, f2)
+
+@register.simple_tag
+def niv_cinco_asiento_exists(nivel_cinco, f1, f2):	
+	return nivel_cinco.asiento_exists(f1, f2)

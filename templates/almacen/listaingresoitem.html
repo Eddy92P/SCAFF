@@ -80,7 +80,7 @@
 							      	{% endif %}
 							      	{% if obj.estado == False %}
 							      		{% if perms.contabilidad.add_asiento %}
-							      			<td><input type="checkbox" name="envia" value="{{ obj.id }}"></td>
+							      			<td class="text-center"><input type="checkbox" name="envia" value="{{ obj.id }}"></td>
 							      		{% endif %}
 							      	{% else %}
 							      	<td> </td>
@@ -112,7 +112,7 @@
 							      	{% endif %}
 							      	{% if obj.estado == False %}
 							      		{% if perms.contabilidad.add_asiento %}
-							      			<td><input type="checkbox" name="envia" value="{{ obj.id }}"></td>
+							      			<td class="text-center"><input type="checkbox" name="envia" value="{{ obj.id }}"></td>
 							      		{% endif %}
 							      	{% else %}
 							      	<td> </td>

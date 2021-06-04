@@ -206,9 +206,12 @@ class searchForm(forms.Form):
 
 class repGeneralForm(forms.Form):
 	try:
-		almacenes = categoria.objects.all().order_by('id').values_list('id', 'nombre')
-		lista = list(almacenes)
-		lista.append(tuple(('T','Todo')))
+		def __init__(self, *args, **kwargs):
+			super(repGeneralForm, self).__init__(*args, **kwargs)
+			almacenes = categoria.objects.all().order_by('id').values_list('id', 'nombre')
+			lista = list(almacenes)
+			lista.append(tuple(('T','Todo')))
+			self.fields['campo2'].choices = lista
 		campo = forms.CharField(label="Desde", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
 		campo1 = forms.CharField(label="Hasta", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
 		campo2 = forms.ChoiceField(label="Almacen", help_text="", choices=lista)
@@ -245,9 +248,12 @@ class repDetalleSalidasForm(forms.Form):
 
 class repDetalleClienteForm(forms.Form):
 	try:
-		clientes = cliente.objects.all().order_by('id').values_list('id', 'nombre')
-		lista = list(clientes)
-		lista.append(tuple(('T','Todo')))
+		def __init__(self, *args, **kwargs):
+			super(repDetalleClienteForm, self).__init__(*args, **kwargs)
+			clientes = cliente.objects.all().order_by('id').values_list('id', 'nombre')
+			lista = list(clientes)
+			lista.append(tuple(('T','Todo')))
+			self.fields['campo2'].choices = lista
 		campo = forms.CharField(label="Desde", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
 		campo1 = forms.CharField(label="Hasta", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
 		campo2 = forms.ChoiceField(label="Cliente", help_text="", choices=lista)
@@ -258,9 +264,12 @@ class repDetalleClienteForm(forms.Form):
 
 class repDetalleProveedorForm(forms.Form):
 	try:
-		proveedores = proveedor.objects.all().order_by('id').values_list('id', 'nombre')
-		lista = list(proveedores)
-		lista.append(tuple(('T','Todo')))
+		def __init__(self, *args, **kwargs):
+			super(repDetalleProveedorForm, self).__init__(*args, **kwargs)
+			proveedores = proveedor.objects.all().order_by('id').values_list('id', 'nombre')
+			lista = list(proveedores)
+			lista.append(tuple(('T','Todo')))
+			self.fields['campo2'].choices = lista
 		campo = forms.CharField(label="Desde", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
 		campo1 = forms.CharField(label="Hasta", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
 		campo2 = forms.ChoiceField(label="Proveedor", help_text="", choices=lista)
@@ -274,8 +283,11 @@ class actualizarInventarioForm(forms.Form):
 
 class repKardexValForm(forms.Form):
 	try:
-		items = item.objects.all().order_by('nombre').values_list('id', 'nombre')
-		lista = list(items)
+		def __init__(self, *args, **kwargs):
+			super(repKardexValForm, self).__init__(*args, **kwargs)
+			items = item.objects.all().order_by('nombre').values_list('id', 'nombre')
+			lista = list(items)
+			self.fields['campo2'].choices = lista
 		campo = forms.CharField(label="Desde", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
 		campo1 = forms.CharField(label="Hasta", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
 		campo2 = forms.ChoiceField(label="Item", help_text="", choices=lista)
