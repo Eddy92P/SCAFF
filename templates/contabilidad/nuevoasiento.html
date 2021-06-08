@@ -1284,7 +1284,7 @@
                             result = parseFloat(m) - parseFloat(res3).toFixed(2) - parseFloat(res5).toFixed(2)
                             $('#'+op).val(parseFloat(res3).toFixed(2));
                             $('#'+opc4).val(parseFloat(res5).toFixed(2));
-                            $('#'+opc5).val(result);
+                            $('#'+opc5).val(result.toFixed(2));
                             $('#'+opc10).select2({
                             ajax:   {
                                 url: '{% url 'contabilidad:cuenta' %}'
@@ -1316,9 +1316,9 @@
                             var descuento_iva_venta_descontado = parseFloat(descuento_venta) * 0.13;
                             var descuento_venta_total = parseFloat(descuento_venta) - parseFloat(descuento_iva_venta_descontado)
 
-                            $('#'+monto_descontar_id).val(parseFloat(monto_descontado));
-                            $('#'+imp_transacc_id).val(parseFloat(imp_transacc_descontado));
-                            $('#'+imp_transacc_pagar_venta_id).val(parseFloat(imp_transacc_pagar_descontado));
+                            $('#'+monto_descontar_id).val(parseFloat(monto_descontado).toFixed(2));
+                            $('#'+imp_transacc_id).val(parseFloat(imp_transacc_descontado).toFixed(2));
+                            $('#'+imp_transacc_pagar_venta_id).val(parseFloat(imp_transacc_pagar_descontado).toFixed(2));
                             $('#'+descuento_iva_venta_id).val(parseFloat(descuento_iva_venta_descontado).toFixed(2));
                             $('#'+descuento_venta_id).val(parseFloat(descuento_venta_total).toFixed(2));
 

@@ -95,6 +95,7 @@ class crearAsiento(CreateView):
 				form.numero_comp = 1
 			elif (t!= None) & (form.tipo_trans=='T'):
 				form.numero_comp = t + 1
+
 			form.save()
 			crear_asiento_form_set.instance = form
 			formset = crear_asiento_form_set.save(commit=False)
@@ -108,7 +109,6 @@ class crearAsiento(CreateView):
 					f.debe_b = 0.00
 					f.debe_d = 0.00
 					f.auxiliar = 2
-
 			crear_asiento_form_set.save()
 			try:
 				for i in selec:

@@ -1317,7 +1317,6 @@ class Cotizacion(models.Model):
 		help_text='Debe tener un máximo de 2 decimales'
 		)
 	ufv = models.DecimalField(
-		unique=True,
 		null=False,
 		blank=False,
 		default=0,
