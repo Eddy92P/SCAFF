@@ -109,7 +109,14 @@ class crearAsiento(CreateView):
 					f.debe_b = 0.00
 					f.debe_d = 0.00
 					f.auxiliar = 2
+
 			crear_asiento_form_set.save()
+			if (form.dif_dls > 0) & (form.dif_dls < 0.10):
+				ajuste = nivel_cinco.objects.get(descripcion="AJUSTE DIFERENCIA DE CAMBIO")
+				asiento.objects.create(encabezadoas_id=form.id, nivel_cinco_id=ajuste.id, refer="AJUSTE", debe_b=0.00, haber_b=0.00, debe_d=0.00, haber_d=form.dif_dls, auxiliar=2)
+				form.haber_dls = form.haber_dls + form.dif_dls
+				form.dif_dls = 0.00
+				form.save()
 			try:
 				for i in selec:
 					ingreso = encingresoitem.objects.get(id=i)
@@ -200,6 +207,12 @@ class crearAsiento1(crearAsiento):
 					f.auxiliar = 2
 
 			crear_asiento_form_set.save()
+			if (form.dif_dls > 0) & (form.dif_dls < 0.10):
+				ajuste = nivel_cinco.objects.get(descripcion="AJUSTE DIFERENCIA DE CAMBIO")
+				asiento.objects.create(encabezadoas_id=form.id, nivel_cinco_id=ajuste.id, refer="AJUSTE", debe_b=0.00, haber_b=0.00, debe_d=0.00, haber_d=form.dif_dls, auxiliar=2)
+				form.haber_dls = form.haber_dls + form.dif_dls
+				form.dif_dls = 0.00
+				form.save()
 			try:
 				pk1 = self.kwargs['pk']
 				sal = encsalidaitem.objects.get(id=pk1)
@@ -305,6 +318,12 @@ class crearAsiento2(CreateView):
 					f.auxiliar = 2
 
 			crear_asiento_form_set.save()
+			if (form.dif_dls > 0) & (form.dif_dls < 0.10):
+				ajuste = nivel_cinco.objects.get(descripcion="AJUSTE DIFERENCIA DE CAMBIO")
+				asiento.objects.create(encabezadoas_id=form.id, nivel_cinco_id=ajuste.id, refer="AJUSTE", debe_b=0.00, haber_b=0.00, debe_d=0.00, haber_d=form.dif_dls, auxiliar=2)
+				form.haber_dls = form.haber_dls + form.dif_dls
+				form.dif_dls = 0.00
+				form.save()
 			try:
 				for i in selec:
 					activo = Alta_baja_activo.objects.get(id=i)
@@ -404,6 +423,12 @@ class crearAsiento3(CreateView):
 					f.auxiliar = 2
 					
 			crear_asiento_form_set.save()
+			if (form.dif_dls > 0) & (form.dif_dls < 0.10):
+				ajuste = nivel_cinco.objects.get(descripcion="AJUSTE DIFERENCIA DE CAMBIO")
+				asiento.objects.create(encabezadoas_id=form.id, nivel_cinco_id=ajuste.id, refer="AJUSTE", debe_b=0.00, haber_b=0.00, debe_d=0.00, haber_d=form.dif_dls, auxiliar=2)
+				form.haber_dls = form.haber_dls + form.dif_dls
+				form.dif_dls = 0.00
+				form.save()
 			try:
 				for i in selec:
 					capital = Capitalizacion.objects.get(id=i)
@@ -446,8 +471,8 @@ class updateAsiento(UpdateView):
 		form = self.form_class(request.POST, instance=self.model.objects.get(id=pk1))
 		crear_asiento_form_set = updateAsientoFormSet(request.POST, instance=self.model.objects.get(id=pk1))
 		if form.is_valid() and crear_asiento_form_set.is_valid():
-			self.object = form.save()
-			crear_asiento_form_set.instance = self.object
+			form1 = form.save()
+			crear_asiento_form_set.instance = form1
 			formset = crear_asiento_form_set.save(commit=False)
 			for obj in crear_asiento_form_set.deleted_objects:
 				obj.delete()
@@ -463,7 +488,15 @@ class updateAsiento(UpdateView):
 					f.debe_d = 0.00
 					f.auxiliar = 2
 
+				if (form1.dif_dls > 0) & (form1.dif_dls < 0.10):
+					ajuste = asiento.objects.get(encabezadoas_id=form1.id, nivel_cinco__descripcion="AJUSTE DIFERENCIA DE CAMBIO")
+					f.haber_d = ajuste.haber_d
+					form1.haber_dls = form1.haber_dls + form1.dif_dls
+					form1.dif_dls = 0.00
+					form1.save()
+
 			crear_asiento_form_set.save()
+
 			return HttpResponseRedirect(reverse_lazy(self.success_url))
 		else:
 			return self.render_to_response(self.get_context_data(form=form, crear_asiento_form_set=crear_asiento_form_set, error=crear_asiento_form_set.non_form_errors()))
