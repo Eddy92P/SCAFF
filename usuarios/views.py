@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
 
 from django.views.generic import ListView, CreateView, UpdateView, FormView, DeleteView
 from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 
 from usuarios.forms import *
 from usuarios.models import *

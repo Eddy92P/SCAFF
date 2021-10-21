@@ -59,17 +59,17 @@ def convierte_cifra(numero,sw):
 	#Valida las decenas
 	texto_decena = lista_decena[decena]
 	if decena == 1 :
-		 texto_decena = texto_decena[unidad]
- 	elif decena > 1 :
+		texto_decena = texto_decena[unidad]
+	elif decena > 1 :
  		if unidad != 0 :
  			texto_decena = texto_decena[1]
  		else:
  			texto_decena = texto_decena[0]
  	#Validar las unidades
  	#print "texto_unidad: ",texto_unidad
- 	if decena != 1:
- 		texto_unidad = lista_unidad[unidad]
- 		if unidad == 1:
- 			texto_unidad = texto_unidad[sw]
+	if decena != 1:
+		texto_unidad = lista_unidad[unidad]
+		if unidad == 1:
+			texto_unidad = texto_unidad[sw]
  
- 	return "%s %s %s" %(texto_centena,texto_decena,texto_unidad)
+	return "%s %s %s" %(texto_centena,texto_decena,texto_unidad)

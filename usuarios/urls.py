@@ -2,7 +2,7 @@
 from django.conf.urls import url, include
 from django.contrib import admin
 from usuarios.views import *
-from django.contrib.auth.views import login, logout_then_login, password_reset
+from django.contrib.auth.views import LoginView, logout_then_login, PasswordResetView
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.csrf import csrf_exempt
 
@@ -13,6 +13,8 @@ from .serializers_views import *
 
 router = routers.DefaultRouter()
 router.register(r'currentuser', currentUserViewSetRest)
+
+app_name = 'usuarios'
 
 urlpatterns = [
 	url(r'^restpersonal/', include(router.urls)),
@@ -47,18 +49,14 @@ urlpatterns = [
   
     #login_required metodo de forsado de login, logout_then_login metodos de logeo de django
     url(r'^login/$',
-        login,
-        {'template_name':'personal/login.html'}, 
+        LoginView.as_view(
+            template_name='personal/login.html'
+        ), 
         name='login'
     ),
     url(r'^logout/$',
         logout_then_login,
         name='logout'
-    ),
-    url(r'^reset_pass/$',
-        permission_required('auth.view_personal')(auth_views.password_change),
-        {'template_name':'personal/password_reset_form.html','post_change_redirect' : '/'}, 
-        name='reset_password'
     ),
     url(r'^updateusuario/(?P<pk>\d+)/$',
         permission_required('auth.view_personal')(login_required(updateUsuario.as_view())), 

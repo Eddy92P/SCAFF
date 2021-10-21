@@ -21,7 +21,7 @@ from django.db.models import F
 from django.db.models import Sum
 
 from django.views.generic import ListView, CreateView, UpdateView, FormView, TemplateView, DeleteView
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 
 from easy_pdf.views import PDFTemplateView
 from openpyxl import Workbook
@@ -57,8 +57,8 @@ class crearAsiento(CreateView):
 					aux1.append(0)
 					aux2.append(j.costo_total)
 					aux2.append(0)
-			aux3 = zip(aux1, aux2)
-			aux6 = zip(aux4, aux5)
+			aux3 = list(zip(aux1, aux2))
+			aux6 = list(zip(aux4, aux5))
 			total_ingreso_objects = ingreso.ingresoitem_set.all().count()
 			crearAsientoFormSetIng = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=total_ingreso_objects*2)
 			if ingreso.iva == True:
@@ -159,7 +159,7 @@ class crearAsiento1(crearAsiento):
 				aux2.append(i.sub_total)
 				aux4.append(i.sub_total)
 				aux4.append(0)
-			aux3 = zip(aux1, aux2, aux4)
+			aux3 = list(zip(aux1, aux2, aux4))
 			total_salida_objects = aux.salidaitem_set.all().count()
 			crearAsientoFormSetSal = inlineformset_factory(encabezadoas, asiento, form=crearAsientoForm , extra=total_salida_objects*2)
 			crear_asiento_form_set = crearAsientoFormSetSal(initial=[{'nivel_cinco': i, 'debe_b': k, 'haber_b': j} for i, j, k in aux3])
@@ -271,7 +271,7 @@ class crearAsiento2(CreateView):
 					aux1.append(activo.tipo_bien.rubro.num_cuenta)
 					aux2.append(activo.deprec_gestion_tot(fecha, f5, 0))
 					aux2.append(activo.deprec_acum_tot(fecha, f5, 0))
-			aux3 = zip(aux1, aux2)
+			aux3 = list(zip(aux1, aux2))
 			crear_asiento_form_set = crearAsientoFormSet(initial=[{'nivel_cinco': i, 'debe_b': j} for i, j in aux3])
 		except Exception as e:
 			crear_asiento_form_set = crearAsientoFormSet()
@@ -376,7 +376,7 @@ class crearAsiento3(CreateView):
 				aux1.append(capital.item.categoria.num_cuenta)
 				aux2.append(capital.deprec_gestion_cap(fecha, f5))
 				aux2.append(capital.deprec_acum_cap(fecha, f5))
-				aux3 = zip(aux1, aux2)
+				aux3 = list(zip(aux1, aux2))
 			crear_asiento_form_set = crearAsientoFormSet(initial=[{'nivel_cinco': i, 'debe_b': j} for i, j in aux3])
 		except Exception as e:
 			crear_asiento_form_set = crearAsientoFormSet()
@@ -507,10 +507,6 @@ class listaAsiento(CreateView, ListView):
 	template_name = 'contabilidad/listaasiento.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaAsiento, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -543,10 +539,6 @@ class listaAsientoForeign(CreateView, ListView):
 	def get_context_data(self, *args, **kwargs):
 		context = super(listaAsientoForeign, self).get_context_data(**kwargs)
 		pk1 = self.kwargs['pk']
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' not in context:
 			context['pk1'] = pk1
 			context['form'] = self.form_class()
@@ -585,10 +577,6 @@ class listaAsientoForeignT(CreateView, ListView):
 	template_name = 'contabilidad/listaasientoft.html'
 	def get_context_data(self, *args, **kwargs):
 		context = super(listaAsientoForeignT, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -602,7 +590,7 @@ class listaAsientoForeignT(CreateView, ListView):
 
 class asientoAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
-		if not self.request.user.is_authenticated():
+		if not self.request.user.is_authenticated:
 			return nivel_cinco.objects.none()
 		qs = nivel_cinco.objects.all().order_by('codigo')
 		if self.q:
@@ -611,7 +599,7 @@ class asientoAutocomplete(autocomplete.Select2QuerySetView):
 
 class nivel_unoAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
-		if not self.request.user.is_authenticated():
+		if not self.request.user.is_authenticated:
 			return nivel_uno.objects.none()
 		qs = nivel_uno.objects.all().order_by('id')
 		if self.q:
@@ -620,7 +608,7 @@ class nivel_unoAutocomplete(autocomplete.Select2QuerySetView):
 
 class nivel_dosAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
-		if not self.request.user.is_authenticated():
+		if not self.request.user.is_authenticated:
 			return nivel_dos.objects.none()
 		qs = nivel_dos.objects.all().order_by('codigo')
 		nivel_uno = self.forwarded.get('nivel_uno', None)
@@ -632,7 +620,7 @@ class nivel_dosAutocomplete(autocomplete.Select2QuerySetView):
 
 class nivel_tresAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
-		if not self.request.user.is_authenticated():
+		if not self.request.user.is_authenticated:
 			return nivel_tres.objects.none()
 		qs = nivel_tres.objects.all().order_by('codigo')
 		nivel_dos = self.forwarded.get('nivel_dos', None)
@@ -644,7 +632,7 @@ class nivel_tresAutocomplete(autocomplete.Select2QuerySetView):
 
 class nivel_cuatroAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
-		if not self.request.user.is_authenticated():
+		if not self.request.user.is_authenticated:
 			return nivel_cuatro.objects.none()
 		qs = nivel_cuatro.objects.all().order_by('codigo')
 		nivel_tres = self.forwarded.get('nivel_tres', None)
@@ -676,10 +664,6 @@ class listaCuenta1(CreateView, ListView):
 	template_name = 'contabilidad/listacuenta1.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCuenta1, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -708,12 +692,6 @@ class crearCuenta2(CreateView):
 	form_class = crearPlanCuenta2Form
 	template_name = 'contabilidad/nuevacuenta2.html'
 	success_url = 'contabilidad:listacuenta2'
-
-	def get_context_data(self, **kwargs):
-		context = super(crearCuenta2, self).get_context_data(**kwargs)
-		if 'form' and 'niv' in context:
-			context['niv'] = nivel_uno.objects.get(id=pk1)
-		return context
 
 	def post(self, request, *args, **kwargs):
 		self.object = self.get_object
@@ -746,10 +724,6 @@ class listaCuenta2(CreateView, ListView):
 	template_name = 'contabilidad/listacuenta2.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCuenta2, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -814,10 +788,6 @@ class listaCuenta3(CreateView, ListView):
 	template_name = 'contabilidad/listacuenta3.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCuenta3, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -882,10 +852,6 @@ class listaCuenta4(CreateView, ListView):
 	template_name = 'contabilidad/listacuenta4.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCuenta4, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -950,10 +916,6 @@ class listaCuenta5(CreateView, ListView):
 	template_name = 'contabilidad/listacuenta5.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCuenta5, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -982,10 +944,6 @@ class listaPlanCuenta(CreateView, ListView):
 	template_name = 'contabilidad/listaplancuentas.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaPlanCuenta, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -1014,10 +972,6 @@ class listaCuenta2T(CreateView, ListView):
 	template_name = 'contabilidad/listacuenta2t.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCuenta2T, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -1046,10 +1000,6 @@ class listaCuenta3T(CreateView, ListView):
 	template_name = 'contabilidad/listacuenta3t.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCuenta3T, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -1078,10 +1028,6 @@ class listaCuenta4T(CreateView, ListView):
 	template_name = 'contabilidad/listacuenta4t.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCuenta4T, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -1110,10 +1056,6 @@ class listaCuenta5TT(CreateView, ListView):
 	template_name = 'contabilidad/listacuenta5tt.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCuenta5TT, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -1142,10 +1084,6 @@ class listaCuenta5T(CreateView, ListView):
 	template_name = 'contabilidad/listacuenta5t.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCuenta5T, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -1174,10 +1112,6 @@ class listaCuenta5TB(CreateView, ListView):
 	template_name = 'contabilidad/cuentas_balance.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCuenta5TB, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -1206,10 +1140,6 @@ class listaCuenta5TE(CreateView, ListView):
 	template_name = 'contabilidad/estado_ev.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCuenta5TE, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -1238,10 +1168,6 @@ class listaCuenta5ER(CreateView, ListView):
 	template_name = 'contabilidad/estado_resultados.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCuenta5ER, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -1270,10 +1196,6 @@ class listaCuenta5SS(CreateView, ListView):
 	template_name = 'contabilidad/suma_saldo.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCuenta5SS, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -1303,10 +1225,6 @@ class listaAsientoRetencion(CreateView, ListView):
 	template_name = 'contabilidad/retencion.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaAsientoRetencion, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -1405,10 +1323,6 @@ class listaFactura(CreateView, ListView):
 	def get_context_data(self, **kwargs):
 		context = super(listaFactura, self).get_context_data(**kwargs)
 		pk1 = self.kwargs['pk']
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 			context['pk1'] = pk1
@@ -1505,10 +1419,6 @@ class listaFacturaV(CreateView, ListView):
 	def get_context_data(self, **kwargs):
 		context = super(listaFacturaV, self).get_context_data(**kwargs)
 		pk1 = self.kwargs['pk']
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 			context['pk1'] = pk1
@@ -1608,10 +1518,6 @@ class listaFacturaBol(CreateView, ListView):
 	def get_context_data(self, **kwargs):
 		context = super(listaFacturaBol, self).get_context_data(**kwargs)
 		pk1 = self.kwargs['pk']
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 			context['pk1'] = pk1
@@ -1712,10 +1618,6 @@ class listaFacturaImp(CreateView, ListView):
 	def get_context_data(self, **kwargs):
 		context = super(listaFacturaImp, self).get_context_data(**kwargs)
 		pk1 = self.kwargs['pk']
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 			context['pk1'] = pk1
@@ -1746,10 +1648,6 @@ class listaFacturaT(CreateView, ListView):
 	template_name = 'contabilidad/listafacturat.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaFacturaT, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -1778,10 +1676,6 @@ class listaFacturaVT(CreateView, ListView):
 	template_name = 'contabilidad/listafacturavt.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaFacturaVT, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -1821,10 +1715,6 @@ class listaCotizacion_tc(CreateView, ListView):
 	template_name = 'contabilidad/listacotizacion_tc.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCotizacion_tc, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -1853,10 +1743,6 @@ class listaCotizacionM(CreateView, ListView):
 	template_name = 'contabilidad/listacotizacion_m.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaCotizacionM, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -1902,7 +1788,7 @@ class uploadCotizacionTC(FormView):
 				aux.append(f2)
 			t_c = sheet.col_values(1, 0)
 			u = sheet.col_values(2, 0)
-			for fecha, tipo_c, ufv in zip(aux, t_c, u):
+			for fecha, tipo_c, ufv in list(zip(aux, t_c, u)):
 				cotizacion, created = Cotizacion.objects.get_or_create(fecha=fecha, tipo_c=tipo_c, ufv=ufv)
 				cotizacion.save()
 			return HttpResponseRedirect(self.success_url)
@@ -1932,7 +1818,7 @@ class uploadCotizacionUFV(FormView):
 				aux.append(f2)
 			t_c = sheet.col_values(1, 0)
 
-			for fecha, tipo_c in zip(aux, t_c):
+			for fecha, tipo_c in list(zip(aux, t_c)):
 				cotizacion, created = Cotizacion_ufv.objects.get_or_create(fecha=fecha, ufv=tipo_c)
 				cotizacion.save()
 			return HttpResponseRedirect(self.success_url)
@@ -1986,7 +1872,7 @@ class uploadNiveldos(FormView):
 			for j in cod:
 				aux1.append(int(j))
 			descr = sheet.col_values(2, 0)
-			for nivel_uno, codigo, descripcion in zip(aux, aux1, descr):
+			for nivel_uno, codigo, descripcion in list(zip(aux, aux1, descr)):
 				cuenta, created = nivel_dos.objects.get_or_create(nivel_uno_id=nivel_uno, codigo=codigo, descripcion=descripcion)
 				cuenta.save()
 			return HttpResponseRedirect(self.success_url)
@@ -2021,7 +1907,7 @@ class uploadNiveltres(FormView):
 			for k in cod:
 				aux2.append(int(k))
 			descr = sheet.col_values(3, 0)
-			for nivel_uno, nivel_dos, codigo, descripcion in zip(aux, aux1, aux2, descr):
+			for nivel_uno, nivel_dos, codigo, descripcion in list(zip(aux, aux1, aux2, descr)):
 				cuenta, created = nivel_tres.objects.get_or_create(nivel_uno_id=nivel_uno, nivel_dos_id=nivel_dos, codigo=codigo, descripcion=descripcion)
 				cuenta.save()
 			return HttpResponseRedirect(self.success_url)
@@ -2060,7 +1946,7 @@ class uploadNivelcuatro(FormView):
 			for l in cod:
 				aux3.append(int(l))
 			descr = sheet.col_values(4, 0)
-			for nivel_uno, nivel_dos, nivel_tres, codigo, descripcion in zip(aux, aux1, aux2, aux3, descr):
+			for nivel_uno, nivel_dos, nivel_tres, codigo, descripcion in list(zip(aux, aux1, aux2, aux3, descr)):
 				cuenta, created = nivel_cuatro.objects.get_or_create(nivel_uno_id=nivel_uno, nivel_dos_id=nivel_dos, nivel_tres_id=nivel_tres, codigo=codigo, descripcion=descripcion)
 				cuenta.save()
 			return HttpResponseRedirect(self.success_url)
@@ -2103,7 +1989,7 @@ class uploadNivelcinco(FormView):
 			for m in cod:
 				aux4.append(int(m))
 			descr = sheet.col_values(5, 0)
-			for nivel_uno, nivel_dos, nivel_tres, nivel_cuatro, codigo, descripcion in zip(aux, aux1, aux2, aux3, aux4, descr):
+			for nivel_uno, nivel_dos, nivel_tres, nivel_cuatro, codigo, descripcion in list(zip(aux, aux1, aux2, aux3, aux4, descr)):
 				cuenta, created = nivel_cinco.objects.get_or_create(nivel_uno_id=nivel_uno, nivel_dos_id=nivel_dos, nivel_tres_id=nivel_tres, nivel_cuatro_id=nivel_cuatro, codigo=codigo, descripcion=descripcion)
 				cuenta.save()
 			return HttpResponseRedirect(self.success_url)
@@ -2127,10 +2013,6 @@ class listaProyecto(CreateView, ListView):
 	template_name = 'contabilidad/listaproyecto.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaProyecto, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -2159,10 +2041,6 @@ class listaProveedorMov(CreateView, ListView):
 	template_name = 'contabilidad/lista_movimiento_proov.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaProveedorMov, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -2255,10 +2133,6 @@ class listaBancarizacion(CreateView, ListView):
 	template_name = 'contabilidad/listabancarizacion.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaBancarizacion, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' and 'car' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -2368,10 +2242,6 @@ class listaLibroMayor(CreateView, ListView):
 	template_name = 'contabilidad/listalibrom.html'
 	def get_context_data(self, **kwargs):
 		context = super(listaLibroMayor, self).get_context_data(**kwargs)
-		parametro = self.request.GET.copy()
-		if parametro.has_key('page'):
-			del parametro['page']
-		context['parametro'] = parametro
 		if 'form' not in context:
 			context['form'] = self.form_class()
 		return context
@@ -2443,10 +2313,10 @@ class listaLibroMayor(CreateView, ListView):
 						saldo.append(saldo[b-1] + aux2[b])
 						saldo_aux.append(saldo_aux[b-1] + aux3[b])
 						b += 1
-			lista = zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'), saldo, saldo_aux)
+			lista = list(zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(campo, campo1)) & Q(Q(nivel_cinco__codigo=campo2)) | Q(nivel_cinco__descripcion=campo2)).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'), saldo, saldo_aux))
 			object_list = lista
 		else:
-			lista = zip(self.model.objects.all().exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('id'), " ", " ")
+			lista = list(zip(self.model.objects.all().exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('id'), " ", " "))
 			object_list = lista
 		return object_list
 
@@ -2580,7 +2450,7 @@ class libroMayorP(PDFTemplateView):
 		context.update({'campo2': fecha2})
 		context.update({'campo3': campo3})
 		context.update({'campo4': campo4})
-		lista = zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'), saldo, saldo_aux)
+		lista = list(zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'), saldo, saldo_aux))
 		context['asi'] = lista
 		return context
 
@@ -2704,6 +2574,7 @@ class FacturasExcel(TemplateView):
 		campo = request.GET.get('campo')
 		campo2 = request.GET.get('campo2')
 		res = Factura.objects.filter(Q(fecha_fac__month=campo) & Q(fecha_fac__year=campo2)).exclude(asiento__encabezadoas__anulado=True, asiento__encabezadoas__cerrado=True)
+		print(res)
 		wb = Workbook()
 		ws = wb.active
 	
@@ -4267,7 +4138,7 @@ class RepLibroMayExcel(TemplateView):
 					saldo_aux.append(saldo_aux[b-1] + aux3[b])
 					b += 1
 
-		lista = zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'), saldo, saldo_aux)
+		lista = list(zip(asiento.objects.filter(Q(encabezadoas__fecha__range=(f1, f2)) & Q(Q(nivel_cinco__codigo=campo3) | Q(nivel_cinco__descripcion=campo3))).exclude(encabezadoas__anulado=True, encabezadoas__cerrado=True).order_by('encabezadoas__fecha'), saldo, saldo_aux))
 		num_queries = len(lista)
 
 		for res, res1, res2 in lista:

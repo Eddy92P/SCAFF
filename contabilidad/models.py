@@ -234,7 +234,7 @@ class nivel_uno(models.Model):
 	def utilidad_bs(self, f1, f2):
 		res = self.debe_b_ter
 
-	def __unicode__(self):
+	def __str__(self):
 		return str(self.id) + " " + self.descripcion
 
 	#Totales para sumas y saldos
@@ -290,7 +290,7 @@ class nivel_dos(models.Model):
 			]
 		)
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.codigo + " " + self.descripcion
 
 	def nivel_tres_related(self):
@@ -422,7 +422,7 @@ class nivel_tres(models.Model):
 			]
 		)
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.codigo + " " + self.descripcion
 
 	def nivel_cuatro_related(self):
@@ -556,7 +556,7 @@ class nivel_cuatro(models.Model):
 			]
 		)
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.codigo + " " + self.descripcion
 
 	def nivel_cinco_related(self):
@@ -696,7 +696,7 @@ class nivel_cinco(models.Model):
 		blank=False,
 		choices=(('1','Bs.'),('2','$us.'))
 		)
-	def __unicode__(self):
+	def __str__(self):
 		return self.codigo + " " + self.descripcion
 
 	def asiento_related(self):
@@ -862,9 +862,9 @@ class encabezadoas(models.Model):
 	cerrado = models.BooleanField(default=False)
 
 	def save_related(self, request, form, formsets, change):
-    		super(encabezadoas, self).save_related(request, form, formsets, change)
-      		encabezadoas = encabezadoas.objects.get(pk=1)
-      		form.instance.encabezadoas.add(encabezadoas)
+		super(encabezadoas, self).save_related(request, form, formsets, change)
+		encabezadoas = encabezadoas.objects.get(pk=1)
+		form.instance.encabezadoas.add(encabezadoas)
 
 	def fecha_f(self):
 		return self.fecha.strftime("%d/%m/%y")
@@ -890,7 +890,7 @@ class encabezadoas(models.Model):
 
 class asiento(models.Model):
 	encabezadoas = models.ForeignKey(encabezadoas, related_name="asientos", on_delete=models.CASCADE)
-	nivel_cinco = models.ForeignKey(nivel_cinco)
+	nivel_cinco = models.ForeignKey(nivel_cinco, on_delete=models.CASCADE)
 	refer = models.CharField(
 		max_length=200,
 		null=False,
@@ -1024,7 +1024,7 @@ class asiento(models.Model):
 
 
 class Factura(models.Model):
-	asiento = models.OneToOneField(asiento)
+	asiento = models.OneToOneField(asiento, on_delete=models.CASCADE)
 	sucursal = models.CharField(
 		max_length=100,
 		null=False,
@@ -1167,7 +1167,7 @@ class Factura(models.Model):
 		form.instance.Factura.add(Factura)
 
 class Factura_V(models.Model):
-	asiento = models.OneToOneField(asiento)
+	asiento = models.OneToOneField(asiento, on_delete=models.CASCADE)
 	sucursal = models.CharField(
 		max_length=100,
 		null=False,
@@ -1361,7 +1361,7 @@ class Proyecto(models.Model):
 		return self.nombre
 
 class bancarizacion(models.Model):
-	factura = models.OneToOneField(Factura)
+	factura = models.OneToOneField(Factura, on_delete=models.CASCADE)
 	modalidad = models.CharField(
 		max_length=10,
 		null=False,

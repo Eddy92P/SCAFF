@@ -34,7 +34,7 @@ def validate_image(image):
 		raise ValidationError(u"El tamaño máximo permitido es de 5 MB")
 
 class Rubro(models.Model):
-	num_cuenta = models.OneToOneField('contabilidad.nivel_cinco')
+	num_cuenta = models.OneToOneField('contabilidad.nivel_cinco', on_delete=models.CASCADE)
 	prefijo = models.CharField(
 		max_length=7,
 		null=False,
@@ -77,7 +77,7 @@ class Rubro(models.Model):
 		default=False
 		)
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.nombre
 
 	def nomb(self):
@@ -214,7 +214,7 @@ class Rubro(models.Model):
 		return result
 
 class Tipo_bien(models.Model):
-	rubro = models.ForeignKey(Rubro)
+	rubro = models.ForeignKey(Rubro, on_delete=models.CASCADE)
 	codigo = models.CharField(
 		default='0',
 		max_length=12,
@@ -296,12 +296,12 @@ class Tipo_bien(models.Model):
 			]
 		)
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.tipo
 
 class personal_aut_act(models.Model):
-	personal = models.ForeignKey('usuarios.personal')
-	alta_activo = models.ForeignKey('Alta_baja_activo')
+	personal = models.ForeignKey('usuarios.personal', on_delete=models.PROTECT)
+	alta_activo = models.ForeignKey('Alta_baja_activo', on_delete=models.PROTECT)
 
 class Ubicacion_gen(models.Model):
 	ubicacion_g = models.CharField(
@@ -316,13 +316,13 @@ class Ubicacion_gen(models.Model):
 			)
 		]
 	)
-	def __unicode__(self):
+	def __str__(self):
 		return self.ubicacion_g
 
 class Alta_baja_activo(models.Model):
 	personal = models.ManyToManyField('usuarios.personal', through='personal_aut_act')
-	tipo_bien = models.ForeignKey(Tipo_bien)
-	ubicacion = models.ForeignKey(Ubicacion_gen)
+	tipo_bien = models.ForeignKey(Tipo_bien, on_delete=models.CASCADE)
+	ubicacion = models.ForeignKey(Ubicacion_gen, on_delete=models.CASCADE)
 	codigo = models.CharField(
 		default='0',
 		max_length=20,
@@ -423,8 +423,8 @@ class Alta_baja_activo(models.Model):
 		default=False
 		)
 
-	def __unicode__(self):
-		return "Activo: " + unicode(self.tipo_bien) + " Ubicación: " + unicode(self.ubicacion) + " Fecha_alta: " + str(self.fecha_alta) + " Valor inicial: " + str(self.valor_inic)
+	def __str__(self):
+		return "Activo: " + str(self.tipo_bien) + " Ubicación: " + str(self.ubicacion) + " Fecha_alta: " + str(self.fecha_alta) + " Valor inicial: " + str(self.valor_inic)
 
 	def cap(self, fecha):
 		return self.capitalizacion_set.filter(alta_activo__tipo_bien__rubro=self.tipo_bien.rubro, fecha_cap__lte=fecha)
@@ -444,6 +444,7 @@ class Alta_baja_activo(models.Model):
 
 	def factor(self, fecha, fecha_ant):
 		f = self.fecha_alta
+		print(fecha_ant)
 		meses = abs((fecha.year - f.year) * 12 + fecha.month - f.month)
 		if (f > fecha_ant) & (f < fecha):
 			ufv_prim = Cotizacion.objects.get(fecha=f).ufv
@@ -487,11 +488,11 @@ class Alta_baja_activo(models.Model):
 		return float(res)
 
 	def valor_actual(self, fecha, fecha_ant):
-		res = self.factor(fecha, fecha_ant) * self.valor_inicial(fecha_ant)
+		res = self.factor(fecha, fecha_ant) * Decimal(self.valor_inicial(fecha_ant))
 		return round(res, 2)
 
 	def actualizacion(self, fecha, fecha_ant):
-		res = self.valor_actual(fecha, fecha_ant) - self.valor_inicial(fecha_ant)
+		res = self.valor_actual(fecha, fecha_ant) - Decimal(self.valor_inicial(fecha_ant))
 		return round(res, 2)
 
 	def depreciacion(self):
@@ -512,7 +513,7 @@ class Alta_baja_activo(models.Model):
 			res = (self.valor_actual(fecha, fecha_ant) * self.depreciacion() / 12 * (meses_res+1)) - cant
 		elif f > fecha_ant:
 			meses1 = abs((fecha.year - f.year) * 12 + fecha.month - f.month)
-			res = self.valor_actual(fecha, fecha_ant) * self.depreciacion() / 12 * (meses1+1)
+			res = self.valor_actual(fecha, fecha_ant) * Decimal(self.depreciacion()) / 12 * (meses1+1)
 		else:
 			res = self.valor_actual(fecha, fecha_ant) * self.depreciacion()
 		return round(res, 2)
@@ -568,12 +569,12 @@ class Alta_baja_activo(models.Model):
 		return round(res, 2)
 
 	def valor_act_deprec_acum(self, fecha, fecha_ant):
-		res = self.deprec_acum_inicial(fecha, fecha_ant) * self.factor(fecha, fecha_ant)
+		res = Decimal(self.deprec_acum_inicial(fecha, fecha_ant)) * self.factor(fecha, fecha_ant)
 		
 		return round(res, 2)
 
 	def actualiz_deprec_acum(self, fecha, fecha_ant):
-		res = self.valor_act_deprec_acum(fecha, fecha_ant) - self.deprec_acum_inicial(fecha, fecha_ant)
+		res = self.valor_act_deprec_acum(fecha, fecha_ant) - Decimal(self.deprec_acum_inicial(fecha, fecha_ant))
 		return round(res, 2)
 
 	def deprec_acum(self, fecha, fecha_ant):
@@ -711,8 +712,8 @@ class Alta_baja_activo(models.Model):
 		return result
 
 class Capitalizacion(models.Model):
-	alta_activo = models.ForeignKey('Alta_baja_activo')
-	item = models.ForeignKey('almacenes.item')
+	alta_activo = models.ForeignKey('Alta_baja_activo', on_delete=models.CASCADE)
+	item = models.ForeignKey('almacenes.item', on_delete=models.CASCADE)
 	valor_inic = models.DecimalField(
 		default=0,
 		max_digits=12,

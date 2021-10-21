@@ -2,7 +2,6 @@
 from django.conf.urls import url, include
 from django.contrib import admin
 from contabilidad.views import *
-from django.contrib.auth.views import login, logout_then_login, password_reset
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.csrf import csrf_exempt
 
@@ -12,6 +11,8 @@ from rest_framework import routers
 from .serializers_views import *
 
 router = routers.DefaultRouter()
+
+app_name = 'contabilidad'
 
 urlpatterns = [
     url(r'^nuevoasiento/$',

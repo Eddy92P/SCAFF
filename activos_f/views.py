@@ -8,7 +8,7 @@ from usuarios.models import *
 from almacenes.models import *
 
 from django.views.generic import ListView, CreateView, UpdateView, FormView, TemplateView
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 
 from easy_pdf.views import PDFTemplateView
@@ -31,7 +31,7 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
 class rubroAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
-		if not self.request.user.is_authenticated():
+		if not self.request.user.is_authenticated:
 			return Rubro.objects.none()
 		qs = Rubro.objects.all().order_by('id')
 		if self.q:
@@ -40,7 +40,7 @@ class rubroAutocomplete(autocomplete.Select2QuerySetView):
 
 class tipo_bienAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
-		if not self.request.user.is_authenticated():
+		if not self.request.user.is_authenticated:
 			return Tipo_bien.objects.none()
 		qs = Tipo_bien.objects.all().order_by('id')
 		rubro = self.forwarded.get('rubro', None)
@@ -154,11 +154,14 @@ class crearAltaActivo(CreateView):
 			persona = crear_personal_form_set.save(commit=False)
 			form1.save()
 			crear_personal_form_set.save()
-			pk1 = self.kwargs['pk']
-			act = salidaitem.objects.get(id=pk1)
-			act.encsalidaitem.estado_act = True
-			act.encsalidaitem.save()
-			return  HttpResponseRedirect(reverse_lazy(self.success_url))
+			try:
+				pk1 = self.kwargs['pk']
+				act = salidaitem.objects.get(id=pk1)
+				act.estado_act = True
+				act.save()
+				return  HttpResponseRedirect(reverse_lazy(self.success_url))
+			except Exception as e:
+				return  HttpResponseRedirect(reverse_lazy(self.success_url))
 		else:
 			return self.render_to_response(self.get_context_data(form=form, crear_personal_form_set = crear_personal_form_set))
 
@@ -313,6 +316,7 @@ class ReporteEspecBien(PDFTemplateView):
 		y_ant = f.year - 1
 		f1 = str(y) + "-09-30"
 		f2 = str(y_ant) + "-09-30"
+		print(f2)
 		fecha1 = f.strftime("%d/%m/%Y")
 		f3 = datetime.datetime.strptime(f1, "%Y-%m-%d")
 		f4 = datetime.datetime.strptime(f2, "%Y-%m-%d")

@@ -75,7 +75,7 @@ class proveedor(models.Model):
 		null=True,
 		blank=True,
 	)
-	def __unicode__(self):
+	def __str__(self):
 		return self.nombre
 
 	class Meta:
@@ -103,8 +103,8 @@ class proveedor(models.Model):
 			return res['total']
 
 class cliente(models.Model):
-	ubicacion_gen = models.ForeignKey('activos_f.Ubicacion_gen')
-	num_cuenta = models.ForeignKey('contabilidad.nivel_cinco')
+	ubicacion_gen = models.ForeignKey('activos_f.Ubicacion_gen', on_delete=models.CASCADE)
+	num_cuenta = models.ForeignKey('contabilidad.nivel_cinco', on_delete=models.CASCADE)
 	nombre = models.CharField(
 		max_length=80,
 		blank=False,
@@ -133,7 +133,7 @@ class cliente(models.Model):
 		null=True,
 		blank=True,
 	)
-	def __unicode__(self):
+	def __str__(self):
 		return self.nombre
 
 	class Meta:
@@ -173,7 +173,7 @@ class tipo_entrada(models.Model):
 				)
 			]
 		)
-	def __unicode__(self):
+	def __str__(self):
 		return self.nombre
 
 	def tipo_ent_importe_excel(self, f1, f2):
@@ -201,7 +201,7 @@ class tipo_salida(models.Model):
 				)
 			]
 		)
-	def __unicode__(self):
+	def __str__(self):
 		return self.nombre
 
 	def tipo_sal_importe_excel(self, f1, f2):
@@ -234,7 +234,7 @@ class unidad(models.Model):
 			]
 		)
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.simbolo
 
 """class almacen(models.Model):
@@ -338,7 +338,7 @@ class unidad(models.Model):
 		return res"""
 
 class categoria(models.Model):
-	num_cuenta = models.OneToOneField('contabilidad.nivel_cinco')
+	num_cuenta = models.OneToOneField('contabilidad.nivel_cinco', on_delete=models.CASCADE)
 	nombre = models.CharField(
 		max_length=100,
 		null=False,
@@ -428,11 +428,11 @@ class categoria(models.Model):
 		res = self.importe_total(f1, f2) - self.importe_total_iva(f1, f2)
 		return res
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.nombre
 
 class subcategoria(models.Model):
-	categoria = models.ForeignKey(categoria)
+	categoria = models.ForeignKey(categoria, on_delete=models.CASCADE)
 	nombre = models.CharField(
 		max_length=100,
 		null=False,
@@ -536,13 +536,13 @@ class subcategoria(models.Model):
 		res = self.importe_total(f1, f2) - self.importe_total_iva(f1, f2)
 		return res
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.nombre
 
 class item(models.Model):
-	categoria = models.ForeignKey(categoria)
-	subcategoria = models.ForeignKey(subcategoria)
-	unidad = models.ForeignKey(unidad)
+	categoria = models.ForeignKey(categoria, on_delete=models.CASCADE)
+	subcategoria = models.ForeignKey(subcategoria, on_delete=models.CASCADE)
+	unidad = models.ForeignKey(unidad, on_delete=models.CASCADE)
 	codigo = models.CharField(
 		max_length=15,
 		unique=True,
@@ -837,18 +837,18 @@ class item(models.Model):
 		res = self.subtotalcat_t_a(f1, c) + self.ingresocat_t(f1, f2, c) - self.salidacat_t(f1, f2, c)
 		return res
 
-	def __unicode__(self):
+	def __str__(self):
 		try:
 		 	return str(self.codigo) + " " + self.nombre + " " + "(" +self.unidad.simbolo + ")" + " " + "-" + " cant. almacen " + str(self.itemalmacen_set.all().get().cantidad) + "(" + self.unidad.simbolo + ")"
 		except Exception as e:
 			return str(self.codigo) + " " + self.nombre + " " + "(" +self.unidad.simbolo + ")" + " " + "-" + " cant. almacen " + '0' + "(" + self.unidad.simbolo + ")"
 
 class item_act(models.Model):
-	item = models.OneToOneField(item)
-	tipo_bien = models.ForeignKey('activos_f.Tipo_bien')
+	item = models.OneToOneField(item, on_delete=models.PROTECT)
+	tipo_bien = models.ForeignKey('activos_f.Tipo_bien', on_delete=models.PROTECT)
 
 class itemalmacen(models.Model):
-	item = models.ForeignKey(item)
+	item = models.ForeignKey(item, on_delete=models.CASCADE)
 	cantidad = models.FloatField(
 		null=False,
 		blank=False,
@@ -863,12 +863,12 @@ class itemalmacen(models.Model):
 		)
 
 class personal_aut(models.Model):
-	personal = models.ForeignKey('usuarios.personal')
-	encingresoitem = models.ForeignKey('encingresoitem')
+	personal = models.ForeignKey('usuarios.personal', on_delete=models.PROTECT)
+	encingresoitem = models.ForeignKey('encingresoitem', on_delete=models.PROTECT)
 
 class encingresoitem(models.Model):
-	tipo_entrada = models.ForeignKey(tipo_entrada)
-	proveedor = models.ForeignKey(proveedor)
+	tipo_entrada = models.ForeignKey(tipo_entrada, on_delete=models.CASCADE)
+	proveedor = models.ForeignKey(proveedor, on_delete=models.CASCADE)
 	personal = models.ManyToManyField('usuarios.personal', through='personal_aut')
 	fecha = models.DateField(
 		null=False,
@@ -943,8 +943,8 @@ class encingresoitem(models.Model):
 		return subcategoria.objects.filter(item__ingresoitem__encingresoitem=self)
 
 class ingresoitem(models.Model):
-	encingresoitem = models.ForeignKey(encingresoitem)
-	item = models.ForeignKey(item)
+	encingresoitem = models.ForeignKey(encingresoitem, on_delete=models.CASCADE)
+	item = models.ForeignKey(item, on_delete=models.CASCADE)
 	cantidad = models.FloatField(
 		default=0,
 		null=False,
@@ -1052,13 +1052,13 @@ class ingresoitem(models.Model):
 			return res['total']
 
 class personal_aut_s(models.Model):
-	personal = models.ForeignKey('usuarios.personal')
-	encsalidaitem = models.ForeignKey('encsalidaitem')
+	personal = models.ForeignKey('usuarios.personal', on_delete=models.PROTECT)
+	encsalidaitem = models.ForeignKey('encsalidaitem', on_delete=models.PROTECT)
 
 class encsalidaitem(models.Model):
-	tipo_salida = models.ForeignKey(tipo_salida)
+	tipo_salida = models.ForeignKey(tipo_salida, on_delete=models.CASCADE)
 	personal = models.ManyToManyField('usuarios.personal', through='personal_aut_s')
-	cliente = models.ForeignKey(cliente)
+	cliente = models.ForeignKey(cliente, on_delete=models.CASCADE)
 	fecha = models.DateField(
 		null=False,
 		blank=False
@@ -1127,8 +1127,8 @@ class encsalidaitem(models.Model):
 		return res['total']
 
 class salidaitem(models.Model):
-	encsalidaitem = models.ForeignKey(encsalidaitem)
-	item = models.ForeignKey(item)
+	encsalidaitem = models.ForeignKey(encsalidaitem, on_delete=models.CASCADE)
+	item = models.ForeignKey(item, on_delete=models.CASCADE)
 	cantidad = models.FloatField(
 		null=False,
 		blank=False,
@@ -1162,6 +1162,9 @@ class salidaitem(models.Model):
 	estado_cap = models.BooleanField(
 		default=False
 		)
+	estado_act = models.BooleanField(
+		default=False
+	)
 
 	def encabezado_f(self):
 		return self.encsalidaitem.fecha

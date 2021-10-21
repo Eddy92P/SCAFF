@@ -183,5 +183,5 @@ class personal(models.Model):
 	def fecha_f(self):
 		return self.fecha_ingreso.strftime("%d/%m/%y")
 
-	def __unicode__(self):
+	def __str__(self):
 		return self.nombre + " " + self.ap_paterno + " " + self.ap_materno

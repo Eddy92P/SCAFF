@@ -17,7 +17,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 
 from django.views.generic import RedirectView
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 
 
@@ -25,14 +25,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 import debug_toolbar
+
 urlpatterns = [
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api-auth/', include(('rest_framework.urls'), namespace='rest_framework')),
     url(r'^admin/', admin.site.urls),
-    url(r'^personal/', include('usuarios.urls', namespace='personal')),
-    url(r'^contabilidad/', include('contabilidad.urls', namespace='contabilidad')),
-    url(r'^almacenes/', include('almacenes.urls', namespace='almacenes')),
-    url(r'^activos_f/', include('activos_f.urls', namespace='activos_f')),
-    #url(r'^chaining/', include('smart_selects.urls')),
-    #url(r'^proyectos/', include('Proyectos.urls', namespace='proyectos')),
+    url(r'^personal/', include(('usuarios.urls'), namespace='personal')),
+    url(r'^contabilidad/', include(('contabilidad.urls'), namespace='contabilidad')),
+    url(r'^almacenes/', include(('almacenes.urls'), namespace='almacenes')),
+    url(r'^activos_f/', include(('activos_f.urls'), namespace='activos_f')),
     url(r'^$', RedirectView.as_view(url=reverse_lazy('personal:main')), name='home'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

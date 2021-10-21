@@ -537,7 +537,7 @@ class repCostoServicioForm(forms.Form):
 	campo1 = forms.CharField(label="Hasta", help_text="", widget=Html5DateInput(format='%Y-%m-%d', attrs={'class':'form-control'}))
 
 class XlsInputForm(forms.Form):
-	input_excel = forms.FileField(required=True, label=' ', help_text='Seleccione un archivo en formato .xls ó .xlsx', widget=forms.FileInput(attrs={'class':'form-control', 'accept':'.xls,.xlsx'}))
+	input_excel = forms.FileField(required=True, label=' ', help_text='Seleccione un archivo en formato .xls (El formato .xlsx ya no es soportado)', widget=forms.FileInput(attrs={'class':'form-control', 'accept':'.xls,.xlsx'}))
 
 	def clean_input_excel(self):
 		IMPORT_FILE_TYPES = ['.xlsx','.xls']

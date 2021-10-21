@@ -8,7 +8,7 @@ from contabilidad.views import *
 # Create your views here.
 
 from django.views.generic import ListView, CreateView, UpdateView, FormView, TemplateView
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 
 from easy_pdf.views import PDFTemplateView
@@ -229,7 +229,7 @@ class listaUnidad(CreateView,ListView):
 
 class categoriaAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
-		if not self.request.user.is_authenticated():
+		if not self.request.user.is_authenticated:
 			return categoria.objects.none()
 		qs = categoria.objects.all().order_by('id')
 		if self.q:
@@ -238,7 +238,7 @@ class categoriaAutocomplete(autocomplete.Select2QuerySetView):
 
 class subcategoriaAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
-		if not self.request.user.is_authenticated():
+		if not self.request.user.is_authenticated:
 			return subcategoria.objects.none()
 		qs = subcategoria.objects.all().order_by('id')
 		categoria = self.forwarded.get('categoria', None)
@@ -250,7 +250,7 @@ class subcategoriaAutocomplete(autocomplete.Select2QuerySetView):
 
 class itemAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
-		if not self.request.user.is_authenticated():
+		if not self.request.user.is_authenticated:
 			return item.objects.none()
 		qs = item.objects.all().order_by('codigo')
 		if self.q:
@@ -259,7 +259,7 @@ class itemAutocomplete(autocomplete.Select2QuerySetView):
 
 class itemActAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
-		if not self.request.user.is_authenticated():
+		if not self.request.user.is_authenticated:
 			return item.objects.none()
 		qs = item.objects.filter(activo_f=True).order_by('codigo')
 		if self.q:
@@ -268,7 +268,7 @@ class itemActAutocomplete(autocomplete.Select2QuerySetView):
 
 class personalAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
-		if not self.request.user.is_authenticated():
+		if not self.request.user.is_authenticated:
 			return personal.objects.none()
 		qs = personal.objects.all().order_by('id')
 		if self.q:
@@ -277,7 +277,7 @@ class personalAutocomplete(autocomplete.Select2QuerySetView):
 
 class proveedorAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
-		if not self.request.user.is_authenticated():
+		if not self.request.user.is_authenticated:
 			return proveedor.objects.none()
 		qs = proveedor.objects.all().order_by('id')
 		if self.q:
@@ -286,7 +286,7 @@ class proveedorAutocomplete(autocomplete.Select2QuerySetView):
 
 class clienteAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
-		if not self.request.user.is_authenticated():
+		if not self.request.user.is_authenticated:
 			return cliente.objects.none()
 		qs = cliente.objects.all().order_by('id')
 		if self.q:
@@ -295,7 +295,7 @@ class clienteAutocomplete(autocomplete.Select2QuerySetView):
 
 class ubicacionAutocomplete(autocomplete.Select2QuerySetView):
 	def get_queryset(self):
-		if not self.request.user.is_authenticated():
+		if not self.request.user.is_authenticated:
 			return Ubicacion_gen.objects.none()
 		qs = Ubicacion_gen.objects.all().order_by('id')
 		if self.q:
@@ -450,6 +450,7 @@ class crearItem(CreateView):
 		form = self.form_class(request.POST)
 		if form.is_valid():
 			form = form.save(commit=False)
+			print(form.subcategoria.codigo)
 			aux = str(form.subcategoria.categoria.id) + '-' + form.subcategoria.codigo + '-' + form.codigo.zfill(4)
 			form.codigo = aux
 			form.save()
@@ -650,14 +651,14 @@ class updateIngresoItem(UpdateView):
 				a = itemalmacen.objects.get_or_create(item = formset.item)
 				i = ingresoitem.objects.filter(item = formset.item, encingresoitem=pk1, id=formset.id).order_by('id').aggregate(total=Sum('cantidad'))
 				if a[0].cantidad >= formset.item.maximo:
-					return self.render_to_response(self.get_context_data(form = form, crear_ingreso_form_set = crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error='El almacen se encuentra lleno, realice salidas del item ' + a.item.nombre))
+					return self.render_to_response(self.get_context_data(form = form, crear_ingreso_form_set = crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error='El almacen se encuentra lleno, realice salidas del item ' + a[0].item.nombre))
 				elif formset.cantidad >= formset.item.maximo:
-					return self.render_to_response(self.get_context_data(form = form, crear_ingreso_form_set = crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad excede el maximo permitido de '+ str(formset.item.maximo) + ' del item ' + a.item.nombre + ', por favor verifique los datos'))
+					return self.render_to_response(self.get_context_data(form = form, crear_ingreso_form_set = crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad excede el maximo permitido de '+ str(formset.item.maximo) + ' del item ' + a[0].item.nombre + ', por favor verifique los datos'))
 				else:
 					if i['total'] == None:
 						a[0].cantidad = a[0].cantidad + formset.cantidad
 						if a[0].cantidad >= formset.item.maximo:
-							return self.render_to_response(self.get_context_data(form = form, crear_ingreso_form_set = crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad excede el maximo permitido de '+ str(formset.item.maximo) + ' del item ' + a.item.nombre + ', por favor verifique los datos'))
+							return self.render_to_response(self.get_context_data(form = form, crear_ingreso_form_set = crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad excede el maximo permitido de '+ str(formset.item.maximo) + ' del item ' + a[0].item.nombre + ', por favor verifique los datos'))
 						elif a[0].cantidad < formset.item.minimo:
 							return self.render_to_response(self.get_context_data(form = form, crear_ingreso_form_set = crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad esta por debajo del minimo permitido de '+ str(formset.item.minimo) + ' del item ' + a[0].item.nombre + ', por favor verifique los datos'))
 						else:
@@ -666,14 +667,14 @@ class updateIngresoItem(UpdateView):
 						aux = formset.cantidad - i['total']
 						a[0].cantidad = a[0].cantidad + aux
 						if a[0].cantidad >= formset.item.maximo:
-							return self.render_to_response(self.get_context_data(form = form, crear_ingreso_form_set = crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad excede el maximo permitido de '+ str(formset.item.maximo) + ' del item ' + a.item.nombre + ', por favor verifique los datos'))
+							return self.render_to_response(self.get_context_data(form = form, crear_ingreso_form_set = crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad excede el maximo permitido de '+ str(formset.item.maximo) + ' del item ' + a[0].item.nombre + ', por favor verifique los datos'))
 						else:
 							a[0].save()
 					elif(formset.cantidad < i['total']):
 						aux = i['total'] - formset.cantidad
 						a[0].cantidad = a[0].cantidad - aux
 						if a[0].cantidad >= formset.item.maximo:
-							return self.render_to_response(self.get_context_data(form = form, crear_ingreso_form_set = crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad excede el maximo permitido de '+ str(formset.item.maximo) + ' del item ' + a.item.nombre + ', por favor verifique los datos'))
+							return self.render_to_response(self.get_context_data(form = form, crear_ingreso_form_set = crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad excede el maximo permitido de '+ str(formset.item.maximo) + ' del item ' + a[0].item.nombre + ', por favor verifique los datos'))
 						elif a[0].cantidad < formset.item.minimo:
 							return self.render_to_response(self.get_context_data(form = form, crear_ingreso_form_set = crear_ingreso_form_set, crear_personal_form_set = crear_personal_form_set, error='La cantidad esta por debajo del minimo permitido de '+ str(formset.item.minimo) + ' del item ' + a[0].item.nombre + ', por favor verifique los datos'))
 						else:
@@ -1024,7 +1025,7 @@ class reporteKardexVal(PDFTemplateView):
 				saldo.append(op)
 				saldo1.append(op1)
 
-		lista_res = zip(lista, saldo, saldo1)
+		lista_res = list(zip(lista, saldo, saldo1))
 		context['cant_e'] = suma_c_e
 		context['sub_e'] = suma_sub_e
 		context['cant_s'] = suma_c_s
@@ -1216,7 +1217,7 @@ class resumenKardex(PDFTemplateView):
 			for i in saldo_sub_t:
 				tot_saldo = tot_saldo + i
 	
-			lista = zip(res, salida, saldo_c_t, saldo_sub_t, saldo_c_a, saldo_sub_a)
+			lista = list(zip(res, salida, saldo_c_t, saldo_sub_t, saldo_c_a, saldo_sub_a))
 	
 			context['res'] = lista
 			context['total_a'] = tot_saldo_a
@@ -1500,7 +1501,7 @@ class uploadCotizacionTC(FormView):
 				aux.append(f2)
 			t_c = sheet.col_values(1, 0)
 			u = sheet.col_values(2, 0)
-			for fecha, tipo_c, ufv in zip(aux, t_c, u):
+			for fecha, tipo_c, ufv in list(zip(aux, t_c, u)):
 				cotizacion, created = Cotizacion.objects.get_or_create(fecha=fecha, tipo_c=tipo_c, ufv=ufv)
 				cotizacion.save()
 			return HttpResponseRedirect(self.success_url)
@@ -2042,7 +2043,7 @@ class RepKardexValExcel(TemplateView):
 				saldo.append(op)
 				saldo1.append(op1)
 
-		lista_res = zip(lista, saldo, saldo1)
+		lista_res = list(zip(lista, saldo, saldo1))
 		num_queries = len(lista_res)
 
 		for i, j, k in lista_res:
@@ -2355,7 +2356,7 @@ class RepResKardexValExcel(TemplateView):
 		for i in saldo_sub_t:
 			tot_saldo = tot_saldo + i
 
-		lista = zip(res, salida, saldo_c_t, saldo_sub_t, saldo_c_a, saldo_sub_a)
+		lista = list(zip(res, salida, saldo_c_t, saldo_sub_t, saldo_c_a, saldo_sub_a))
 		num_queries = len(lista)
 
 		for i, j, k, l, m, n in lista:
