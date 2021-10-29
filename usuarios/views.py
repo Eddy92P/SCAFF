@@ -63,7 +63,6 @@ class updateUsuario(UpdateView):
 		if 'form' not in context or 'form2' not in context:
 			context['form'] = self.form_class(instance=modelRes)
 			context['form2'] = self.second_form_class(instance=modelRes2)
-			print(context)
 		return context
 	def post(self, request, *args, **kwargs):
 		self.object = self.get_object	
@@ -73,16 +72,12 @@ class updateUsuario(UpdateView):
 
 		form = self.form_class(request.POST,instance=modelRes)
 		form2 = self.second_form_class(request.POST,request.FILES, instance=modelRes2)
-		#print (form.is_valid())
-		#print (form2.is_valid())
 		if form.is_valid() and form2.is_valid():
-			#print ("paso")
 			form2Save = form2.save(commit=False)
 			form2Save.user = form.save()
 			form2Save.save()
 			return  HttpResponseRedirect(self.succes_url)
 		else:
-			#print ("paso2")
 			return self.render_to_response(self.get_context_data(form=form, form2=form2))
 
 #actualisa datos del usuario actual logeado
@@ -136,15 +131,9 @@ class listaUsuario(CreateView, ListView):
 		id = None
 		if self.request.method == "GET":
 			form = self.form_class(self.request.GET)
-			print (form.is_valid())
 			if form.is_valid():
-				print(self.request.GET)
-				print(form)
 				id = form.cleaned_data['search']
-				#kwargs['id']
-				print(id)
 		if (id):
-			#object_list = self.model.objects.filter(name__icontains = id)
 			object_list = self.model.objects.filter(id = id, is_staff=False)
 		else:
 			object_list = self.model.objects.all().filter(is_staff=False).order_by('id')
@@ -163,8 +152,6 @@ class agregarPermisos(FormView):
 										'mod_contabilidad':user.has_perm('auth.view_contabilidad'),
 										'mod_almacenes':user.has_perm('auth.view_almacenes'),
 										'mod_activos_f':user.has_perm('auth.view_activos_f')})
-		#form.fields["mod_personal"] = True
-		#print(form)
 		if 'form' in context :
 			context['form'] = form
 			context['user'] = user
@@ -195,7 +182,6 @@ class agregarPermisos(FormView):
 
 			return  HttpResponseRedirect(self.succes_url)
 		else:
-			print ("paso2")
 			return self.render_to_response(self.get_context_data(form=form))
 
 class crearCargo(CreateView):
@@ -226,13 +212,9 @@ class listaCargo(CreateView,ListView):
 		id = None
 		if self.request.method == "GET":
 			form = self.form_class(self.request.GET)
-			print (form.is_valid())
 			if form.is_valid():
-				print(self.request.GET)
-				print(form)
 				id = form.cleaned_data['search']
 				#kwargs['id']
-				print(id)
 		if (id):
 			#object_list = self.model.objects.filter(name__icontains = id)
 			object_list = self.model.objects.filter(pk=id)
